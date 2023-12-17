@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace GamesForClass {  
         public partial class TicTacToe : Form
         {
-        int[] choices = new int[] {0, 0, 0, 0};
+        int choices = 0;
         bool complete = false;
             public TicTacToe()
             {
@@ -248,24 +248,164 @@ namespace GamesForClass {
         /* Runs AI for Tic-Tac-Toe */
         private void runAI()
         {
-            bool run = true;
-            while (run)
-            {
-                //If the maximum number of choices has not been made yet
-                if (choices[3] == 0)
+           //middle strat, if AI can take middle it will do. Then tries to get corners
+           if (button5.Text == "" || button5.Text == "O")
+           {
+                if (button5.Text == "")
                 {
-                    //make a new choice
-                    Random rnd = new Random();
-                    if (fillO(rnd.Next(1, 9)))
+                    button5.Text = "O";
+                } 
+                else
+                {
+                    bool choiceMade = false;
+                    //checks if a corner has already been chosen, and if it can fill the opposite corner
+                    if (button1.Text == "O")
                     {
-                        run = false;
+                        choiceMade = fillO(9);
                     }
-                } else
-                {
-                    run = false;
+                    else if (button3.Text == "O")
+                    {
+                        choiceMade = fillO(7);
+                    }
+                    else if (button7.Text == "O")
+                    {
+                        choiceMade = fillO(6);
+                    }
+                    else if (button9.Text == "O")
+                    {
+                        choiceMade = fillO(1);
+                    }
+                    //If the opposite corner has been taken, or no corners taken already, runs random chooser
+                    if (!choiceMade)
+                    {
+                        //If all corners have been taken already, lowest value space
+                        if (button1.Text != "" && button3.Text != "" && button7.Text != "" && button9.Text != "")
+                        {
+                            int[] index = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                            int i = 0;
+                            while (!fillO(index[i]))
+                            {
+                                i++;
+                            }
+                        }
+                        else if (button1.Text == "X" || button9.Text == "X")
+                        {
+                            if (!fillO(7))
+                            {
+                                fillO(3);
+                            }
+                        }
+                        else
+                        {
+                            if (fillO(1))
+                            {
+                                fillO(9);
+                            }
+                        }
+                    }
                 }
-            }
-
+           }
+           //play defensive strat
+           else
+           {
+                bool choiceMade = false;
+                //if player has chosen top row
+                if (button1.Text == "X" || button2.Text == "X" || button3.Text == "X")
+                {
+                    if (!fillO(2))
+                    {
+                        if (!fillO(1))
+                        {
+                            if (fillO(3))
+                            {
+                                choiceMade = true;
+                            }
+                        } else
+                        {
+                            choiceMade = true;
+                        }
+                    } else
+                    {
+                        choiceMade = true;
+                    }
+                }
+                //if player has chosen bottom row
+                if (!choiceMade && button7.Text == "X" || button9.Text == "X" || button8.Text == "X")
+                {
+                    if (!fillO(8))
+                    {
+                        if (!fillO(7))
+                        {
+                            if (fillO(9))
+                            {
+                                choiceMade = true;
+                            }
+                        }
+                        else
+                        {
+                            choiceMade = true;
+                        }
+                    }
+                    else
+                    {
+                        choiceMade = true;
+                    }
+                }
+                //if player has chosen left column
+                if (!choiceMade && button1.Text == "X" || button4.Text == "X" || button7.Text == "X")
+                {
+                    if (!fillO(4))
+                    {
+                        if (!fillO(1))
+                        {
+                            if (fillO(7))
+                            {
+                                choiceMade = true;
+                            }
+                        }
+                        else
+                        {
+                            choiceMade = true;
+                        }
+                    }
+                    else
+                    {
+                        choiceMade = true;
+                    }
+                }
+                //if player has chosen right column
+                if (!choiceMade && button3.Text == "X" || button6.Text == "X" || button9.Text == "X")
+                {
+                    if (!fillO(6))
+                    {
+                        if (!fillO(3))
+                        {
+                            if (fillO(9))
+                            {
+                                choiceMade = true;
+                            }
+                        }
+                        else
+                        {
+                            choiceMade = true;
+                        }
+                    }
+                    else
+                    {
+                        choiceMade = true;
+                    }
+                }
+                //if the choice does not fall into these categories, makes random choice
+                if (!choiceMade)
+                {
+                    Random rnd = new Random();
+                    int val = rnd.Next(1, 10);
+                    while (!fillO(val))
+                    {
+                        val = rnd.Next(1, 10);
+                    }
+                }
+           }
         }
         private void checkWinner()
         {
@@ -414,6 +554,7 @@ namespace GamesForClass {
             button9.Text = "";
             complete = false;
             label7.Text = "";
+            choices = 0;
         }
     }
     
