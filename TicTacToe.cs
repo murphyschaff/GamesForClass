@@ -253,14 +253,17 @@ namespace GamesForClass {
             if (difficulty == 0)
             {
                 easyAI();
+                choices++;
             }
             else if (difficulty == 1)
             {
                 mediumAI();
+                choices++;
             }
             else
             {
                 hardAI();
+                choices++;
             }      
         }
         /*
@@ -547,32 +550,57 @@ namespace GamesForClass {
                 else
                 {
                     //attempt to set up auto win through filling middle and two corners, if it cannot fills randomly
-                    if (button5.Text == "" || button5.Text == "O")
+                    int val = 1;
+                    if (choices == 0)
                     {
-                        if (button5.Text == "")
+                        Random rnd = new Random();
+                        val = rnd.Next(1,100);
+                    }
+                    if (val < 70)
+                    {
+                        if (button5.Text == "" || button5.Text == "O")
                         {
-                            fillO(5);
-                        }
-                        else
-                        {
-                            if (!fillO(7))
+                            if (button5.Text == "")
                             {
-                                if (!fillO(9))
+                                fillO(5);
+                            }
+                            else
+                            {
+                                if (!fillO(7))
                                 {
-                                    if (!fillO(1))
+                                    if (!fillO(9))
                                     {
-                                        if (!fillO(3))
+                                        if (!fillO(1))
                                         {
-                                            easyAI();
+                                            if (!fillO(3))
+                                            {
+                                                easyAI();
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    } 
+                        else
+                        {
+                            easyAI();
+                        }
+                    }
                     else
                     {
-                        easyAI();
+                        if (!fillO(7))
+                        {
+                            if (!fillO(9))
+                            {
+                                if (!fillO(1))
+                                {
+                                    if (!fillO(3))
+                                    {
+                                        easyAI();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -674,19 +702,23 @@ namespace GamesForClass {
         private void button12_Click(object sender, EventArgs e)
         {
             difficulty = 0;
-            label10.Text = "Easy"
+            label10.Text = "Easy";
+            newGame();
 ;        }
         //Medium
         private void button13_Click(object sender, EventArgs e)
         {
             difficulty = 1;
             label10.Text = "Medium";
+            newGame();
         }
         //Hard
         private void button14_Click(object sender, EventArgs e)
         {
             difficulty = 2;
             label10.Text = "Hard";
+            newGame();
+
         }
         /* button that resets the score */
         private void button10_Click(object sender, EventArgs e)
@@ -696,6 +728,11 @@ namespace GamesForClass {
         }
         /*starts a new game */
         private void button11_Click(object sender, EventArgs e)
+        {
+            newGame();
+        }
+        /* creates a new game */
+        private void newGame()
         {
             button1.Text = "";
             button2.Text = "";
@@ -709,6 +746,11 @@ namespace GamesForClass {
             complete = false;
             label7.Text = "";
             choices = 0;
+            if (difficulty == 2)
+            {
+                hardAI();
+                choices++;
+            }
         }
     }
     
