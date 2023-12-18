@@ -550,40 +550,27 @@ namespace GamesForClass {
                 else
                 {
                     //attempt to set up auto win through filling middle and two corners, if it cannot fills randomly
-                    int val = 1;
                     if (choices == 0)
                     {
-                        Random rnd = new Random();
-                        val = rnd.Next(1,100);
-                    }
-                    if (val < 70)
-                    {
-                        if (button5.Text == "" || button5.Text == "O")
+                        if (button1.Text == "X")
                         {
-                            if (button5.Text == "")
-                            {
-                                fillO(5);
-                            }
-                            else
-                            {
-                                if (!fillO(7))
-                                {
-                                    if (!fillO(9))
-                                    {
-                                        if (!fillO(1))
-                                        {
-                                            if (!fillO(3))
-                                            {
-                                                easyAI();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            fillO(9);
+                        }
+                        else if (button3.Text == "X")
+                        {
+                            fillO(7);
+                        }
+                        else if (button7.Text == "X")
+                        {
+                            fillO(3);
+                        }
+                        else if (button9.Text == "X")
+                        {
+                            fillO(1);
                         }
                         else
                         {
-                            easyAI();
+                            fillO(5);
                         }
                     }
                     else
@@ -746,11 +733,6 @@ namespace GamesForClass {
             complete = false;
             label7.Text = "";
             choices = 0;
-            if (difficulty == 2)
-            {
-                hardAI();
-                choices++;
-            }
         }
     }
     
