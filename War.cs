@@ -153,14 +153,14 @@ namespace GamesForClass
                     }
                     //adds the graphics for the tie
                     label3.Text = "Round Tie!";
+                    label10.Visible = true;
+                    label11.Visible = true;
+                    label12.Visible = true;
+                    label13.Visible = true;
+                    label14.Visible = true;
+                    label15.Visible = true;
                     label17.Visible = true;
                     label16.Visible = true;
-                    label15.Visible = true;
-                    label14.Visible = true;
-                    label13.Visible = true;
-                    label12.Visible = true;
-                    label11.Visible = true;
-                    label10.Visible = true;
                     label10.Text = Convert.ToString(CPUDownCards.Count);
                     label13.Text = Convert.ToString(playerDownCards.Count);
 

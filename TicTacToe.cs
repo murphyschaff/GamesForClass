@@ -570,7 +570,19 @@ namespace GamesForClass {
                         }
                         else
                         {
-                            fillO(5);
+                            if (!fillO(7))
+                            {
+                                if (!fillO(9))
+                                {
+                                    if (!fillO(1))
+                                    {
+                                        if (!fillO(3))
+                                        {
+                                            easyAI();
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     else
