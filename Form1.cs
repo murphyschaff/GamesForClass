@@ -15,6 +15,7 @@ namespace GamesForClass
     {
         private TicTacToe ticTac;
         private War war;
+        private Battleship ship;
         public Form1()
         {
             InitializeComponent();
@@ -25,11 +26,17 @@ namespace GamesForClass
             ticTac = new TicTacToe();
             ticTac.Show();
         }
-
+        /* War */
         private void button2_Click(object sender, EventArgs e)
         {
             war = new War();
             war.Show();
+        }
+        /* Battleship */
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ship = new Battleship();
+            ship.Show();
         }
     }
 }
