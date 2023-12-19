@@ -22,6 +22,7 @@ namespace GamesForClass
         }
         public void initBattleship()
         {
+            //creates and adds blank boards to both player and CPU player
             String[][] blankBoard = new String[9][];
             for (int i = 0; i < blankBoard.Length; i++)
             {
@@ -39,6 +40,7 @@ namespace GamesForClass
             if (isplayer) {
                 if (placePlayerShip())
                 {
+                    //places down the new board results into label (NEEDS MORE SPACES AND NEW LINES)
                     String[][] board = player.getBoard();
                     String output ="";
                     for (int i = 0;i < board.Length; i++)
@@ -80,7 +82,8 @@ namespace GamesForClass
                 counter++;
             }
 
-            if (counter > 3)
+            //makes sure correct number of coordinates was entered
+            if (counter == 4)
             {
                 //checks validity of coordinates based on ship type
                 if (validatePlaceCoords(shipType, startCoords, endCoords))
@@ -96,7 +99,7 @@ namespace GamesForClass
             }
             else
             {
-                label6.Text = "Please enter correct number of coordinates";
+                label6.Text = "Please enter correct number of coordinates (4 total numbers)";
                 return false;
             }
         }
@@ -243,6 +246,7 @@ namespace GamesForClass
             updateBoard(true);
         }
     }
+    /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
     {
         String[][] board = new String[9][];
