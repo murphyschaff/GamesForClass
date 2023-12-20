@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using static System.Windows.Forms.AxHost;
+using System.Runtime.CompilerServices;
+using System.Diagnostics.Tracing;
+using System.Security.Policy;
+using System.Xml.Linq;
 
 namespace GamesForClass
 {
@@ -23,17 +27,17 @@ namespace GamesForClass
         }
         public void initBattleship()
         {
+            String[][] guessBoard = new string[9][];
             //creates and adds blank boards to both player and CPU player
-            String[][] blankBoard = new String[9][];
-            for (int i = 0; i < blankBoard.Length; i++)
+            for (int i = 0; i < guessBoard.Length; i++)
             {
-                for (int j = 0; j < blankBoard[i].Length; j++)
+                for (int j = 0; j < guessBoard[i].Length; j++)
                 {
-                    blankBoard[i][j] = "_";
+                    guessBoard[i][j] = "_";
                 }
             }
-            player.setBoard(blankBoard);
-            CPU.setBoard(blankBoard);
+            player.setBoard(guessBoard);
+            CPU.setBoard(guessBoard);
         }
         //Updates graphics on board
         public void updateBoard(bool isplayer)
@@ -61,6 +65,50 @@ namespace GamesForClass
                     output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
                 }
                 label1.Text = output;
+            }
+        }
+        //Places guess on board, tells player if it was a hit or not (Assumes valid coordinates)
+        public void makeGuess(BattleshipPlayer user, int[] coords)
+        {
+            String[][] board = user.getBoard();
+            String[][] guessBoard = user.getGuessBoard();
+            Ship[,] ships = user.getShips();
+
+            
+            //Is a hit
+            if (board[coords[0]-1][coords[1]-1] == "X")
+            {
+                guessBoard[coords[0] - 1][coords[1] - 1] = "X";
+                Ship ship = ships[coords[0]-1,coords[1]-1];
+                ship.hit();
+                if (ship.isSunk())
+                {
+                    label11.Text = String.Format("You sunk a {0}!", ship.getName());
+                }
+                else
+                {
+                    label11.Text = "You hit a ship!";
+                }
+            }
+            else
+            {
+                guessBoard[coords[0] - 1][coords[1] - 1] = "O";
+                label11.Text = "You missed.";
+            }
+
+            //run computer guess
+ 
+        }
+        //makes sure guess coordinates are within the board
+        public bool valGuessCoords(int[] coords)
+        {
+            if (coords[0] < 1 || coords[1] < 1 || coords[0] > 9 || coords[1] > 9)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
         /* places player ship on board */
@@ -96,9 +144,30 @@ namespace GamesForClass
                 //checks validity of coordinates based on ship type
                 if (validatePlaceCoords(shipType, startCoords, endCoords))
                 {
-                    player.addShipToBoard(startCoords, endCoords);
-                    label6.Text = "Ship Placed!";
-                    return true;
+                    if (shipType == "Aircraft Carrier (Size: 4)")
+                    {
+                        player.addShipToBoard("Aircraft Carrier", 4, startCoords, endCoords);
+                        label6.Text = "Ship Placed!";
+                        return true;
+                    }
+                    else if (shipType == "Battleship (Size: 3)")
+                    {
+                        player.addShipToBoard("Battleship", 3, startCoords, endCoords);
+                        label6.Text = "Ship Placed!";
+                        return true;
+                    }
+                    else if (shipType == "Destroyer (Size: 2)")
+                    {
+                        player.addShipToBoard("Destroyer", 2, startCoords, endCoords);
+                        label6.Text = "Ship Placed!";
+                        return true;
+                    }
+                    else
+                    {
+                        player.addShipToBoard("Submarine", 1, startCoords, endCoords);
+                        label6.Text = "Ship Placed!";
+                        return true;
+                    }
                 }
                 else
                 {
@@ -197,11 +266,49 @@ namespace GamesForClass
         {
             updateBoard(false);
         }
+        //button that runs the make guess sequence
+        private void button2_Click(object sender, EventArgs e)
+        {
+            String expr = @"[0-9]";
+            MatchCollection mc = Regex.Matches(textBox2.Text, expr);
+            int[] coords = new int[2];
+            int i = 0;
+            int counter = 0;
+            //gets coordinates from UI
+            foreach (Match m in mc)
+            {
+                GroupCollection group = m.Groups;
+                if (counter < 2)
+                {
+                    coords[i] = Convert.ToInt32(group[0].Value);
+                }
+                i++;
+                counter++;
+            }
+            if (counter == 2)
+            {
+                //player is making guess, send CPU
+                if (valGuessCoords(coords))
+                {
+                    makeGuess(CPU, coords);
+                }
+                else
+                {
+                    label11.Text = "Please enter valid coordinates";
+                }
+            } 
+            else
+            {
+                label11.Text = "Please enter valid coordinates";
+            }
+        }
     }
     /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
     {
         private String[][] board = new String[9][];
+        private String[][] guessBoard = new String[9][];
+        Ship[,] ships = new Ship[9, 9];
         public BattleshipPlayer()
         {
             board[0] = new String[9];
@@ -213,15 +320,27 @@ namespace GamesForClass
             board[6] = new String[9];
             board[7] = new String[9];
             board[8] = new String[9];
+            guessBoard[0] = new String[9];
+            guessBoard[1] = new String[9];
+            guessBoard[2] = new String[9];
+            guessBoard[3] = new String[9];
+            guessBoard[4] = new String[9];
+            guessBoard[5] = new String[9];
+            guessBoard[6] = new String[9];
+            guessBoard[7] = new String[9];
+            guessBoard[8] = new String[9];
+            Ship blankShip = new Ship(0, "None");
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
                     board[i][j] = "_";
+                    guessBoard[i][j] = "_";
+                    ships[i, j] = blankShip;
                 }
             }
         }
-
+        //Getters and setters
         public String[][] getBoard()
         {
             return board;
@@ -230,12 +349,23 @@ namespace GamesForClass
         {
             this.board = board;
         }
+        public String[][] getGuessBoard()
+        {
+            return guessBoard;
+        }
+        public void setGuessBoard(String[][] guessBoard)
+        {
+            this.guessBoard = guessBoard;
+        }
+        public Ship[,] getShips() { return ships; }
+        public void setShips(Ship[,] ships) {  this.ships = ships; }
         /* AI places ships onto board */
         public void placeShips()
         {
             //Get to place: 1 Aircraft Carrier, 2 Battleships, 2 Destroyers, 1 Submarine
             int numShips = 0;
             Random rnd = new Random();
+            String name;
             while (numShips < 6)
             {
                 //Aircraft carrier
@@ -243,6 +373,7 @@ namespace GamesForClass
                 {
                     int type = rnd.Next(0, 3);
                     int x, y;
+                    name = "Aircraft Carrier";
                     //horizontal
                     if (type == 0) {
                         x = rnd.Next(1, 7);
@@ -251,7 +382,7 @@ namespace GamesForClass
                         int[] end = { x + 3, y };
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 4, start, end);
                             numShips++;
                         }
                     }
@@ -264,7 +395,7 @@ namespace GamesForClass
                         int[] end = { x, y + 3};
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 4, start, end);
                             numShips++;
                         }
                     }
@@ -277,7 +408,7 @@ namespace GamesForClass
                         int[] end = { x + 3, y + 3 };
                         if (checkForPlacedShip(start,end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 4, start, end);
                             numShips++;
                         }
                     }
@@ -288,6 +419,7 @@ namespace GamesForClass
                 {
                     int type = rnd.Next(0, 3);
                     int x, y;
+                    name = "Battleship";
                     //horizontal
                     if (type == 0)
                     {
@@ -297,7 +429,7 @@ namespace GamesForClass
                         int[] end = { x + 2, y };
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 3, start, end);
                             numShips++;
                         }
                     }
@@ -310,7 +442,7 @@ namespace GamesForClass
                         int[] end = { x, y + 2};
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 3, start, end);
                             numShips++;
                         }
                     }
@@ -323,7 +455,7 @@ namespace GamesForClass
                         int[] end = { x + 2, y + 2 };
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 3, start, end);
                             numShips++;
                         }
                     }
@@ -333,6 +465,7 @@ namespace GamesForClass
                 {
                     int type = rnd.Next(0, 3);
                     int x, y;
+                    name = "Destroyer";
                     //horizontal
                     if (type == 0)
                     {
@@ -342,7 +475,7 @@ namespace GamesForClass
                         int[] end = {x + 1, y };
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 2, start, end);
                             numShips++;
                         }
                     }
@@ -355,7 +488,7 @@ namespace GamesForClass
                         int[] end = {x, y + 1 };
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 2, start, end);
                             numShips++;
                         }
                     }
@@ -368,7 +501,7 @@ namespace GamesForClass
                         int[] end = { x + 1, y + 1 };
                         if (checkForPlacedShip(start, end))
                         {
-                            addShipToBoard(start, end);
+                            addShipToBoard(name, 2, start, end);
                             numShips++;
                         }
                     }
@@ -376,13 +509,14 @@ namespace GamesForClass
                 //Submarine
                 else
                 {
+                    name = "Submarine";
                     int x = rnd.Next(1, 10);
                     int y = rnd.Next(1, 10);
                     int[] start = { x, y };
                     int[] end = { x, y };
                     if (checkForPlacedShip(start, end))
                     {
-                        addShipToBoard(start, end);
+                        addShipToBoard(name, 1, start, end);
                         numShips++;
                     }
                 }
@@ -457,7 +591,7 @@ namespace GamesForClass
             return true;
         }
         //places the ships onto the board
-        public void addShipToBoard(int[] startCoord, int[] endCoord)
+        public void addShipToBoard(String name, int size, int[] startCoord, int[] endCoord)
         {
             //places already validated ship into board space
             int startX = startCoord[0];
@@ -486,7 +620,7 @@ namespace GamesForClass
                 y = startY;
                 yDif = endY - startY;
             }
-
+            Ship newShip = new Ship(size, name);
             //Placement Loops
             //if the placement is vertical
             if (xDif == 0)
@@ -494,6 +628,7 @@ namespace GamesForClass
                 for (int i = y - 1; i < y + yDif; i++)
                 {
                     this.board[i][y - 1] = "X";
+                    this.ships[i,y - 1] = newShip;
                 }
             }
             //if placement is horizontal
@@ -502,6 +637,7 @@ namespace GamesForClass
                 for (int i = x - 1; i < x + xDif; i++)
                 {
                     this.board[x - 1][i] = "X";
+                    this.ships[x-1, i] = newShip;
                 }
             }
             //if placement is diagonal
@@ -511,8 +647,58 @@ namespace GamesForClass
                 for (int i = x - 1; i < x + xDif; i++)
                 {
                     this.board[i][j] = "X";
+                    this.ships[i, j] = newShip;
                     j++;
                 }
+            }
+        }
+    }
+    //Class that represents the individual ship
+    public class Ship
+    {
+        private int size;
+        private int[] health;
+        private String name;
+        public Ship(int size, String name)
+        {
+            this.size = size;
+            health = new int[size];
+            for (int i = 0; i < size; i++)
+            {
+                health[i] = 0;
+            }
+
+            this.name = name;
+        }
+
+        //Getters and setters
+        public int getSize() { return size; }
+        public void setSize(int size) {  this.size = size; }
+        public String getName() { return name; }
+        //checks if the ship is sunk. If each value of the ship is 1, then it is sunk
+        public bool isSunk()
+        {
+            for (int i = 0; i < size; i++)
+            {
+                if (health[i] == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        //'hits' the ship
+        public void hit()
+        {
+            int counter = 0;
+            while (counter < size)
+            {
+                if (health[counter] == 0)
+                {
+                    health[counter] = 1;
+                    break;
+                }
+                counter++;
             }
         }
     }
