@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using static System.Windows.Forms.AxHost;
 
 namespace GamesForClass
 {
@@ -28,7 +29,7 @@ namespace GamesForClass
             {
                 for (int j = 0; j < blankBoard[i].Length; j++)
                 {
-                    blankBoard[i][j] = " ";
+                    blankBoard[i][j] = "_";
                 }
             }
             player.setBoard(blankBoard);
@@ -45,14 +46,21 @@ namespace GamesForClass
                     String output ="";
                     for (int i = 0;i < board.Length; i++)
                     {
-                        output += board[i][0] + " " + board[i][1] + " " + board[i][2] + " " + board[i][3] + " " + board[i][4] + " " + board[i][5] + " " + board[i][6] + " " + board[i][7] + " " + board[i][8] + "\n";
+                        output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
                     }
                     label2.Text = output;
                 }
             }
             else
             {
-
+                CPU.placeShips();
+                String[][] board = CPU.getBoard();
+                String output = "";
+                for (int i = 0; i < board.Length; i++)
+                {
+                    output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
+                }
+                label1.Text = output;
             }
         }
         /* places player ship on board */
@@ -88,7 +96,7 @@ namespace GamesForClass
                 //checks validity of coordinates based on ship type
                 if (validatePlaceCoords(shipType, startCoords, endCoords))
                 {
-                    player.setBoard(addShipToBoard(player.getBoard(), startCoords, endCoords));
+                    player.addShipToBoard(startCoords, endCoords);
                     label6.Text = "Ship Placed!";
                     return true;
                 }
@@ -178,8 +186,278 @@ namespace GamesForClass
 
             return output;
         }
-        //places a ship onto the board
-        public String[][] addShipToBoard(String[][] board, int[] startCoord, int[] endCoord)
+        /* BUTTON FUNCTIONS */
+        // Place ship function. Allows the player to place a ship
+        private void button1_Click(object sender, EventArgs e)
+        {
+            updateBoard(true);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            updateBoard(false);
+        }
+    }
+    /* BattleshipPlayer class. Represents the players, holds board data */
+    public class BattleshipPlayer
+    {
+        private String[][] board = new String[9][];
+        public BattleshipPlayer()
+        {
+            board[0] = new String[9];
+            board[1] = new String[9];
+            board[2] = new String[9];
+            board[3] = new String[9];
+            board[4] = new String[9];
+            board[5] = new String[9];
+            board[6] = new String[9];
+            board[7] = new String[9];
+            board[8] = new String[9];
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    board[i][j] = "_";
+                }
+            }
+        }
+
+        public String[][] getBoard()
+        {
+            return board;
+        }
+        public void setBoard(String[][] board)
+        {
+            this.board = board;
+        }
+        /* AI places ships onto board */
+        public void placeShips()
+        {
+            //Get to place: 1 Aircraft Carrier, 2 Battleships, 2 Destroyers, 1 Submarine
+            int numShips = 0;
+            Random rnd = new Random();
+            while (numShips < 6)
+            {
+                //Aircraft carrier
+                if (numShips == 0)
+                {
+                    int type = rnd.Next(0, 3);
+                    int x, y;
+                    //horizontal
+                    if (type == 0) {
+                        x = rnd.Next(1, 7);
+                        y = rnd.Next(1, 10);
+                        int[] start = { x, y };
+                        int[] end = { x + 3, y };
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                    //vertical
+                    else if (type == 1)
+                    {
+                        x = rnd.Next(1, 10);
+                        y = rnd.Next(1, 7);
+                        int[] start = { x, y };
+                        int[] end = { x, y + 3};
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                    //diagonal
+                    else
+                    {
+                        x = rnd.Next(1, 7);
+                        y = rnd.Next(1,7);
+                        int[] start = { x, y };
+                        int[] end = { x + 3, y + 3 };
+                        if (checkForPlacedShip(start,end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+
+                }
+                //Battleship
+                else if (numShips < 3)
+                {
+                    int type = rnd.Next(0, 3);
+                    int x, y;
+                    //horizontal
+                    if (type == 0)
+                    {
+                        x = rnd.Next(1, 8);
+                        y = rnd.Next(1, 10);
+                        int[] start = { x, y };
+                        int[] end = { x + 2, y };
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                    //vertical
+                    else if (type == 1) 
+                    {
+                        x = rnd.Next(1, 10);
+                        y = rnd.Next(1, 8);
+                        int[] start = { x, y };
+                        int[] end = { x, y + 2};
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                    //diagonal
+                    else
+                    {
+                        x = rnd.Next(1, 8);
+                        y = rnd.Next(1, 8);
+                        int[] start = { x, y };
+                        int[] end = { x + 2, y + 2 };
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                }
+                //Destroyer
+                else if (numShips < 5)
+                {
+                    int type = rnd.Next(0, 3);
+                    int x, y;
+                    //horizontal
+                    if (type == 0)
+                    {
+                        x = rnd.Next(1, 9);
+                        y = rnd.Next(1, 10);
+                        int[] start = { x, y };
+                        int[] end = {x + 1, y };
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                    //vertical
+                    else if (type == 1)
+                    {
+                        x = rnd.Next(1, 10);
+                        y = rnd.Next(1, 9);
+                        int[] start = { x, y };
+                        int[] end = {x, y + 1 };
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                    //diagonal
+                    else
+                    {
+                        x = rnd.Next(1, 9);
+                        y = rnd.Next(1, 9);
+                        int[] start = { x, y };
+                        int[] end = { x + 1, y + 1 };
+                        if (checkForPlacedShip(start, end))
+                        {
+                            addShipToBoard(start, end);
+                            numShips++;
+                        }
+                    }
+                }
+                //Submarine
+                else
+                {
+                    int x = rnd.Next(1, 10);
+                    int y = rnd.Next(1, 10);
+                    int[] start = { x, y };
+                    int[] end = { x, y };
+                    if (checkForPlacedShip(start, end))
+                    {
+                        addShipToBoard(start, end);
+                        numShips++;
+                    }
+                }
+                    
+            }
+        }
+        //Makes sure there was not a ship placed in this spot already
+        public bool checkForPlacedShip(int[] startCoord, int[] endCoord)
+        {
+            int startX = startCoord[0];
+            int endX = endCoord[0];
+            int startY = startCoord[1];
+            int endY = endCoord[1];
+            int x, y, xDif, yDif;
+
+            if (startX > endX)
+            {
+                x = endX;
+                xDif = startX - endX;
+            }
+            else
+            {
+                x = startX;
+                xDif = endX - startX;
+            }
+            if (startY > endY)
+            {
+                y = endY;
+                yDif = startY - endY;
+            }
+            else
+            {
+                y = startY;
+                yDif = endY - startY;
+            }
+            //Placement Loops
+            //if the placement is vertical
+            if (xDif == 0)
+            {
+                for (int i = y - 1; i < y + yDif; i++)
+                {
+                    if (this.board[i][y - 1] == "X") 
+                    {
+                        return false;
+                    }
+                }
+            }
+            //if placement is horizontal
+            else if (yDif == 0)
+            {
+                for (int i = x - 1; i < x + xDif; i++)
+                {
+                    if (this.board[x - 1][i] == "X")
+                    {
+                        return false;
+                    }
+                }
+            }
+            //if placement is diagonal
+            else
+            {
+                int j = y - 1;
+                for (int i = x - 1; i < x + xDif; i++)
+                {
+                    if (this.board[i][j] == "X")
+                    {
+                        return false;
+                    }
+                    j++;
+                }
+            }
+            return true;
+        }
+        //places the ships onto the board
+        public void addShipToBoard(int[] startCoord, int[] endCoord)
         {
             //places already validated ship into board space
             int startX = startCoord[0];
@@ -201,7 +479,7 @@ namespace GamesForClass
             if (startY > endY)
             {
                 y = endY;
-                yDif  = startY - endY;
+                yDif = startY - endY;
             }
             else
             {
@@ -215,7 +493,7 @@ namespace GamesForClass
             {
                 for (int i = y - 1; i < y + yDif; i++)
                 {
-                    board[i][y-1] = "X";
+                    this.board[i][y - 1] = "X";
                 }
             }
             //if placement is horizontal
@@ -223,60 +501,19 @@ namespace GamesForClass
             {
                 for (int i = x - 1; i < x + xDif; i++)
                 {
-                    board[x-1][i] = "X";
+                    this.board[x - 1][i] = "X";
                 }
             }
             //if placement is diagonal
             else
             {
                 int j = y - 1;
-                for (int i = x - 1;i < x + xDif; i++)
+                for (int i = x - 1; i < x + xDif; i++)
                 {
-                    board[i][j] = "X";
+                    this.board[i][j] = "X";
                     j++;
                 }
             }
-
-            return board;
-        }
-        /* BUTTON FUNCTIONS */
-        // Place ship function. Allows the player to place a ship
-        private void button1_Click(object sender, EventArgs e)
-        {
-            updateBoard(true);
-        }
-    }
-    /* BattleshipPlayer class. Represents the players, holds board data */
-    public class BattleshipPlayer
-    {
-        String[][] board = new String[9][];
-        public BattleshipPlayer()
-        {
-            board[0] = new String[9];
-            board[1] = new String[9];
-            board[2] = new String[9];
-            board[3] = new String[9];
-            board[4] = new String[9];
-            board[5] = new String[9];
-            board[6] = new String[9];
-            board[7] = new String[9];
-            board[8] = new String[9];
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    board[i][j] = " ";
-                }
-            }
-        }
-
-        public String[][] getBoard()
-        {
-            return board;
-        }
-        public void setBoard(String[][] board)
-        {
-            this.board = board;
         }
     }
 }
