@@ -309,6 +309,8 @@ namespace GamesForClass
         private String[][] board = new String[9][];
         private String[][] guessBoard = new String[9][];
         Ship[,] ships = new Ship[9, 9];
+        //keeps track of previous guess, 0: last guess was mark, 1&2: X,y coords of previous guess, 3: direction type, 4&5: first found local, 6: ship direction
+        private int[] guesses = { 0, 0, 0, 0, 0, 0, 0 };
         public BattleshipPlayer()
         {
             board[0] = new String[9];
@@ -650,6 +652,250 @@ namespace GamesForClass
                     this.ships[i, j] = newShip;
                     j++;
                 }
+            }
+        }
+        //Algorithm to make a guess on the board
+        public void guess()
+        {
+            int x, y;
+            int cX, cY;
+            //means previous guess was correct
+            if (guesses[0] == 1)
+            {
+                //means that there is a streak of correct guesses
+                if (guesses[3] != 0)
+                {
+                    x = guesses[1];
+                    y = guesses[2];
+                    int direction = guesses[3];
+                    bool run = true;
+                    while (run)
+                    {
+                        switch (direction)
+                        {
+                            case 1:
+                                cX = x - 1;
+                                cY = y - 1;
+                                if (hitOrMiss(cX,cY))
+                                {
+                                    run = false;
+                                } else { x++;y++; direction = 8; }
+                                break;
+                            case 2:
+                                cX = x - 1;
+                                cY = y;
+                                if (x > 0)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                } else { x++; direction = 7; }
+                                break;
+                            case 3:
+                                cX = x - 1;
+                                cY = y + 1;
+                                if (x < 0 && y < 9)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                } else { x++; y--; direction = 6; }
+                                break;
+                            case 4:
+                                cX = x;
+                                cY = y - 1;
+                                if (y > 0)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                } else { y++; direction = 5; }
+                                break;
+                            case 5:
+                                cX = x;
+                                cY = y + 1;
+                                if (y < 9)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                } else { y--; direction = 4; }
+                                break;
+                            case 6:
+                                cX = x + 1;
+                                cY = y - 1;
+                                if (x < 9 && y > 0)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                } else { x--;y++; direction = 3; }
+                                break;
+                            case 7:
+                                cX = x + 1;
+                                cY = y;
+                                if (x < 9)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                } else { x--; direction = 2; }
+                                break;
+                            case 8:
+                                cX = x + 1;
+                                cY = y + 1;
+                                if (x < 9 && y < 9)
+                                {
+                                    hitOrMiss(cX, cY);
+                                    run = false;
+                                }
+                                else { x--;y--; direction = 1;}
+                                break;
+                        }
+                    }
+                }
+                //not a streak of correct guesses, but working on ship
+                else
+                {
+                    //getting random starting direction from original starting place
+                    Random rnd = new Random();
+                    x = guesses[4];
+                    y = guesses[5];
+                    bool run = true;
+                    while (run)
+                    {
+                        switch (rnd.Next(1, 8))
+                        {
+                            case 1:
+                                cX = x - 1;
+                                cY = y - 1;
+                                if (x > 0 && y > 0)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 1;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 2:
+                                cX = x - 1;
+                                cY = y;
+                                if (x > 0)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 2;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 3:
+                                cX = x - 1;
+                                cY = y + 1;
+                                if (x < 0 && y < 9)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 3;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 4:
+                                cX = x;
+                                cY = y - 1;
+                                if (y > 0)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 4;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 5:
+                                cX = x;
+                                cY = y + 1;
+                                if (y < 9)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 5;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 6:
+                                cX = x + 1;
+                                cY = y - 1;
+                                if (x < 9 && y > 0)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 6;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 7:
+                                cX = x + 1;
+                                cY = y;
+                                if (x < 9)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 7;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                            case 8:
+                                cX = x + 1;
+                                cY = y + 1;
+                                if (x < 9 && y < 9)
+                                {
+                                    if (hitOrMiss(cX, cY))
+                                    {
+                                        guesses[6] = 8;
+                                    }
+                                    run = false;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            //previous guess was incorrect, makes random guess on board
+            else
+            {
+                Random rnd = new Random();
+                int valX = rnd.Next(0, 9);
+                int valY = rnd.Next(0, 9);
+
+            }
+        } 
+        //returns true if guess was made, false if not
+        public bool hitOrMiss(int cX, int cY)
+        {
+            if (cX > 0 && cX < 9 && cY > 0 && cY < 9 && guessBoard[cX][cY] == "_")
+            {
+                if (board[cX][cY] == "X")
+                {
+                    guessBoard[cX][cY] = "X";
+                    ships[cX, cY].hit();
+                    guesses[1] = cX;
+                    guesses[2] = cY;
+                    if (ships[cX, cY].isSunk())
+                    {
+                        guesses[3] = 0;
+                    }
+                }
+                //was a miss
+                else
+                {
+                    guessBoard[cX][cY] = "O";
+                    guesses[0] = 0;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
