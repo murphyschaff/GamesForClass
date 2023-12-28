@@ -57,9 +57,16 @@ namespace GamesForClass
             }
             else
             {
-                CPU.placeShips();
-                String[][] board = CPU.getGuessBoard();
+                String[][] board = player.getGuessBoard();
                 String output = "";
+                for (int i = 0; i < board.Length; i++)
+                {
+                    output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
+                }
+                label2.Text = output;
+                CPU.placeShips();
+                board = CPU.getGuessBoard();
+                output = "";
                 for (int i = 0; i < board.Length; i++)
                 {
                     output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
@@ -98,7 +105,7 @@ namespace GamesForClass
             user.setGuessBoard(guessBoard);
 
             //AI makes guess
-            if (CPU.guess(player.getGuessBoard()))
+            if (CPU.guess(player))
             {
                 label11.Text = label11.Text + "\nCPU hit a ship!";
             }
@@ -107,7 +114,6 @@ namespace GamesForClass
                 label11.Text = label11.Text + "\nCPU missed.";
             }
 
-            updateBoard(true);
             updateBoard(false);
 
         }
@@ -271,12 +277,21 @@ namespace GamesForClass
         // Place ship function. Allows the player to place a ship
         private void button1_Click(object sender, EventArgs e)
         {
+            player.setGuessBoard(player.getBoard());
+            int numShips = player.getNumShips();
+            if (numShips > 5)
+            {
+                button3.Visible = true;
+            }
             updateBoard(true);
         }
         //Start game function
         private void button3_Click(object sender, EventArgs e)
         {
             player.setGuessBoard(player.getBoard());
+            button2.Visible = true;
+            textBox2.Visible = true;
+            label5.Visible = true;
             updateBoard(false);
         }
         //button that runs the make guess sequence
@@ -324,6 +339,7 @@ namespace GamesForClass
         Ship[,] ships = new Ship[9, 9];
         //keeps track of previous guess, 0: last guess was mark, 1&2: X,y coords of previous guess, 3: direction type, 4&5: first found local, 6: ship direction
         private int[] guesses = { -1, -1, -1, -1, -1, -1, -1 };
+        private int numShips = 0;
         public BattleshipPlayer()
         {
             board[0] = new String[9];
@@ -374,6 +390,8 @@ namespace GamesForClass
         }
         public Ship[,] getShips() { return ships; }
         public void setShips(Ship[,] ships) {  this.ships = ships; }
+        public int getNumShips() { return numShips; }
+        public void setNumShips() { this.numShips = numShips; }
         /* AI places ships onto board */
         public void placeShips()
         {
@@ -668,8 +686,9 @@ namespace GamesForClass
             }
         }
         //Algorithm to make a guess on the board
-        public bool guess(String[][] opboard)
+        public bool guess(BattleshipPlayer user)
         {
+            String[][] opboard = user.getGuessBoard();
             int x, y;
             bool correct = false;
             //previous guess was correct
@@ -679,7 +698,7 @@ namespace GamesForClass
                 //guess is in bounds
                 if (status[0] == 1)
                 {
-                    if (hitOrMiss(opboard, status[1], status[2]))
+                    if (hitOrMiss(user, status[1], status[2]))
                     {
                         guesses[0] = 1;
                         correct = true;
@@ -702,7 +721,7 @@ namespace GamesForClass
                 {
                     //flips direction and uses og guess
                     status = checkGuessBounds(flipDirection(guesses[6]), guesses[4], guesses[5]);
-                    if (hitOrMiss(opboard, status[1], status[2]))
+                    if (hitOrMiss(user, status[1], status[2]))
                     {
                         guesses[0] = 1;
                         correct = true;
@@ -729,6 +748,8 @@ namespace GamesForClass
                 {
                     Random rnd = new Random();
                     bool run = true;
+                    String[][] opguessBoard = user.getGuessBoard();
+                    Ship[,] opships = user.getShips();
                     while (run)
                     {
                         x = rnd.Next(0, 9);
@@ -736,8 +757,8 @@ namespace GamesForClass
                         //found a ship to sink
                         if (opboard[x][y] == "X")
                         {
-                            guessBoard[x][y] = "X";
-                            ships[x, y].hit();
+                            opguessBoard[x][y] = "X";
+                            opships[x, y].hit();
                             guesses[0] = 1;
                             correct = true;
                             if (!ships[x, y].isSunk())
@@ -758,11 +779,12 @@ namespace GamesForClass
                         //nothing guessed
                         else
                         {
-                            guessBoard[x][y] = "O";
+                            opguessBoard[x][y] = "O";
                             guesses[0] = 0;
                             run = false;
                         }
                     }
+                    user.setGuessBoard(opguessBoard);
                 }
                 //currently working on a ship
                 else
@@ -816,7 +838,7 @@ namespace GamesForClass
                             //within bounds
                             if (status[0] == 1)
                             {
-                                if (hitOrMiss(opboard, status[1], status[2]))
+                                if (hitOrMiss(user, status[1], status[2]))
                                 {
                                     guesses[0] = 1;
                                     correct = true;
@@ -850,7 +872,7 @@ namespace GamesForClass
                         //working status
                         if (status[0] == 1)
                         {
-                            if (hitOrMiss(opboard, status[1], status[2]))
+                            if (hitOrMiss(user, status[1], status[2]))
                             {
                                 guesses[0] = 1;
                                 correct = true;
@@ -877,14 +899,17 @@ namespace GamesForClass
             return correct;
         } 
         //returns true if guess was correct, false if not
-        public bool hitOrMiss(String[][] board, int cX, int cY)
+        public bool hitOrMiss(BattleshipPlayer user, int cX, int cY)
         {
+            String[][] board = user.getBoard();
+            String[][] guessBoard = user.getGuessBoard();
             if (board[cX][cY] == "X")
             {
                 guessBoard[cX][cY] = "X";
                 ships[cX, cY].hit();
                 guesses[1] = cX;
                 guesses[2] = cY;
+                user.setGuessBoard(guessBoard);
                 return true;
             }
             //was a miss
@@ -892,6 +917,7 @@ namespace GamesForClass
             {
                 guessBoard[cX][cY] = "O";
                 guesses[0] = 0;
+                user.setGuessBoard(guessBoard);
                 return false;
             }
         }
