@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Diagnostics.Tracing;
 using System.Security.Policy;
 using System.Xml.Linq;
+using System.Diagnostics.Eventing.Reader;
 
 namespace GamesForClass
 {
@@ -271,6 +272,12 @@ namespace GamesForClass
                     output = false;
                     label6.Text = "Wrong length for selected ship";
                 }
+                //makes sure a ship is not already there
+                if (!player.checkForPlacedShip(startCoord, endCoord))
+                {
+                    output = false;
+                    label6.Text = "A ship already exists in this space.";
+                }
             }
 
             return output;
@@ -397,7 +404,7 @@ namespace GamesForClass
         public Ship[,] getShips() { return ships; }
         public void setShips(Ship[,] ships) {  this.ships = ships; }
         public int getNumShips() { return numShips; }
-        public void setNumShips() { this.numShips = numShips; }
+        public void setNumShips(int numShips) { this.numShips = numShips; }
         /* AI places ships onto board */
         public void placeShips()
         {
@@ -562,7 +569,7 @@ namespace GamesForClass
                     
             }
         }
-        //Makes sure there was not a ship placed in this spot already
+        //Makes sure there was not a ship placed in this spot already. False if ship already exists, true if not
         public bool checkForPlacedShip(int[] startCoord, int[] endCoord)
         {
             int startX = startCoord[0];
@@ -595,7 +602,7 @@ namespace GamesForClass
             //if the placement is vertical
             if (xDif == 0)
             {
-                for (int i = y - 1; i < y + yDif; i++)
+                for (int i = x - 1; i < y + yDif; i++)
                 {
                     if (this.board[i][y - 1] == "X") 
                     {
@@ -606,7 +613,7 @@ namespace GamesForClass
             //if placement is horizontal
             else if (yDif == 0)
             {
-                for (int i = x - 1; i < x + xDif; i++)
+                for (int i = y - 1; i < x + xDif; i++)
                 {
                     if (this.board[x - 1][i] == "X")
                     {
@@ -664,16 +671,16 @@ namespace GamesForClass
             //if the placement is vertical
             if (xDif == 0)
             {
-                for (int i = y - 1; i < y + yDif; i++)
+                for (int i = x - 1; i < y + yDif; i++)
                 {
-                    this.board[i][y - 1] = "X";
+                    this.board[i][y-1] = "X";
                     this.ships[i,y - 1] = newShip;
                 }
             }
             //if placement is horizontal
             else if (yDif == 0)
             {
-                for (int i = x - 1; i < x + xDif; i++)
+                for (int i = y - 1; i < x + xDif; i++)
                 {
                     this.board[x - 1][i] = "X";
                     this.ships[x-1, i] = newShip;
@@ -700,179 +707,258 @@ namespace GamesForClass
             //previous guess was correct
             if (guesses[0] == 1)
             {
-                int[] status = checkGuessBounds(guesses[3], guesses[1], guesses[2]);
-                //guess is in bounds
-                if (status[0] == 1)
+                //only made one correct guess so far
+                if (guesses[6] == 0)
                 {
-                    if (hitOrMiss(user, status[1], status[2]))
+                    Random rnd = new Random();
+                    bool run = true;
+                    x = 0;
+                    y = 0;
+                    while (run)
                     {
-                        guesses[0] = 1;
-                        correct = true;
-                        //checking if the ship was sunk
-                        if (ships[status[1], status[2]].isSunk())
+                        //gets random direction
+                        int dir = rnd.Next(1, 8);
+                        switch (dir)
                         {
-                            for (int i = 0; i < guesses.Length; i++)
-                            {
-                                guesses[i] = -1;
-                            }
+                            case 1:
+                                x = guesses[1] - 1;
+                                y = guesses[2] - 1;
+                                break;
+                            case 2:
+                                x = guesses[1] - 1;
+                                y = guesses[2];
+                                break;
+                            case 3:
+                                x = guesses[1] - 1;
+                                y = guesses[2] + 1;
+                                break;
+                            case 4:
+                                x = guesses[1];
+                                y = guesses[2] - 1;
+                                break;
+                            case 5:
+                                x = guesses[1];
+                                y = guesses[2] + 1;
+                                break;
+                            case 6:
+                                x = guesses[1] + 1;
+                                y = guesses[2] - 1;
+                                break;
+                            case 7:
+                                x = guesses[1] + 1;
+                                y = guesses[2];
+                                break;
+                            case 8:
+                                x = guesses[1] + 1;
+                                y = guesses[2] + 1;
+                                break;
                         }
-                    } 
-                    else
-                    {
-                        guesses[0] = 0;
+                        int[] status = checkGuessBounds(dir, x, y);
+                        //within bounds
+                        if (status[0] == 1)
+                        {
+                            if (hitOrMiss(user, status[1], status[2]))
+                            {
+                                guesses[0] = 1;
+                                correct = true;
+                                //sets correct direction
+                                guesses[3] = dir;
+                                //sets og direction
+                                guesses[6] = dir;
+                                //checking if the ship was sunk
+                                if (ships[status[1], status[2]].isSunk())
+                                {
+                                    for (int i = 0; i < guesses.Length; i++)
+                                    {
+                                        guesses[i] = -1;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                guesses[0] = 0;
+                            }
+                            run = false;
+                        }
                     }
                 }
-                //guess is not in bounds
                 else
                 {
-                    //flips direction and uses og guess
-                    status = checkGuessBounds(flipDirection(guesses[6]), guesses[4], guesses[5]);
-                    if (hitOrMiss(user, status[1], status[2]))
+                    int[] status = checkGuessBounds(guesses[3], guesses[1], guesses[2]);
+                    //guess is in bounds
+                    if (status[0] == 1)
                     {
-                        guesses[0] = 1;
-                        correct = true;
-                        //checking if the ship was sunk
-                        if (ships[status[1], status[2]].isSunk())
+                        if (hitOrMiss(user, status[1], status[2]))
                         {
-                            for (int i = 0; i < guesses.Length; i++)
+                            guesses[0] = 1;
+                            correct = true;
+                            //checking if the ship was sunk
+                            if (ships[status[1], status[2]].isSunk())
                             {
-                                guesses[i] = -1;
+                                for (int i = 0; i < guesses.Length; i++)
+                                {
+                                    guesses[i] = -1;
+                                }
                             }
                         }
+                        else
+                        {
+                            guesses[0] = 0;
+                        }
                     }
+                    //guess is not in bounds
                     else
                     {
-                        guesses[0] = 0;
+                        //flips direction and uses og guess
+                        status = checkGuessBounds(flipDirection(guesses[6]), guesses[4], guesses[5]);
+                        if (hitOrMiss(user, status[1], status[2]))
+                        {
+                            guesses[0] = 1;
+                            correct = true;
+                            //checking if the ship was sunk
+                            if (ships[status[1], status[2]].isSunk())
+                            {
+                                for (int i = 0; i < guesses.Length; i++)
+                                {
+                                    guesses[i] = -1;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            guesses[0] = 0;
+                        }
                     }
                 }
             }
             //The previous guess was not correct
             else
             {
-                //not currently working on a ship
-                if (guesses[6] == -1)
+                //There is no og correct direction, i.e only one guess made so far
+                if (guesses[6] == 0)
                 {
                     Random rnd = new Random();
                     bool run = true;
-                    String[][] opguessBoard = user.getGuessBoard();
-                    Ship[,] opships = user.getShips();
+                    x = 0;
+                    y = 0;
                     while (run)
                     {
-                        x = rnd.Next(0, 9);
-                        y = rnd.Next(0, 9);
-                        //found a ship to sink
-                        if (opboard[x][y] == "X")
+                        //gets random direction
+                        int dir = rnd.Next(1, 8);
+                        switch (dir)
                         {
-                            opguessBoard[x][y] = "X";
-                            opships[x, y].hit();
-                            guesses[0] = 1;
-                            correct = true;
-                            if (!ships[x, y].isSunk())
+                            case 1:
+                                x = guesses[1] - 1;
+                                y = guesses[2] - 1;
+                                break;
+                            case 2:
+                                x = guesses[1] - 1;
+                                y = guesses[2];
+                                break;
+                            case 3:
+                                x = guesses[1] - 1;
+                                y = guesses[2] + 1;
+                                break;
+                            case 4:
+                                x = guesses[1];
+                                y = guesses[2] - 1;
+                                break;
+                            case 5:
+                                x = guesses[1];
+                                y = guesses[2] + 1;
+                                break;
+                            case 6:
+                                x = guesses[1] + 1;
+                                y = guesses[2] - 1;
+                                break;
+                            case 7:
+                                x = guesses[1] + 1;
+                                y = guesses[2];
+                                break;
+                            case 8:
+                                x = guesses[1] + 1;
+                                y = guesses[2] + 1;
+                                break;
+                        }
+                        int[] status = checkGuessBounds(dir, x, y);
+                        //within bounds
+                        if (status[0] == 1)
+                        {
+                            if (hitOrMiss(user, status[1], status[2]))
                             {
-                                guesses[1] = x;
-                                guesses[2] = y;
-                                guesses[4] = x;
-                                guesses[5] = y;
-                                guesses[6] = 0;
+                                guesses[0] = 1;
+                                correct = true;
+                                //sets correct direction
+                                guesses[3] = dir;
+                                //sets og direction
+                                guesses[6] = dir;
+                                //checking if the ship was sunk
+                                if (ships[status[1], status[2]].isSunk())
+                                {
+                                    for (int i = 0; i < guesses.Length; i++)
+                                    {
+                                        guesses[i] = -1;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                guesses[0] = 0;
                             }
                             run = false;
                         }
-                        //already guessed
-                        else if (opboard[x][y] == "O")
-                        {
-                            continue;
-                        }
-                        //nothing guessed
-                        else
-                        {
-                            opguessBoard[x][y] = "O";
-                            guesses[0] = 0;
-                            run = false;
-                        }
                     }
-                    user.setGuessBoard(opguessBoard);
                 }
-                //currently working on a ship
                 else
                 {
-                    //There is no og correct direction, i.e only one guess made so far
-                    if (guesses[6] == 0)
+                    //not currently working on a ship
+                    if (guesses[6] == -1)
                     {
                         Random rnd = new Random();
                         bool run = true;
-                        x = 0;
-                        y = 0;
+                        String[][] opguessBoard = user.getGuessBoard();
+                        Ship[,] opships = user.getShips();
                         while (run)
                         {
-                            //gets random direction
-                            int dir = rnd.Next(1, 8);
-                            switch (dir) {
-                                case 1:
-                                    x = guesses[1] - 1;
-                                    y = guesses[2] - 1;
-                                    break;
-                                case 2:
-                                    x = guesses[1] - 1;
-                                    y = guesses[2];
-                                    break;
-                                case 3:
-                                    x = guesses[1] - 1;
-                                    y = guesses[2] + 1;
-                                    break;
-                                case 4:
-                                    x = guesses[1];
-                                    y = guesses[2] - 1;
-                                    break;
-                                case 5:
-                                    x = guesses[1];
-                                    y = guesses[2] + 1;
-                                    break;
-                                case 6:
-                                    x = guesses[1] + 1;
-                                    y = guesses[2] - 1;
-                                    break;
-                                case 7:
-                                    x = guesses[1] + 1;
-                                    y = guesses[2];
-                                    break;
-                                case 8:
-                                    x = guesses[1] + 1;
-                                    y = guesses[2] + 1;
-                                    break;
-                            }
-                            int[] status = checkGuessBounds(dir, x, y);
-                            //within bounds
-                            if (status[0] == 1)
+                            x = rnd.Next(0, 9);
+                            y = rnd.Next(0, 9);
+                            //found a ship to sink
+                            if (opboard[x][y] == "X")
                             {
-                                if (hitOrMiss(user, status[1], status[2]))
+                                opguessBoard[x][y] = "H";
+                                opships[x, y].hit();
+                                guesses[0] = 1;
+                                correct = true;
+                                if (!ships[x, y].isSunk())
                                 {
-                                    guesses[0] = 1;
-                                    correct = true;
-                                    //sets correct direction
-                                    guesses[3] = dir;
-                                    //sets og direction
-                                    guesses[6] = dir;
-                                    //checking if the ship was sunk
-                                    if (ships[status[1], status[2]].isSunk())
-                                    {
-                                        for (int i = 0; i < guesses.Length; i++)
-                                        {
-                                            guesses[i] = -1;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    guesses[0] = 0;
+                                    guesses[1] = x;
+                                    guesses[2] = y;
+                                    guesses[4] = x;
+                                    guesses[5] = y;
+                                    guesses[6] = 0;
                                 }
                                 run = false;
                             }
-
+                            //already guessed
+                            else if (opboard[x][y] == "O")
+                            {
+                                continue;
+                            }
+                            //nothing guessed
+                            else
+                            {
+                                opguessBoard[x][y] = "O";
+                                guesses[0] = 0;
+                                run = false;
+                            }
                         }
+                        user.setGuessBoard(opguessBoard);
                     }
-                    //there is a og correct direction, go in opposite direction.
+                    //currently working on a ship
                     else
                     {
+
+                        //there is a og correct direction, go in opposite direction.
                         int newDir = flipDirection(guesses[6]);
                         int[] status = checkGuessBounds(newDir, guesses[4], guesses[5]);
                         //working status
@@ -899,6 +985,7 @@ namespace GamesForClass
                             }
 
                         }
+
                     }
                 }
             }
@@ -911,7 +998,7 @@ namespace GamesForClass
             String[][] guessBoard = user.getGuessBoard();
             if (board[cX][cY] == "X")
             {
-                guessBoard[cX][cY] = "X";
+                guessBoard[cX][cY] = "H";
                 ships[cX, cY].hit();
                 guesses[1] = cX;
                 guesses[2] = cY;
