@@ -39,7 +39,7 @@ namespace GamesForClass
             player.setBoard(guessBoard);
             CPU.setBoard(guessBoard);
         }
-        //Updates graphics on board
+        //Updates graphics on board, depends on if board is being updated when player placing ships
         public void updateBoard(bool isplayer)
         {
             if (isplayer) {
@@ -57,6 +57,7 @@ namespace GamesForClass
             }
             else
             {
+                //Player board
                 String[][] board = player.getGuessBoard();
                 String output = "";
                 for (int i = 0; i < board.Length; i++)
@@ -64,7 +65,8 @@ namespace GamesForClass
                     output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
                 }
                 label2.Text = output;
-                CPU.placeShips();
+                
+                //CPU board
                 board = CPU.getGuessBoard();
                 output = "";
                 for (int i = 0; i < board.Length; i++)
@@ -277,6 +279,7 @@ namespace GamesForClass
         // Place ship function. Allows the player to place a ship
         private void button1_Click(object sender, EventArgs e)
         {
+            //need to stop player from overwriting ships
             player.setGuessBoard(player.getBoard());
             int numShips = player.getNumShips();
             if (numShips > 5)
@@ -288,6 +291,9 @@ namespace GamesForClass
         //Start game function
         private void button3_Click(object sender, EventArgs e)
         {
+            //for testing purposes, player ships set automatically
+            player.placeShips();
+            CPU.placeShips();
             player.setGuessBoard(player.getBoard());
             button2.Visible = true;
             textBox2.Visible = true;
