@@ -75,7 +75,7 @@ namespace GamesForClass
         public void makeGuess(BattleshipPlayer user, int[] coords)
         {
             String[,] board = user.getBoard();
-            Ship[,] ships = user.getFleet();
+            Ship[,] fleet = user.getFleet();
             coords[0] = coords[0] - 1;
             coords[1] = coords[1] - 1;
 
@@ -86,10 +86,10 @@ namespace GamesForClass
                 return;
             }
             //Is a hit
-            else if (board[coords[0],coords[1]] != "_")
+            else if (fleet[coords[0],coords[1]].getName() != "None")
             {
                 board[coords[0],coords[1]] = "H";
-                Ship ship = ships[coords[0],coords[1]];
+                Ship ship = fleet[coords[0],coords[1]];
                 ship.hit();
                 if (ship.isSunk())
                 {
@@ -159,6 +159,7 @@ namespace GamesForClass
             int[] endCoords = new int[2];
             int i = 0;
             int counter = 0;
+
             //gets coordinates from UI
             foreach (Match m in mc)
             {
@@ -175,42 +176,15 @@ namespace GamesForClass
                 i++;
                 counter++;
             }
-            int type;
-            //finding type
-            if (startCoords[0] - endCoords[0] == 0) { type = 1; }
-            else if (startCoords[1] - endCoords[1] == 0) { type = 2; }
-            else { type = 3; }
-
+            
             //makes sure correct number of coordinates was entered
             if (counter == 4)
             {
                 //checks validity of coordinates based on ship type
                 if (validatePlaceCoords(shipType, startCoords, endCoords))
                 {
-                    if (shipType == "Aircraft Carrier (Size: 4)")
-                    {
-                        player.addShip(startCoords, endCoords, type, new Ship(4, "Aircraft Carrier"), "A", true);
-                        label6.Text = "Ship Placed!";
-                        return true;
-                    }
-                    else if (shipType == "Battleship (Size: 3)")
-                    {
-                        player.addShip(startCoords, endCoords, type, new Ship(3, "Battleship"), "B", true);
-                        label6.Text = "Ship Placed!";
-                        return true;
-                    }
-                    else if (shipType == "Destroyer (Size: 2)")
-                    {
-                        player.addShip(startCoords, endCoords, type, new Ship(2, "Destroyer"), "D", true);
-                        label6.Text = "Ship Placed!";
-                        return true;
-                    }
-                    else
-                    {
-                        player.addShip(startCoords, endCoords, type, new Ship(1, "Submarine"), "S", true);
-                        label6.Text = "Ship Placed!";
-                        return true;
-                    }
+                    label6.Text = "Ship Placed!";
+                    return true;
                 }
                 else
                 {
@@ -232,7 +206,10 @@ namespace GamesForClass
             int endX = endCoord[0];
             int startY = startCoord[1];
             int endY = endCoord[1];
-            int type = 0;
+            int type;
+            int index = 0;
+            int[] numShips = player.getNumShips();
+
             if (startX - endX == 0)
             {
                 type = 1;
@@ -294,45 +271,81 @@ namespace GamesForClass
                     output = false;
                     label6.Text = "Wrong length for selected ship";
                     }
+                    if (numShips[0] == 1)
+                    {
+                        label6.Text = "You have placed the max number of ships of this type";
+                        output = false;
+                    }
                     shipName = "Aircraft Carrier";
                     letter = "A";
+                    index = 0;
                 }
                 else if (shipType == "Battleship (Size: 3)")
                 {
                     if (length != 3)
                     {
-                    output = false;
-                    label6.Text = "Wrong length for selected ship";
+                        output = false;
+                        label6.Text = "Wrong length for selected ship";
+                    }
+                    if (numShips[1] == 2)
+                    {
+                        label6.Text = "You have placed the max number of ships of this type";
+                        output = false;
                     }
                     shipName = "Battleship";
                     letter = "B";
+                    index = 1;
                 }
                 else if (shipType == "Destroyer (Size: 2)")
                 {
                     if (length != 2)
                     {
-                    output = false;
-                    label6.Text = "Wrong length for selected ship";
+                        output = false;
+                        label6.Text = "Wrong length for selected ship";
+                    }
+                    if (numShips[2] == 2)
+                    {
+                        label6.Text = "You have placed the max number of ships of this type";
+                        output = false;
                     }
                     shipName = "Destroyer";
                     letter = "D";
+                    index = 2;
                 }
-                else if (shipType == "Submarine (Size: 1)" && length != 1)
+                else if (shipType == "Submarine (Size: 1)")
                 {
                     if (length != 1)
                     {
-                    output = false;
-                    label6.Text = "Wrong length for selected ship";
+                        output = false;
+                        label6.Text = "Wrong length for selected ship";
+                    }
+                    if (numShips[3] == 1)
+                    {
+                        label6.Text = "You have placed the max number of ships of this type";
+                        output = false;
                     }
                     shipName = "Submarine";
                     letter = "S";
+                    index = 3;
                 }
                 Ship ship = new Ship(length, shipName);
                 //makes sure a ship is not already there
-                if (!player.addShip(startCoord, endCoord, type, ship, letter, true))
+                startCoord[0] = startCoord[0] - 1;
+                startCoord[1] = startCoord[1] - 1;
+                endCoord[0] = endCoord[0] - 1;
+                endCoord[1] = endCoord[1] - 1;
+                if (output)
                 {
-                    output = false;
-                    label6.Text = "A ship already exists in this space.";
+                    if (!player.addShip(startCoord, endCoord, type, ship, letter, true))
+                    {
+                        output = false;
+                        label6.Text = "A ship already exists in this space.";
+                    }
+                    else
+                    {
+                        numShips[index] = numShips[index] + 1;
+                        player.setNumShips(numShips);
+                    }
                 }
             }
 
@@ -344,20 +357,24 @@ namespace GamesForClass
         {
             //need to stop player from overwriting ships
             button5.Visible = false;
-            int numShips = player.getNumShips();
-            if (numShips > 5)
+            int[] numShips = player.getNumShips();
+            updateBoard(true);
+            if (numShips[0] == 1 && numShips[1] == 2 && numShips[2] == 2 && numShips[3] == 1)
             {
                 button3.Visible = true;
                 button1.Visible = false;
+                textBox1.Visible = false;
+                domainUpDown1.Visible = false;
+                label4.Visible = false;
+                label6.Visible = false;
             }
-            updateBoard(true);
         }
         //Start game function
         private void button3_Click(object sender, EventArgs e)
         {
             button3.Visible = false;
             //for testing purposes, user can see CPU placed ships
-            CPU.placeShips(true);
+            CPU.placeShips(false);
             button2.Visible = true;
             textBox2.Visible = true;
             label5.Visible = true;
@@ -440,7 +457,7 @@ namespace GamesForClass
         Ship[,] fleet = new Ship[9, 9];
         //keeps track of previous guess, 0: last guess was mark, 1&2: X,y coords of previous guess, 3: direction type, 4&5: first found local, 6: ship direction
         private int[] guesses = { -1, -1, -1, -1, -1, -1, -1 };
-        private int numShips = 0;
+        private int[] numShips = { 0, 0, 0, 0 };
         private int sunkShips = 0;
         public BattleshipPlayer()
         {
@@ -459,8 +476,8 @@ namespace GamesForClass
         public void setBoard(String[,] board) { this.board = board; }
         public Ship[,] getFleet() { return fleet; }
         public void setFleet(Ship[,] ships) {  this.fleet = ships; }
-        public int getNumShips() { return numShips; }
-        public void setNumShips(int numShips) { this.numShips = numShips; }
+        public int[] getNumShips() { return numShips; }
+        public void setNumShips(int[] numShips) { this.numShips = numShips; }
         public int getSunkShips() { return sunkShips; }
         public void setSunkShips(int sunkShips) { this.sunkShips = sunkShips; }
         /* AI places ships onto board */
