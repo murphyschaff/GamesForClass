@@ -15,6 +15,8 @@ using System.Diagnostics.Tracing;
 using System.Security.Policy;
 using System.Xml.Linq;
 using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Contracts;
+using System.Diagnostics;
 
 namespace GamesForClass
 {
@@ -28,13 +30,13 @@ namespace GamesForClass
         }
         public void initBattleship()
         {
-            String[][] guessBoard = new string[9][];
+            String[,] guessBoard = new string[9,9];
             //creates and adds blank boards to both player and CPU player
             for (int i = 0; i < guessBoard.Length; i++)
             {
-                for (int j = 0; j < guessBoard[i].Length; j++)
+                for (int j = 0; j < guessBoard.Length; j++)
                 {
-                    guessBoard[i][j] = "_";
+                    guessBoard[i, j] = "_";
                 }
             }
             player.setBoard(guessBoard);
@@ -47,11 +49,11 @@ namespace GamesForClass
                 if (placePlayerShip())
                 {
                     //places down the new board results into label (NEEDS MORE SPACES AND NEW LINES)
-                    String[][] board = player.getGuessBoard();
+                    String[,] board = player.getBoard();
                     String output ="";
-                    for (int i = 0;i < board.Length; i++)
+                    for (int i = 0;i < 9; i++)
                     {
-                        output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
+                        output += board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
                     }
                     label2.Text = output;
                 }
@@ -59,20 +61,20 @@ namespace GamesForClass
             else
             {
                 //Player board
-                String[][] board = player.getGuessBoard();
+                String[,] board = player.getBoard();
                 String output = "";
-                for (int i = 0; i < board.Length; i++)
+                for (int i = 0; i < 9; i++)
                 {
-                    output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
+                    output += board[i, 0] + "__" + board[i,1] + "__" + board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 8] + "\n";
                 }
                 label2.Text = output;
                 
                 //CPU board
-                board = CPU.getGuessBoard();
+                board = CPU.getBoard();
                 output = "";
-                for (int i = 0; i < board.Length; i++)
+                for (int i = 0; i < 9; i++)
                 {
-                    output += board[i][0] + "__" + board[i][1] + "__" + board[i][2] + "__" + board[i][3] + "__" + board[i][4] + "__" + board[i][5] + "__" + board[i][6] + "__" + board[i][7] + "__" + board[i][8] + "\n";
+                    output += board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
                 }
                 label1.Text = output;
             }
@@ -80,15 +82,14 @@ namespace GamesForClass
         //Places guess on board, tells player if it was a hit or not (Assumes valid coordinates)
         public void makeGuess(BattleshipPlayer user, int[] coords)
         {
-            String[][] board = user.getBoard();
-            String[][] guessBoard = user.getGuessBoard();
-            Ship[,] ships = user.getShips();
+            String[,] board = user.getBoard();
+            Ship[,] ships = user.getFleet();
 
             
             //Is a hit
-            if (board[coords[0]-1][coords[1]-1] == "X")
+            if (board[coords[0]-1,coords[1]-1] == "X")
             {
-                guessBoard[coords[0] - 1][coords[1] - 1] = "X";
+                board[coords[0] - 1,coords[1] - 1] = "H";
                 Ship ship = ships[coords[0]-1,coords[1]-1];
                 ship.hit();
                 if (ship.isSunk())
@@ -102,10 +103,9 @@ namespace GamesForClass
             }
             else
             {
-                guessBoard[coords[0] - 1][coords[1] - 1] = "O";
+                board[coords[0] - 1, coords[1] - 1] = "O";
                 label11.Text = "You missed.";
             }
-            user.setGuessBoard(guessBoard);
 
             //AI makes guess
             if (CPU.guess(player))
@@ -158,6 +158,11 @@ namespace GamesForClass
                 i++;
                 counter++;
             }
+            int type;
+            //finding type
+            if (startCoords[0] - endCoords[0] == 0) { type = 1; }
+            else if (startCoords[1] - endCoords[1] == 0) { type = 2; }
+            else { type = 3; }
 
             //makes sure correct number of coordinates was entered
             if (counter == 4)
@@ -167,25 +172,25 @@ namespace GamesForClass
                 {
                     if (shipType == "Aircraft Carrier (Size: 4)")
                     {
-                        player.addShipToBoard("Aircraft Carrier", 4, startCoords, endCoords);
+                        player.addShip(startCoords, endCoords, type, new Ship(4, "Aircraft Carrier"), "A", true);
                         label6.Text = "Ship Placed!";
                         return true;
                     }
                     else if (shipType == "Battleship (Size: 3)")
                     {
-                        player.addShipToBoard("Battleship", 3, startCoords, endCoords);
+                        player.addShip(startCoords, endCoords, type, new Ship(3, "Battleship"), "B", true);
                         label6.Text = "Ship Placed!";
                         return true;
                     }
                     else if (shipType == "Destroyer (Size: 2)")
                     {
-                        player.addShipToBoard("Destroyer", 2, startCoords, endCoords);
+                        player.addShip(startCoords, endCoords, type, new Ship(2, "Destroyer"), "D", true);
                         label6.Text = "Ship Placed!";
                         return true;
                     }
                     else
                     {
-                        player.addShipToBoard("Submarine", 1, startCoords, endCoords);
+                        player.addShip(startCoords, endCoords, type, new Ship(1, "Submarine"), "S", true);
                         label6.Text = "Ship Placed!";
                         return true;
                     }
@@ -210,7 +215,19 @@ namespace GamesForClass
             int endX = endCoord[0];
             int startY = startCoord[1];
             int endY = endCoord[1];
-
+            int type = 0;
+            if (startX - endX == 0)
+            {
+                type = 1;
+            }
+            else if (startY - endY == 0)
+            {
+                type = 2;
+            }
+            else
+            {
+                type = 3;
+            }
             
             //not outside of board
             if (startX > 9 || endX > 9 || startY > 9 || endY > 9)
@@ -250,30 +267,52 @@ namespace GamesForClass
                 {
                     length = Math.Abs(startX - endX) + 1;
                 }
-
+                String shipName = "";
+                String letter = "";
                 //does checks
-                if (shipType == "Aircraft Carrier (Size: 4)" && length != 4)
+                if (shipType == "Aircraft Carrier (Size: 4)")
                 {
+                    if (length != 4)
+                    {
                     output = false;
                     label6.Text = "Wrong length for selected ship";
+                    }
+                    shipName = "Aircraft Carrier";
+                    letter = "A";
                 }
-                else if (shipType == "Battleship (Size: 3)" && length != 3)
+                else if (shipType == "Battleship (Size: 3)")
                 {
+                    if (length != 3)
+                    {
                     output = false;
                     label6.Text = "Wrong length for selected ship";
+                    }
+                    shipName = "Battleship";
+                    letter = "B";
                 }
-                else if (shipType == "Destroyer (Size: 2)" && length != 2)
+                else if (shipType == "Destroyer (Size: 2)")
                 {
+                    if (length != 2)
+                    {
                     output = false;
                     label6.Text = "Wrong length for selected ship";
+                    }
+                    shipName = "Destroyer";
+                    letter = "D";
                 }
                 else if (shipType == "Submarine (Size: 1)" && length != 1)
                 {
+                    if (length != 1)
+                    {
                     output = false;
                     label6.Text = "Wrong length for selected ship";
+                    }
+                    shipName = "Submarine";
+                    letter = "S";
                 }
+                Ship ship = new Ship(length, shipName);
                 //makes sure a ship is not already there
-                if (!player.checkForPlacedShip(startCoord, endCoord))
+                if (!player.addShip(startCoord, endCoord, type, ship, letter, true))
                 {
                     output = false;
                     label6.Text = "A ship already exists in this space.";
@@ -287,7 +326,6 @@ namespace GamesForClass
         private void button1_Click(object sender, EventArgs e)
         {
             //need to stop player from overwriting ships
-            player.setGuessBoard(player.getBoard());
             int numShips = player.getNumShips();
             if (numShips > 5)
             {
@@ -299,9 +337,8 @@ namespace GamesForClass
         private void button3_Click(object sender, EventArgs e)
         {
             //for testing purposes, player ships set automatically
-            player.placeShips();
-            CPU.placeShips();
-            player.setGuessBoard(player.getBoard());
+            player.placeShips(true);
+            CPU.placeShips(true);
             button2.Visible = true;
             textBox2.Visible = true;
             label5.Visible = true;
@@ -347,361 +384,253 @@ namespace GamesForClass
     /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
     {
-        private String[][] board = new String[9][];
-        private String[][] guessBoard = new String[9][];
-        Ship[,] ships = new Ship[9, 9];
+        private String[,] board = new String[9,9];
+        Ship[,] fleet = new Ship[9, 9];
         //keeps track of previous guess, 0: last guess was mark, 1&2: X,y coords of previous guess, 3: direction type, 4&5: first found local, 6: ship direction
         private int[] guesses = { -1, -1, -1, -1, -1, -1, -1 };
         private int numShips = 0;
         public BattleshipPlayer()
         {
-            board[0] = new String[9];
-            board[1] = new String[9];
-            board[2] = new String[9];
-            board[3] = new String[9];
-            board[4] = new String[9];
-            board[5] = new String[9];
-            board[6] = new String[9];
-            board[7] = new String[9];
-            board[8] = new String[9];
-            guessBoard[0] = new String[9];
-            guessBoard[1] = new String[9];
-            guessBoard[2] = new String[9];
-            guessBoard[3] = new String[9];
-            guessBoard[4] = new String[9];
-            guessBoard[5] = new String[9];
-            guessBoard[6] = new String[9];
-            guessBoard[7] = new String[9];
-            guessBoard[8] = new String[9];
             Ship blankShip = new Ship(0, "None");
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    board[i][j] = "_";
-                    guessBoard[i][j] = "_";
-                    ships[i, j] = blankShip;
+                    board[i,j] = "_";
+                    fleet[i, j] = blankShip;
                 }
             }
         }
         //Getters and setters
-        public String[][] getBoard()
-        {
-            return board;
-        }
-        public void setBoard(String[][] board)
-        {
-            this.board = board;
-        }
-        public String[][] getGuessBoard()
-        {
-            return guessBoard;
-        }
-        public void setGuessBoard(String[][] guessBoard)
-        {
-            this.guessBoard = guessBoard;
-        }
-        public Ship[,] getShips() { return ships; }
-        public void setShips(Ship[,] ships) {  this.ships = ships; }
+        public String[,] getBoard() { return board; }
+        public void setBoard(String[,] board) { this.board = board; }
+        public Ship[,] getFleet() { return fleet; }
+        public void setFleet(Ship[,] ships) {  this.fleet = ships; }
         public int getNumShips() { return numShips; }
         public void setNumShips(int numShips) { this.numShips = numShips; }
         /* AI places ships onto board */
-        public void placeShips()
+        public void placeShips(bool visual)
         {
-            //Get to place: 1 Aircraft Carrier, 2 Battleships, 2 Destroyers, 1 Submarine
-            int numShips = 0;
+            int x, y, type;
+            int count = 0;
             Random rnd = new Random();
-            String name;
-            while (numShips < 6)
+            int[] start = new int[2];
+            int[] end = new int[2];
+            //places ships onto board
+            while (count < 6)
             {
-                //Aircraft carrier
-                if (numShips == 0)
+                //aircraft carrier
+                if (count == 0)
                 {
-                    int type = rnd.Next(0, 3);
-                    int x, y;
-                    name = "Aircraft Carrier";
-                    //horizontal
-                    if (type == 0) {
-                        x = rnd.Next(1, 7);
-                        y = rnd.Next(1, 10);
-                        int[] start = { x, y };
-                        int[] end = { x + 3, y };
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 4, start, end);
-                            numShips++;
-                        }
-                    }
-                    //vertical
-                    else if (type == 1)
+                    //gets placement type, 1-3 (vertical, horizontal, diagonal)
+                    type = rnd.Next(1, 3);
+                    switch (type)
                     {
-                        x = rnd.Next(1, 10);
-                        y = rnd.Next(1, 7);
-                        int[] start = { x, y };
-                        int[] end = { x, y + 3};
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 4, start, end);
-                            numShips++;
-                        }
+                        //x remains the same
+                        case 1:
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(0, 5);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x;
+                            end[1] = y + 3;
+                            break;
+                        //y remains the same
+                        case 2:
+                            x = rnd.Next(0, 5);
+                            y = rnd.Next(0, 8);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x + 3;
+                            end[1] = y;
+                            break;
+                        //diagonal
+                        case 3:
+                            x = rnd.Next(0, 5);
+                            y = rnd.Next(0, 5);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x + 3;
+                            end[1] = y + 3;
+                            break;
                     }
-                    //diagonal
-                    else
+                    Ship ac = new Ship(4, "Aircraft Carrier");
+                    //checks if the ship can be placed, places it if it can
+                    if (addShip(start, end, type, ac, "A", visual))
                     {
-                        x = rnd.Next(1, 7);
-                        y = rnd.Next(1,7);
-                        int[] start = { x, y };
-                        int[] end = { x + 3, y + 3 };
-                        if (checkForPlacedShip(start,end))
-                        {
-                            addShipToBoard(name, 4, start, end);
-                            numShips++;
-                        }
+                        count++;
                     }
-
                 }
                 //Battleship
-                else if (numShips < 3)
+                else if (count < 3)
                 {
-                    int type = rnd.Next(0, 3);
-                    int x, y;
-                    name = "Battleship";
-                    //horizontal
-                    if (type == 0)
+                    //gets placement type, 1-3 (vertical, horizontal, diagonal)
+                    type = rnd.Next(1, 3);
+                    switch (type)
                     {
-                        x = rnd.Next(1, 8);
-                        y = rnd.Next(1, 10);
-                        int[] start = { x, y };
-                        int[] end = { x + 2, y };
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 3, start, end);
-                            numShips++;
-                        }
+                        //x remains the same
+                        case 1:
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(0, 6);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x;
+                            end[1] = y + 2;
+                            break;
+                        //y remains the same
+                        case 2:
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(0, 8);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x + 2;
+                            end[1] = y;
+                            break;
+                        //diagonal
+                        case 3:
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(0, 6);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x + 2;
+                            end[1] = y + 2;
+                            break;
                     }
-                    //vertical
-                    else if (type == 1) 
+                    Ship ac = new Ship(3, "Battleship");
+                    //checks if the ship can be placed, places it if it can
+                    if (addShip(start, end, type, ac, "B", visual))
                     {
-                        x = rnd.Next(1, 10);
-                        y = rnd.Next(1, 8);
-                        int[] start = { x, y };
-                        int[] end = { x, y + 2};
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 3, start, end);
-                            numShips++;
-                        }
-                    }
-                    //diagonal
-                    else
-                    {
-                        x = rnd.Next(1, 8);
-                        y = rnd.Next(1, 8);
-                        int[] start = { x, y };
-                        int[] end = { x + 2, y + 2 };
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 3, start, end);
-                            numShips++;
-                        }
+                        count++;
                     }
                 }
                 //Destroyer
-                else if (numShips < 5)
+                else if (count < 5)
                 {
-                    int type = rnd.Next(0, 3);
-                    int x, y;
-                    name = "Destroyer";
-                    //horizontal
-                    if (type == 0)
+                    //gets placement type, 1-3 (vertical, horizontal, diagonal)
+                    type = rnd.Next(1, 3);
+                    switch (type)
                     {
-                        x = rnd.Next(1, 9);
-                        y = rnd.Next(1, 10);
-                        int[] start = { x, y };
-                        int[] end = {x + 1, y };
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 2, start, end);
-                            numShips++;
-                        }
+                        //x remains the same
+                        case 1:
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(0, 7);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x;
+                            end[1] = y + 1;
+                            break;
+                        //y remains the same
+                        case 2:
+                            x = rnd.Next(0, 7);
+                            y = rnd.Next(0, 8);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x + 1;
+                            end[1] = y;
+                            break;
+                        //diagonal
+                        case 3:
+                            x = rnd.Next(0, 7);
+                            y = rnd.Next(0, 7);
+                            start[0] = x;
+                            start[1] = y;
+                            end[0] = x + 1;
+                            end[1] = y + 1;
+                            break;
                     }
-                    //vertical
-                    else if (type == 1)
+                    Ship ac = new Ship(2, "Destroyer");
+                    //checks if the ship can be placed, places it if it can
+                    if (addShip(start, end, type, ac, "D", visual))
                     {
-                        x = rnd.Next(1, 10);
-                        y = rnd.Next(1, 9);
-                        int[] start = { x, y };
-                        int[] end = {x, y + 1 };
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 2, start, end);
-                            numShips++;
-                        }
-                    }
-                    //diagonal
-                    else
-                    {
-                        x = rnd.Next(1, 9);
-                        y = rnd.Next(1, 9);
-                        int[] start = { x, y };
-                        int[] end = { x + 1, y + 1 };
-                        if (checkForPlacedShip(start, end))
-                        {
-                            addShipToBoard(name, 2, start, end);
-                            numShips++;
-                        }
+                        count++;
                     }
                 }
                 //Submarine
                 else
                 {
-                    name = "Submarine";
-                    int x = rnd.Next(1, 10);
-                    int y = rnd.Next(1, 10);
-                    int[] start = { x, y };
-                    int[] end = { x, y };
-                    if (checkForPlacedShip(start, end))
+                    x = rnd.Next(0, 8);
+                    y = rnd.Next(0, 8);
+                    start[0] = x;
+                    end[0] = x;
+                    start[1] = y;
+                    end[1] = y;
+                    Ship ac = new Ship(1, "Submarine");
+                    if (addShip(start, end, 1, ac, "S", visual))
                     {
-                        addShipToBoard(name, 1, start, end);
-                        numShips++;
+                        count++;
                     }
                 }
-                    
             }
         }
-        //Makes sure there was not a ship placed in this spot already. False if ship already exists, true if not
-        public bool checkForPlacedShip(int[] startCoord, int[] endCoord)
+        //checks current ship placement, places ship if it is able to (false, unable to place)
+        //visual: if the ship is actually placed onto the visual board
+        public bool addShip(int[] start, int[] end, int type, Ship ship, String letter, bool visual)
         {
-            int startX = startCoord[0];
-            int endX = endCoord[0];
-            int startY = startCoord[1];
-            int endY = endCoord[1];
-            int x, y, xDif, yDif;
+            int x, y;
+            switch (type)
+            {
+                //no change in x
+                case 1:
+                    x = start[0];
+                    //check for already placed ship
+                    for (int i = start[1]; i <= end[1]; i++)
+                    {
+                        if (fleet[x, i].getName() != "None")
+                        {
+                            return false;
+                        }
+                    }
+                    //place ship if there was not one there already
+                    for (int i = start[1]; i <= end[1]; i++)
+                    {
+                        if (visual) { board[x, i] = letter; }
+                        fleet[x, i] = ship;
 
-            if (startX > endX)
-            {
-                x = endX;
-                xDif = startX - endX;
-            }
-            else
-            {
-                x = startX;
-                xDif = endX - startX;
-            }
-            if (startY > endY)
-            {
-                y = endY;
-                yDif = startY - endY;
-            }
-            else
-            {
-                y = startY;
-                yDif = endY - startY;
-            }
-            //Placement Loops
-            //if the placement is vertical
-            if (xDif == 0)
-            {
-                for (int i = x - 1; i < y + yDif; i++)
-                {
-                    if (this.board[i][y - 1] == "X") 
-                    {
-                        return false;
                     }
-                }
-            }
-            //if placement is horizontal
-            else if (yDif == 0)
-            {
-                for (int i = y - 1; i < x + xDif; i++)
-                {
-                    if (this.board[x - 1][i] == "X")
+                    return true;
+                //no change in y
+                case 2:
+                    y = start[1];
+                    for (int i = start[0]; i <= end[0]; i++)
                     {
-                        return false;
+                        if (fleet[i, y].getName() != "None")
+                        {
+                            return false;
+                        }
                     }
-                }
-            }
-            //if placement is diagonal
-            else
-            {
-                int j = y - 1;
-                for (int i = x - 1; i < x + xDif; i++)
-                {
-                    if (this.board[i][j] == "X")
+                    for (int i = start[0]; i <= end[0]; i++)
                     {
-                        return false;
+                        if (visual) { board[i, y] = letter; }
+                        fleet[i, y] = ship;
                     }
-                    j++;
-                }
+                    return true;
+                //diagonal
+                case 3:
+                    int j = start[1];
+                    for (int i = start[0]; i <= end[0]; i++)
+                    {
+                        if (fleet[i, j].getName() != "None")
+                        {
+                            return false;
+                        }
+                        j++;
+                    }
+                    j = 0;
+                    for (int i = start[0]; i <= end[0]; i++)
+                    {
+                        if (visual) { board[i, j] = letter; }
+                        fleet[i, j] = ship;
+                        j++;
+                    }
+                    return true;
             }
-            return true;
+            return false;
         }
-        //places the ships onto the board
-        public void addShipToBoard(String name, int size, int[] startCoord, int[] endCoord)
-        {
-            //places already validated ship into board space
-            int startX = startCoord[0];
-            int endX = endCoord[0];
-            int startY = startCoord[1];
-            int endY = endCoord[1];
-            int x, y, xDif, yDif;
-
-            if (startX > endX)
-            {
-                x = endX;
-                xDif = startX - endX;
-            }
-            else
-            {
-                x = startX;
-                xDif = endX - startX;
-            }
-            if (startY > endY)
-            {
-                y = endY;
-                yDif = startY - endY;
-            }
-            else
-            {
-                y = startY;
-                yDif = endY - startY;
-            }
-            Ship newShip = new Ship(size, name);
-            //Placement Loops
-            //if the placement is vertical
-            if (xDif == 0)
-            {
-                for (int i = x - 1; i < y + yDif; i++)
-                {
-                    this.board[i][y-1] = "X";
-                    this.ships[i,y - 1] = newShip;
-                }
-            }
-            //if placement is horizontal
-            else if (yDif == 0)
-            {
-                for (int i = y - 1; i < x + xDif; i++)
-                {
-                    this.board[x - 1][i] = "X";
-                    this.ships[x-1, i] = newShip;
-                }
-            }
-            //if placement is diagonal
-            else
-            {
-                int j = y - 1;
-                for (int i = x - 1; i < x + xDif; i++)
-                {
-                    this.board[i][j] = "X";
-                    this.ships[i, j] = newShip;
-                    j++;
-                }
-            }
-        }
+        
         //Algorithm to make a guess on the board
         public bool guess(BattleshipPlayer user)
         {
-            String[][] opboard = user.getGuessBoard();
+            String[,] opboard = user.getBoard();
             int x, y;
             bool correct = false;
             //previous guess was correct
@@ -766,7 +695,7 @@ namespace GamesForClass
                                 //sets og direction
                                 guesses[6] = dir;
                                 //checking if the ship was sunk
-                                if (ships[status[1], status[2]].isSunk())
+                                if (fleet[status[1], status[2]].isSunk())
                                 {
                                     for (int i = 0; i < guesses.Length; i++)
                                     {
@@ -793,7 +722,7 @@ namespace GamesForClass
                             guesses[0] = 1;
                             correct = true;
                             //checking if the ship was sunk
-                            if (ships[status[1], status[2]].isSunk())
+                            if (fleet[status[1], status[2]].isSunk())
                             {
                                 for (int i = 0; i < guesses.Length; i++)
                                 {
@@ -816,7 +745,7 @@ namespace GamesForClass
                             guesses[0] = 1;
                             correct = true;
                             //checking if the ship was sunk
-                            if (ships[status[1], status[2]].isSunk())
+                            if (fleet[status[1], status[2]].isSunk())
                             {
                                 for (int i = 0; i < guesses.Length; i++)
                                 {
@@ -893,7 +822,7 @@ namespace GamesForClass
                                 //sets og direction
                                 guesses[6] = dir;
                                 //checking if the ship was sunk
-                                if (ships[status[1], status[2]].isSunk())
+                                if (fleet[status[1], status[2]].isSunk())
                                 {
                                     for (int i = 0; i < guesses.Length; i++)
                                     {
@@ -916,20 +845,20 @@ namespace GamesForClass
                     {
                         Random rnd = new Random();
                         bool run = true;
-                        String[][] opguessBoard = user.getGuessBoard();
-                        Ship[,] opships = user.getShips();
+                        String[,] opguessBoard = user.getBoard();
+                        Ship[,] opships = user.getFleet();
                         while (run)
                         {
                             x = rnd.Next(0, 9);
                             y = rnd.Next(0, 9);
                             //found a ship to sink
-                            if (opboard[x][y] == "X")
+                            if (opboard[x, y] == "X")
                             {
-                                opguessBoard[x][y] = "H";
+                                opguessBoard[x, y] = "H";
                                 opships[x, y].hit();
                                 guesses[0] = 1;
                                 correct = true;
-                                if (!ships[x, y].isSunk())
+                                if (!fleet[x, y].isSunk())
                                 {
                                     guesses[1] = x;
                                     guesses[2] = y;
@@ -940,19 +869,19 @@ namespace GamesForClass
                                 run = false;
                             }
                             //already guessed
-                            else if (opboard[x][y] == "O")
+                            else if (opboard[x,y] == "O")
                             {
                                 continue;
                             }
                             //nothing guessed
                             else
                             {
-                                opguessBoard[x][y] = "O";
+                                opguessBoard[x, y] = "O";
                                 guesses[0] = 0;
                                 run = false;
                             }
                         }
-                        user.setGuessBoard(opguessBoard);
+                        user.setBoard(opguessBoard);
                     }
                     //currently working on a ship
                     else
@@ -971,7 +900,7 @@ namespace GamesForClass
                                 //sets correct direction
                                 guesses[3] = newDir;
                                 //checking if the ship was sunk
-                                if (ships[status[1], status[2]].isSunk())
+                                if (fleet[status[1], status[2]].isSunk())
                                 {
                                     for (int i = 0; i < guesses.Length; i++)
                                     {
@@ -994,23 +923,22 @@ namespace GamesForClass
         //returns true if guess was correct, false if not
         public bool hitOrMiss(BattleshipPlayer user, int cX, int cY)
         {
-            String[][] board = user.getBoard();
-            String[][] guessBoard = user.getGuessBoard();
-            if (board[cX][cY] == "X")
+            String[,] usrboard = user.getBoard();
+            if (usrboard[cX, cY] == "X")
             {
-                guessBoard[cX][cY] = "H";
-                ships[cX, cY].hit();
+                usrboard[cX, cY] = "H";
+                fleet[cX, cY].hit();
                 guesses[1] = cX;
                 guesses[2] = cY;
-                user.setGuessBoard(guessBoard);
+                user.setBoard(usrboard);
                 return true;
             }
             //was a miss
             else
             {
-                guessBoard[cX][cY] = "O";
+                usrboard[cX,cY] = "O";
                 guesses[0] = 0;
-                user.setGuessBoard(guessBoard);
+                user.setBoard(usrboard);
                 return false;
             }
         }
