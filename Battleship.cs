@@ -670,7 +670,7 @@ namespace GamesForClass
                         }
                         j++;
                     }
-                    j = 0;
+                    j = start[1];
                     for (int i = start[0]; i <= end[0]; i++)
                     {
                         if (visual) { board[i, j] = letter; }
@@ -686,6 +686,7 @@ namespace GamesForClass
         public bool guess(BattleshipPlayer user)
         {
             String[,] opboard = user.getBoard();
+            Ship[,] opfleet = user.getFleet();
             int sunkShips = user.getSunkShips();
             int x, y;
             bool correct = false;
@@ -738,7 +739,7 @@ namespace GamesForClass
                                 y = guesses[2] + 1;
                                 break;
                         }
-                        int[] status = checkGuessBounds(dir, x, y);
+                        int[] status = checkGuessBounds(dir, x, y, opboard, false);
                         //within bounds
                         if (status[0] == 1)
                         {
@@ -751,7 +752,7 @@ namespace GamesForClass
                                 //sets og direction
                                 guesses[6] = dir;
                                 //checking if the ship was sunk
-                                if (fleet[status[1], status[2]].isSunk())
+                                if (opfleet[status[1], status[2]].isSunk())
                                 {
                                     for (int i = 0; i < guesses.Length; i++)
                                     {
@@ -770,7 +771,7 @@ namespace GamesForClass
                 }
                 else
                 {
-                    int[] status = checkGuessBounds(guesses[3], guesses[1], guesses[2]);
+                    int[] status = checkGuessBounds(guesses[3], guesses[1], guesses[2], opboard, true);
                     //guess is in bounds
                     if (status[0] == 1)
                     {
@@ -779,7 +780,7 @@ namespace GamesForClass
                             guesses[0] = 1;
                             correct = true;
                             //checking if the ship was sunk
-                            if (fleet[status[1], status[2]].isSunk())
+                            if (opfleet[status[1], status[2]].isSunk())
                             {
                                 for (int i = 0; i < guesses.Length; i++)
                                 {
@@ -797,24 +798,35 @@ namespace GamesForClass
                     else
                     {
                         //flips direction and uses og guess
-                        status = checkGuessBounds(flipDirection(guesses[6]), guesses[4], guesses[5]);
-                        if (hitOrMiss(user, status[1], status[2]))
-                        {
-                            guesses[0] = 1;
-                            correct = true;
-                            //checking if the ship was sunk
-                            if (fleet[status[1], status[2]].isSunk())
+                        status = checkGuessBounds(flipDirection(guesses[6]), guesses[4], guesses[5], opboard, true);
+                        if (status[0] == 1)
+                        { 
+                            if (hitOrMiss(user, status[1], status[2]))
                             {
-                                for (int i = 0; i < guesses.Length; i++)
+                                guesses[0] = 1;
+                                correct = true;
+                                //checking if the ship was sunk
+                                if (opfleet[status[1], status[2]].isSunk())
                                 {
-                                    guesses[i] = -1;
+                                    for (int i = 0; i < guesses.Length; i++)
+                                    {
+                                        guesses[i] = -1;
+                                    }
+                                    sunkShips++;
                                 }
-                                sunkShips++;
+                            }
+                            else
+                            {
+                                guesses[0] = 0;
                             }
                         }
+                        //both directions are invalid, find new location
                         else
                         {
-                            guesses[0] = 0;
+                            for (int i = 0; i < guesses.Length; i++)
+                            {
+                                guesses[i] = -1;
+                            }
                         }
                     }
                 }
@@ -868,7 +880,7 @@ namespace GamesForClass
                                 y = guesses[2] + 1;
                                 break;
                         }
-                        int[] status = checkGuessBounds(dir, x, y);
+                        int[] status = checkGuessBounds(dir, x, y, opboard, false);
                         //within bounds
                         if (status[0] == 1)
                         {
@@ -881,7 +893,7 @@ namespace GamesForClass
                                 //sets og direction
                                 guesses[6] = dir;
                                 //checking if the ship was sunk
-                                if (fleet[status[1], status[2]].isSunk())
+                                if (opfleet[status[1], status[2]].isSunk())
                                 {
                                     for (int i = 0; i < guesses.Length; i++)
                                     {
@@ -905,20 +917,18 @@ namespace GamesForClass
                     {
                         Random rnd = new Random();
                         bool run = true;
-                        String[,] opguessBoard = user.getBoard();
-                        Ship[,] opships = user.getFleet();
                         while (run)
                         {
                             x = rnd.Next(0, 9);
                             y = rnd.Next(0, 9);
                             //found a ship to sink
-                            if (opboard[x, y] == "X")
+                            if (opfleet[x, y].getName() != "None")
                             {
-                                opguessBoard[x, y] = "H";
-                                opships[x, y].hit();
+                                opboard[x, y] = "H";
+                                opfleet[x, y].hit();
                                 guesses[0] = 1;
                                 correct = true;
-                                if (!fleet[x, y].isSunk())
+                                if (!opfleet[x, y].isSunk())
                                 {
                                     guesses[1] = x;
                                     guesses[2] = y;
@@ -930,19 +940,20 @@ namespace GamesForClass
                                 run = false;
                             }
                             //already guessed
-                            else if (opboard[x,y] == "O")
+                            else if (opboard[x,y] == "O" || opboard[x,y] == "H")
                             {
                                 continue;
                             }
                             //nothing guessed
                             else
                             {
-                                opguessBoard[x, y] = "O";
+                                opboard[x, y] = "O";
                                 guesses[0] = 0;
                                 run = false;
                             }
                         }
-                        user.setBoard(opguessBoard);
+                        user.setBoard(opboard);
+                        user.setFleet(opfleet);
                     }
                     //currently working on a ship
                     else
@@ -950,7 +961,7 @@ namespace GamesForClass
 
                         //there is a og correct direction, go in opposite direction.
                         int newDir = flipDirection(guesses[6]);
-                        int[] status = checkGuessBounds(newDir, guesses[4], guesses[5]);
+                        int[] status = checkGuessBounds(newDir, guesses[4], guesses[5], opboard, true);
                         //working status
                         if (status[0] == 1)
                         {
@@ -961,7 +972,7 @@ namespace GamesForClass
                                 //sets correct direction
                                 guesses[3] = newDir;
                                 //checking if the ship was sunk
-                                if (fleet[status[1], status[2]].isSunk())
+                                if (opfleet[status[1], status[2]].isSunk())
                                 {
                                     for (int i = 0; i < guesses.Length; i++)
                                     {
@@ -987,13 +998,16 @@ namespace GamesForClass
         public bool hitOrMiss(BattleshipPlayer user, int cX, int cY)
         {
             String[,] usrboard = user.getBoard();
-            if (usrboard[cX, cY] == "X")
+            Ship[,] usrfleet = user.getFleet();
+            //checks if the spot has a ship on it
+            if (usrfleet[cX, cY].getName() != "None")
             {
                 usrboard[cX, cY] = "H";
-                fleet[cX, cY].hit();
+                usrfleet[cX, cY].hit();
                 guesses[1] = cX;
                 guesses[2] = cY;
                 user.setBoard(usrboard);
+                user.setFleet(usrfleet);
                 return true;
             }
             //was a miss
@@ -1005,8 +1019,8 @@ namespace GamesForClass
                 return false;
             }
         }
-        //checks the bounds of coordinates
-        public int[] checkGuessBounds(int direction, int x, int y)
+        //checks the bounds of coordinates, makes sure spot was not already taken
+        public int[] checkGuessBounds(int direction, int x, int y, String[,] usrboard, bool mov)
         {
             int[] output = new int[3];
             int cX = 0;
@@ -1046,12 +1060,32 @@ namespace GamesForClass
                     cY = y + 1;
                     break;
             }
-            output[1] = cX;
-            output[2] = cY;
-            if (cX > 0 && cX < 9 && cY > 0 && cY < 9)
+            //checks if the coordinates need to move
+            if (mov)
             {
-                output[0] = 1;
-                return output;
+                output[1] = cX;
+                output[2] = cY;
+            }
+            else
+            {
+                output[1] = x;
+                output[2] = y;
+                cX = x;
+                cY = y;
+            }
+            if (cX >= 0 && cX < 9 && cY >= 0 && cY < 9)
+            {
+                //guess is within bounds, check if used already
+                if (usrboard[cX, cY] == "O" || usrboard[cX,cY] == "H") {
+                    output[0] = 0;
+                    return output;
+                }
+                //guess is valid
+                else
+                {
+                    output[0] = 1;
+                    return output;
+                }
             }
             else
             {
