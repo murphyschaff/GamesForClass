@@ -30,17 +30,9 @@ namespace GamesForClass
         }
         public void initBattleship()
         {
-            String[,] guessBoard = new string[9,9];
-            //creates and adds blank boards to both player and CPU player
-            for (int i = 0; i < guessBoard.Length; i++)
-            {
-                for (int j = 0; j < guessBoard.Length; j++)
-                {
-                    guessBoard[i, j] = "_";
-                }
-            }
-            player.setBoard(guessBoard);
-            CPU.setBoard(guessBoard);
+            player = new BattleshipPlayer();
+            CPU = new BattleshipPlayer();
+
         }
         //Updates graphics on board, depends on if board is being updated when player placing ships
         public void updateBoard(bool isplayer)
@@ -50,7 +42,7 @@ namespace GamesForClass
                 {
                     //places down the new board results into label (NEEDS MORE SPACES AND NEW LINES)
                     String[,] board = player.getBoard();
-                    String output ="";
+                    String output = "";
                     for (int i = 0;i < 9; i++)
                     {
                         output += board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
@@ -65,7 +57,7 @@ namespace GamesForClass
                 String output = "";
                 for (int i = 0; i < 9; i++)
                 {
-                    output += board[i, 0] + "__" + board[i,1] + "__" + board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 8] + "\n";
+                    output += board[i, 0] + "__" + board[i,1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
                 }
                 label2.Text = output;
                 
@@ -84,17 +76,25 @@ namespace GamesForClass
         {
             String[,] board = user.getBoard();
             Ship[,] ships = user.getFleet();
+            coords[0] = coords[0] - 1;
+            coords[1] = coords[1] - 1;
 
-            
-            //Is a hit
-            if (board[coords[0]-1,coords[1]-1] == "X")
+            //checks if the space has been guessed already
+            if (board[coords[0], coords[1]] == "O" || board[coords[0], coords[1]] == "H")
             {
-                board[coords[0] - 1,coords[1] - 1] = "H";
-                Ship ship = ships[coords[0]-1,coords[1]-1];
+                label11.Text = "You have already selected this space";
+                return;
+            }
+            //Is a hit
+            else if (board[coords[0],coords[1]] != "_")
+            {
+                board[coords[0],coords[1]] = "H";
+                Ship ship = ships[coords[0],coords[1]];
                 ship.hit();
                 if (ship.isSunk())
                 {
                     label11.Text = String.Format("You sunk a {0}!", ship.getName());
+                    CPU.setSunkShips(CPU.getSunkShips() + 1);
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace GamesForClass
             }
             else
             {
-                board[coords[0] - 1, coords[1] - 1] = "O";
+                board[coords[0], coords[1]] = "O";
                 label11.Text = "You missed.";
             }
 
@@ -118,6 +118,23 @@ namespace GamesForClass
             }
 
             updateBoard(false);
+            //check for win condition
+            int playersunk = player.getSunkShips();
+            int cpusunk = CPU.getSunkShips();
+            if (playersunk > 5)
+            {
+                label11.Text = label11.Text + "\nThe CPU has sunk all your ships. You loose";
+                button2.Visible = false;
+                textBox2.Visible = false;
+                label5.Visible = false;
+            }
+            else if (cpusunk > 5)
+            {
+                label11.Text = label11.Text + "\nYou have sunk all CPU ships. You Win!!!!";
+                button2.Visible = false;
+                textBox2.Visible = false;
+                label5.Visible = false;
+            }
 
         }
         //makes sure guess coordinates are within the board
@@ -326,18 +343,20 @@ namespace GamesForClass
         private void button1_Click(object sender, EventArgs e)
         {
             //need to stop player from overwriting ships
+            button5.Visible = false;
             int numShips = player.getNumShips();
             if (numShips > 5)
             {
                 button3.Visible = true;
+                button1.Visible = false;
             }
             updateBoard(true);
         }
         //Start game function
         private void button3_Click(object sender, EventArgs e)
         {
-            //for testing purposes, player ships set automatically
-            player.placeShips(true);
+            button3.Visible = false;
+            //for testing purposes, user can see CPU placed ships
             CPU.placeShips(true);
             button2.Visible = true;
             textBox2.Visible = true;
@@ -380,6 +399,39 @@ namespace GamesForClass
                 label11.Text = "Please enter valid coordinates";
             }
         }
+        //auto place ships
+        private void button5_Click(object sender, EventArgs e)
+        {
+            button1.Visible = false;
+            button3.Visible = true;
+            button5.Visible = false;
+            label4.Visible = false;
+            domainUpDown1.Visible = false;
+            label6.Visible = false;
+            textBox1.Visible = false;
+            player.placeShips(true);
+            updateBoard(false);
+        }
+        //reset button sequence
+        private void button4_Click(object sender, EventArgs e)
+        {
+            button1.Visible = true;
+            button5.Visible = true;
+            label4.Visible = true;
+            domainUpDown1.Visible = true;
+            label6.Visible = true;
+            textBox1.Visible = true;
+
+            button2.Visible = false;
+            textBox2.Visible = false;
+            label5.Visible = false;
+
+            label1.Text = "";
+            label2.Text = "";
+            label11.Text = "";
+
+            initBattleship();
+        }
     }
     /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
@@ -389,6 +441,7 @@ namespace GamesForClass
         //keeps track of previous guess, 0: last guess was mark, 1&2: X,y coords of previous guess, 3: direction type, 4&5: first found local, 6: ship direction
         private int[] guesses = { -1, -1, -1, -1, -1, -1, -1 };
         private int numShips = 0;
+        private int sunkShips = 0;
         public BattleshipPlayer()
         {
             Ship blankShip = new Ship(0, "None");
@@ -408,6 +461,8 @@ namespace GamesForClass
         public void setFleet(Ship[,] ships) {  this.fleet = ships; }
         public int getNumShips() { return numShips; }
         public void setNumShips(int numShips) { this.numShips = numShips; }
+        public int getSunkShips() { return sunkShips; }
+        public void setSunkShips(int sunkShips) { this.sunkShips = sunkShips; }
         /* AI places ships onto board */
         public void placeShips(bool visual)
         {
@@ -631,6 +686,7 @@ namespace GamesForClass
         public bool guess(BattleshipPlayer user)
         {
             String[,] opboard = user.getBoard();
+            int sunkShips = user.getSunkShips();
             int x, y;
             bool correct = false;
             //previous guess was correct
@@ -701,6 +757,7 @@ namespace GamesForClass
                                     {
                                         guesses[i] = -1;
                                     }
+                                    sunkShips++;
                                 }
                             }
                             else
@@ -728,6 +785,7 @@ namespace GamesForClass
                                 {
                                     guesses[i] = -1;
                                 }
+                                sunkShips++;
                             }
                         }
                         else
@@ -751,6 +809,7 @@ namespace GamesForClass
                                 {
                                     guesses[i] = -1;
                                 }
+                                sunkShips++;
                             }
                         }
                         else
@@ -828,6 +887,7 @@ namespace GamesForClass
                                     {
                                         guesses[i] = -1;
                                     }
+                                    sunkShips++;
                                 }
                             }
                             else
@@ -865,6 +925,7 @@ namespace GamesForClass
                                     guesses[4] = x;
                                     guesses[5] = y;
                                     guesses[6] = 0;
+                                    sunkShips++;
                                 }
                                 run = false;
                             }
@@ -906,6 +967,7 @@ namespace GamesForClass
                                     {
                                         guesses[i] = -1;
                                     }
+                                    sunkShips++;
                                 }
                             }
                             else
@@ -918,6 +980,7 @@ namespace GamesForClass
                     }
                 }
             }
+            user.setSunkShips(sunkShips);
             return correct;
         } 
         //returns true if guess was correct, false if not

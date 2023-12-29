@@ -46,6 +46,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -78,7 +79,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(499, 15);
+            this.label3.Location = new System.Drawing.Point(516, 9);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(311, 69);
@@ -169,6 +170,7 @@
             this.button3.TabIndex = 11;
             this.button3.Text = "Start Game!";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Visible = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // label7
@@ -224,6 +226,7 @@
             this.button4.TabIndex = 16;
             this.button4.Text = "Reset";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // label11
             // 
@@ -243,11 +246,23 @@
             this.label6.Size = new System.Drawing.Size(0, 16);
             this.label6.TabIndex = 10;
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(1139, 576);
+            this.button5.Margin = new System.Windows.Forms.Padding(4);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(160, 43);
+            this.button5.TabIndex = 18;
+            this.button5.Text = "Auto Ship Place";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // Battleship
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1351, 634);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label10);
@@ -295,5 +310,6 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button button5;
     }
 }
