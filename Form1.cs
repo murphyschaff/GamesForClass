@@ -16,6 +16,7 @@ namespace GamesForClass
         private TicTacToe ticTac;
         private War war;
         private Battleship ship;
+        private Yahtzee yahtzee;
         public Form1()
         {
             InitializeComponent();
@@ -37,6 +38,12 @@ namespace GamesForClass
         {
             ship = new Battleship();
             ship.Show();
+        }
+        /* Yhatzee */
+        private void button4_Click(object sender, EventArgs e)
+        {
+            yahtzee = new Yahtzee();
+            yahtzee.Show();
         }
     }
 }
