@@ -59,7 +59,7 @@
             // 
             this.dice.AccessibleName = "";
             this.dice.AutoSize = true;
-            this.dice.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice.BackColor = System.Drawing.Color.DarkGray;
             this.dice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice.Location = new System.Drawing.Point(479, 145);
             this.dice.MinimumSize = new System.Drawing.Size(100, 100);
@@ -72,7 +72,7 @@
             // 
             this.dice1.AccessibleName = "";
             this.dice1.AutoSize = true;
-            this.dice1.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice1.BackColor = System.Drawing.Color.DarkGray;
             this.dice1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice1.Location = new System.Drawing.Point(596, 145);
             this.dice1.MinimumSize = new System.Drawing.Size(100, 100);
@@ -85,7 +85,7 @@
             // 
             this.dice2.AccessibleName = "";
             this.dice2.AutoSize = true;
-            this.dice2.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice2.BackColor = System.Drawing.Color.DarkGray;
             this.dice2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice2.Location = new System.Drawing.Point(712, 145);
             this.dice2.MinimumSize = new System.Drawing.Size(100, 100);
@@ -98,7 +98,7 @@
             // 
             this.dice3.AccessibleName = "";
             this.dice3.AutoSize = true;
-            this.dice3.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice3.BackColor = System.Drawing.Color.DarkGray;
             this.dice3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice3.Location = new System.Drawing.Point(479, 268);
             this.dice3.MinimumSize = new System.Drawing.Size(100, 100);
@@ -111,7 +111,7 @@
             // 
             this.dice4.AccessibleName = "";
             this.dice4.AutoSize = true;
-            this.dice4.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice4.BackColor = System.Drawing.Color.DarkGray;
             this.dice4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice4.Location = new System.Drawing.Point(596, 268);
             this.dice4.MinimumSize = new System.Drawing.Size(100, 100);
@@ -124,7 +124,7 @@
             // 
             this.dice5.AccessibleName = "";
             this.dice5.AutoSize = true;
-            this.dice5.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice5.BackColor = System.Drawing.Color.DarkGray;
             this.dice5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice5.Location = new System.Drawing.Point(712, 268);
             this.dice5.MinimumSize = new System.Drawing.Size(100, 100);
@@ -137,7 +137,7 @@
             // 
             this.dice6.AccessibleName = "";
             this.dice6.AutoSize = true;
-            this.dice6.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice6.BackColor = System.Drawing.Color.DarkGray;
             this.dice6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice6.Location = new System.Drawing.Point(479, 388);
             this.dice6.MinimumSize = new System.Drawing.Size(100, 100);
@@ -150,7 +150,7 @@
             // 
             this.dice7.AccessibleName = "";
             this.dice7.AutoSize = true;
-            this.dice7.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice7.BackColor = System.Drawing.Color.DarkGray;
             this.dice7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice7.Location = new System.Drawing.Point(596, 388);
             this.dice7.MinimumSize = new System.Drawing.Size(100, 100);
@@ -163,7 +163,7 @@
             // 
             this.dice8.AccessibleName = "";
             this.dice8.AutoSize = true;
-            this.dice8.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.dice8.BackColor = System.Drawing.Color.DarkGray;
             this.dice8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice8.Location = new System.Drawing.Point(712, 388);
             this.dice8.MinimumSize = new System.Drawing.Size(100, 100);
@@ -180,6 +180,7 @@
             this.rollButton.TabIndex = 9;
             this.rollButton.Text = "Roll";
             this.rollButton.UseVisualStyleBackColor = true;
+            this.rollButton.Click += new System.EventHandler(this.rollButton_Click);
             // 
             // label1
             // 
