@@ -30,26 +30,15 @@ namespace GamesForClass
         //updates yahtzee board
         public void updateBoard(YahtzeeBoard board)
         {
-            int[] free = board.getFreeDice();
-            int[] hold = board.getHoldDice();
+            int[] diceVals = board.getDiceVals();
+            bool[] held = board.getHold();
             int val;
             Color clr;
-            bool isHeld = false;
-            for (int i = 0; i < free.Length; i++)
+            for (int i = 0; i < diceVals.Length; i++)
             {
-                //dice is being held
-                if (free[i] == -1)
-                {
-                    isHeld = true;
-                    val = hold[i];
-                }
-                else
-                {
-                    isHeld = false;
-                    val = free[i];
-                }
+                val = diceVals[i];
                 //changes background color
-                if (isHeld) { clr = Color.DarkGray; } else { clr = Color.LightGray; }
+                if (held[i]) { clr = Color.DarkGray; } else { clr = Color.LightGray; }
                 //updates respective label
                 switch (i)
                 {
@@ -97,49 +86,26 @@ namespace GamesForClass
         public void rollDice(YahtzeeBoard board)
         {
             Random rnd = new Random();
-            int[] freeDice = board.getFreeDice();
+            int[] diceVal = board.getDiceVals();
+            bool[] hold = board.getHold();
 
-            for (int i  = 0; i < freeDice.Length; i++)
+            for (int i  = 0; i < diceVal.Length; i++)
             {
-                if (freeDice[i] != -1)
+                if (hold[i] == false)
                 {
-                    freeDice[i] = rnd.Next(1, 6);
+                    diceVal[i] = rnd.Next(1, 6);
                 }
             }
             
-            board.setFreeDice(freeDice);
+            board.setDiceVals(diceVal);
             
         }
         //finds options for user based on currently selected dice
         public void findOptions(YahtzeePlayer plr)
         {
-            int[] hold = plr.getBoard().getHoldDice();
-            int[] vals = new int[6];
-            hideChecks();
-            //finds the number of dice that have the same value from the hold dice
-            for (int i = 0; i < hold.Length;i++)
-            {
-                switch(hold[i])
-                {
-                    case 0:
-                        //base case
-                        break;
-                    case 1:
-                        vals[0]++; break;
-                    case 2:
-                        vals[1]++; break;
-                    case 3:
-                        vals[2]++; break;
-                    case 4:
-                        vals[3]++; break;
-                    case 5:
-                        vals[4]++; break;
-                    case 6:
-                        vals[5]++; break;
-                }
-            }
-            //checks which ones are available
+            int[] vals = plr.getBoard().calculateVals();
             bool[] sections = plr.getSections();
+            //checks which ones are available
             for (int i = 0; i < sections.Length;i++)
             {
                 switch(i)
@@ -256,7 +222,11 @@ namespace GamesForClass
                     case 10:
                         if (sections[i] == false)
                         {
-                            if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
+                            if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
+                            {
+                                userls.Visible = true;
+                            }
+                            else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
                             {
                                 userls.Visible = true;
                             }
@@ -287,6 +257,161 @@ namespace GamesForClass
             }
 
         }
+        //calculates the points from a given round
+        public void calculatePoints(YahtzeePlayer plr)
+        {
+            int[] points = plr.getPoints();
+            bool[] sections = plr.getSections();
+            YahtzeeBoard board = plr.getBoard();
+            bool[] hold = board.getHold();
+            bool[] locked = board.getLocked();
+            int[] vals = board.calculateVals();
+
+            //finds appropriate sections and marks them complete if done so
+            if (user1s.Checked == true)
+            {
+                points[0] = vals[0];
+                sections[0] = true;
+            }
+            if (user2s.Checked == true)
+            {
+                points[1] = vals[1] * 2;
+                sections[1] = true;
+            }
+            if (user3s.Checked == true)
+            {
+                points[2] = vals[2] * 3;
+                sections[2] = true;
+            }
+            if (user4s.Checked == true)
+            {
+                points[3] = vals[3] * 4;
+                sections[3] = true;
+            }
+            if (user5s.Checked == true)
+            {
+                points[4] = vals[4] * 5;
+                sections[4] = true;
+            }
+            if (user6s.Checked == true)
+            {
+                points[5] = vals[5] * 6;
+                sections[5] = true;
+            }
+            if (user3k.Checked == true)
+            {
+                for (int i = 0; i < vals.Length; i++)
+                {
+                    if (vals[i] >= 3)
+                    {
+                        points[6] = vals[i] * (i + 1);
+                        sections[6] = true;
+                        break;
+                    }
+                }
+            }
+            if (user4k.Checked == true)
+            {
+                for (int i = 0; i < vals.Length; i++)
+                {
+                    if (vals[i] >= 4)
+                    {
+                        points[7] = vals[i] * (i + 1);
+                        sections[7] = true;
+                        break;
+                    }
+                }
+            }
+            if (userfh.Checked == true)
+            {
+                for (int j = 0; j < vals.Length; j++)
+                {
+                    if (vals[j] == 3)
+                    {
+                        //checks if there is another value that has 2
+                        for (int k = 0; k < vals.Length; k++)
+                        {
+                            if (vals[k] == 2)
+                            {
+                                points[8] = vals[j] * 3 + vals[k] * 2;
+                                sections[8] = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (userss.Checked == true)
+            {
+                sections[9] = true;
+                if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
+                {
+                    points[9] = 10;
+                }
+                else if (vals[1] == 1 & vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
+                {
+                    points[9] = 14;
+                }
+                else
+                {
+                    points[9] = 18;
+                }
+            }
+            if (userls.Checked == true)
+            {
+                sections[10] = true;
+                if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
+                {
+                    points[10] = 15;
+                }
+                else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
+                {
+                    points[10] = 20;
+                }
+            }
+            if (userya.Checked == true)
+            {
+                sections[11] = true;
+                points[11] = 30;
+            }
+            if (userch.Checked == true)
+            {
+                int tot = 0;
+                for (int i = 0; i < vals.Length; i++)
+                {
+                    tot += (vals[i] * (i + 1));
+                }
+                sections[12] = true;
+                points[12] = tot;
+            }
+
+            //set all point totals to board
+            String output = "";
+            for (int i = 0; i < sections.Length; i++)
+            {
+                output += points[i].ToString() + "\n";
+                if (i == 5)
+                {
+                    output += "\n";
+                }
+            }
+            userPoints.Text = output;
+            //lock the used dice from being used again in that round
+            for (int i = 0; i < hold.Length; i++)
+            {
+                if (hold[i] == true)
+                {
+                    locked[i] = true;
+                }
+            }
+
+            //set all values back in code
+            plr.setPoints(points);
+            plr.setSections(sections);
+            board.setHoldDice(hold);
+            board.setLocked(locked);
+            plr.setBoard(board);
+        }
         //roll button action
         private void rollButton_Click(object sender, EventArgs e)
         {
@@ -296,7 +421,7 @@ namespace GamesForClass
         //confirm button action
         private void confirmButton_Click(object sender, EventArgs e)
         {
-
+            calculatePoints(player);
         }
 
         /* LABELS */
@@ -304,8 +429,9 @@ namespace GamesForClass
         {
             Color clr = Color.DarkGray;
             YahtzeeBoard board = player.getBoard();
+            bool[] locked = board.getLocked();
             //dice is currently set to hold
-            if (dice.BackColor == clr)
+            if (dice.BackColor == clr && locked[0] == false)
             {
                 board.markFree(0);
             }
@@ -322,8 +448,9 @@ namespace GamesForClass
         {
             Color clr = Color.DarkGray;
             YahtzeeBoard board = player.getBoard();
+            bool[] locked = board.getLocked();
             //dice is currently set to hold
-            if (dice1.BackColor == clr)
+            if (dice1.BackColor == clr && locked[1] == false)
             {
                 board.markFree(1);
             }
@@ -340,8 +467,9 @@ namespace GamesForClass
         {
             Color clr = Color.DarkGray;
             YahtzeeBoard board = player.getBoard();
+            bool[] locked = board.getLocked();
             //dice is currently set to hold
-            if (dice2.BackColor == clr)
+            if (dice2.BackColor == clr && locked[2] == false)
             {
                 board.markFree(2);
             }
@@ -358,8 +486,9 @@ namespace GamesForClass
         {
             Color clr = Color.DarkGray;
             YahtzeeBoard board = player.getBoard();
+            bool[] locked = board.getLocked();
             //dice is currently set to hold
-            if (dice3.BackColor == clr)
+            if (dice3.BackColor == clr && locked[3] == false)
             {
                 board.markFree(3);
             }
@@ -376,8 +505,9 @@ namespace GamesForClass
         {
             Color clr = Color.DarkGray;
             YahtzeeBoard board = player.getBoard();
+            bool[] locked = board.getLocked();
             //dice is currently set to hold
-            if (dice4.BackColor == clr)
+            if (dice4.BackColor == clr && locked[4] == false)
             {
                 board.markFree(4);
             }
@@ -418,22 +548,60 @@ namespace GamesForClass
 
     public class YahtzeeBoard
     {
-        private int[] freeDice = new int[5];
-        private int[] holdDice = new int[5];
+        private int[] diceVals = new int[5];
+        private bool[] diceHold = new bool[5];
+        private bool[] locked = new bool[5];
+        private int[] vals = new int[6];
         public YahtzeeBoard()
         {
-            for (int i = 0; i < freeDice.Length;i++) { freeDice[i] = 0; holdDice[i] = -1; }
+            for (int i = 0; i < diceVals.Length;i++) { diceVals[i] = 0; diceHold[i] = false; locked[i] = false;}
         }
 
         //getters and setters
-        public int[] getFreeDice() {  return freeDice; }
-        public void setFreeDice(int[] freeDice) { this.freeDice = freeDice; }
-        public int[] getHoldDice() { return holdDice;}
-        public void setHoldDice(int[] holdDice) { this.holdDice = holdDice; }
+        public int[] getDiceVals() {  return diceVals; }
+        public void setDiceVals(int[] diceVals) { this.diceVals = diceVals; }
+        public bool[] getHold() { return diceHold;}
+        public void setHoldDice(bool[] hold) { this.diceHold = hold; }
+        public bool[] getLocked() { return locked; }
+        public void setLocked(bool[] locked) {  this.locked = locked; }
+
 
         //marks a dice as 'free' or 'hold'
-        public void markFree(int index) { freeDice[index] = holdDice[index]; holdDice[index] = -1; }
-        public void markHold(int index) { holdDice[index] = freeDice[index]; freeDice[index] = -1; }
+        public void markFree(int index) { diceHold[index] = false; }
+        public void markHold(int index) { diceHold[index] = true; }
+        public void markLocked(int index) { locked[index] = true; }
+        public void unlockDice() { for (int i = 0; i < locked.Length; i++) { locked[i] = false; } }
+
+        public int[] calculateVals()
+        {
+            vals = new int[6];
+            for (int i = 0; i < diceVals.Length; i++)
+            {
+                //only calculates the values being held
+                if (diceHold[i] == true)
+                {
+                    switch (diceVals[i])
+                    {
+                        case 0:
+                            //base case
+                            break;
+                        case 1:
+                            vals[0]++; break;
+                        case 2:
+                            vals[1]++; break;
+                        case 3:
+                            vals[2]++; break;
+                        case 4:
+                            vals[3]++; break;
+                        case 5:
+                            vals[4]++; break;
+                        case 6:
+                            vals[5]++; break;
+                    }
+                }
+            }
+            return vals;
+        }
 
     }
 }

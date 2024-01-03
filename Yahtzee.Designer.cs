@@ -49,6 +49,7 @@
             this.userya = new System.Windows.Forms.CheckBox();
             this.userch = new System.Windows.Forms.CheckBox();
             this.confirmButton = new System.Windows.Forms.Button();
+            this.userPoints = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // dice
@@ -292,11 +293,21 @@
             this.confirmButton.UseVisualStyleBackColor = true;
             this.confirmButton.Click += new System.EventHandler(this.confirmButton_Click);
             // 
+            // userPoints
+            // 
+            this.userPoints.AutoSize = true;
+            this.userPoints.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.userPoints.Location = new System.Drawing.Point(1244, 39);
+            this.userPoints.Name = "userPoints";
+            this.userPoints.Size = new System.Drawing.Size(0, 36);
+            this.userPoints.TabIndex = 25;
+            // 
             // Yahtzee
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1336, 589);
+            this.Controls.Add(this.userPoints);
             this.Controls.Add(this.confirmButton);
             this.Controls.Add(this.userch);
             this.Controls.Add(this.userya);
@@ -348,5 +359,6 @@
         private System.Windows.Forms.CheckBox userya;
         private System.Windows.Forms.CheckBox userch;
         private System.Windows.Forms.Button confirmButton;
+        private System.Windows.Forms.Label userPoints;
     }
 }
