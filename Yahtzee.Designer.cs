@@ -59,7 +59,7 @@
             this.dice.BackColor = System.Drawing.Color.DarkGray;
             this.dice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice.Location = new System.Drawing.Point(485, 185);
+            this.dice.Location = new System.Drawing.Point(470, 184);
             this.dice.MinimumSize = new System.Drawing.Size(100, 100);
             this.dice.Name = "dice";
             this.dice.Size = new System.Drawing.Size(100, 100);
@@ -75,7 +75,7 @@
             this.dice1.BackColor = System.Drawing.Color.DarkGray;
             this.dice1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice1.Location = new System.Drawing.Point(602, 185);
+            this.dice1.Location = new System.Drawing.Point(587, 184);
             this.dice1.MinimumSize = new System.Drawing.Size(100, 100);
             this.dice1.Name = "dice1";
             this.dice1.Size = new System.Drawing.Size(100, 100);
@@ -91,7 +91,7 @@
             this.dice2.BackColor = System.Drawing.Color.DarkGray;
             this.dice2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice2.Location = new System.Drawing.Point(718, 185);
+            this.dice2.Location = new System.Drawing.Point(703, 184);
             this.dice2.MinimumSize = new System.Drawing.Size(100, 100);
             this.dice2.Name = "dice2";
             this.dice2.Size = new System.Drawing.Size(100, 100);
@@ -107,7 +107,7 @@
             this.dice3.BackColor = System.Drawing.Color.DarkGray;
             this.dice3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice3.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice3.Location = new System.Drawing.Point(544, 307);
+            this.dice3.Location = new System.Drawing.Point(529, 306);
             this.dice3.MinimumSize = new System.Drawing.Size(100, 100);
             this.dice3.Name = "dice3";
             this.dice3.Size = new System.Drawing.Size(100, 100);
@@ -123,7 +123,7 @@
             this.dice4.BackColor = System.Drawing.Color.DarkGray;
             this.dice4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice4.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice4.Location = new System.Drawing.Point(664, 308);
+            this.dice4.Location = new System.Drawing.Point(649, 307);
             this.dice4.MinimumSize = new System.Drawing.Size(100, 100);
             this.dice4.Name = "dice4";
             this.dice4.Size = new System.Drawing.Size(100, 100);
@@ -162,6 +162,7 @@
             this.user1s.TabIndex = 11;
             this.user1s.UseVisualStyleBackColor = true;
             this.user1s.Visible = false;
+            this.user1s.CheckedChanged += new System.EventHandler(this.user1s_CheckedChanged);
             // 
             // user2s
             // 
@@ -172,6 +173,7 @@
             this.user2s.TabIndex = 12;
             this.user2s.UseVisualStyleBackColor = true;
             this.user2s.Visible = false;
+            this.user2s.CheckedChanged += new System.EventHandler(this.user2s_CheckedChanged);
             // 
             // user3s
             // 
@@ -182,6 +184,7 @@
             this.user3s.TabIndex = 13;
             this.user3s.UseVisualStyleBackColor = true;
             this.user3s.Visible = false;
+            this.user3s.CheckedChanged += new System.EventHandler(this.user3s_CheckedChanged);
             // 
             // user4s
             // 
@@ -192,6 +195,7 @@
             this.user4s.TabIndex = 14;
             this.user4s.UseVisualStyleBackColor = true;
             this.user4s.Visible = false;
+            this.user4s.CheckedChanged += new System.EventHandler(this.user4s_CheckedChanged);
             // 
             // user5s
             // 
@@ -202,6 +206,7 @@
             this.user5s.TabIndex = 15;
             this.user5s.UseVisualStyleBackColor = true;
             this.user5s.Visible = false;
+            this.user5s.CheckedChanged += new System.EventHandler(this.user5s_CheckedChanged);
             // 
             // user6s
             // 
@@ -212,6 +217,7 @@
             this.user6s.TabIndex = 16;
             this.user6s.UseVisualStyleBackColor = true;
             this.user6s.Visible = false;
+            this.user6s.CheckedChanged += new System.EventHandler(this.user6s_CheckedChanged);
             // 
             // user3k
             // 
@@ -222,6 +228,7 @@
             this.user3k.TabIndex = 17;
             this.user3k.UseVisualStyleBackColor = true;
             this.user3k.Visible = false;
+            this.user3k.CheckedChanged += new System.EventHandler(this.user3k_CheckedChanged);
             // 
             // user4k
             // 
@@ -232,6 +239,7 @@
             this.user4k.TabIndex = 18;
             this.user4k.UseVisualStyleBackColor = true;
             this.user4k.Visible = false;
+            this.user4k.CheckedChanged += new System.EventHandler(this.user4k_CheckedChanged);
             // 
             // userfh
             // 
@@ -242,6 +250,7 @@
             this.userfh.TabIndex = 19;
             this.userfh.UseVisualStyleBackColor = true;
             this.userfh.Visible = false;
+            this.userfh.CheckedChanged += new System.EventHandler(this.userfh_CheckedChanged);
             // 
             // userss
             // 
@@ -252,6 +261,7 @@
             this.userss.TabIndex = 20;
             this.userss.UseVisualStyleBackColor = true;
             this.userss.Visible = false;
+            this.userss.CheckedChanged += new System.EventHandler(this.userss_CheckedChanged);
             // 
             // userls
             // 
@@ -262,6 +272,7 @@
             this.userls.TabIndex = 21;
             this.userls.UseVisualStyleBackColor = true;
             this.userls.Visible = false;
+            this.userls.CheckedChanged += new System.EventHandler(this.userls_CheckedChanged);
             // 
             // userya
             // 
@@ -272,6 +283,7 @@
             this.userya.TabIndex = 22;
             this.userya.UseVisualStyleBackColor = true;
             this.userya.Visible = false;
+            this.userya.CheckedChanged += new System.EventHandler(this.userya_CheckedChanged);
             // 
             // userch
             // 
@@ -282,6 +294,7 @@
             this.userch.TabIndex = 23;
             this.userch.UseVisualStyleBackColor = true;
             this.userch.Visible = false;
+            this.userch.CheckedChanged += new System.EventHandler(this.userch_CheckedChanged);
             // 
             // confirmButton
             // 
@@ -297,7 +310,7 @@
             // 
             this.userPoints.AutoSize = true;
             this.userPoints.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.userPoints.Location = new System.Drawing.Point(1244, 39);
+            this.userPoints.Location = new System.Drawing.Point(1238, 36);
             this.userPoints.Name = "userPoints";
             this.userPoints.Size = new System.Drawing.Size(0, 36);
             this.userPoints.TabIndex = 25;

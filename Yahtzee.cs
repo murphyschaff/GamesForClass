@@ -65,22 +65,56 @@ namespace GamesForClass
                 }
             }
         }
-        //hides all check boxes on screen
-        public void hideChecks()
+        //hides all check boxes on screen, except one being ignored
+        public void hideChecks(int keep)
         {
-            user1s.Visible = false;
-            user2s.Visible = false;
-            user3s.Visible = false;
-            user4s.Visible = false;
-            user5s.Visible = false;
-            user6s.Visible = false;
-            user3k.Visible = false;
-            user4k.Visible = false;
-            userss.Visible = false;
-            userls.Visible = false;
-            userfh.Visible = false;
-            userya.Visible = false;
-            userch.Visible = false;
+            for (int i = 0; i < 13; i++)
+            {
+                if (i == keep) { continue; }
+                switch(i)
+                {
+                    case 0:
+                        user1s.Visible = false;
+                        break;
+                    case 1:
+                        user2s.Visible = false;
+                        break;
+                    case 2:
+                        user3s.Visible = false;
+                        break;
+                    case 3:
+                        user4s.Visible = false;
+                        break;
+                    case 4:
+                        user5s.Visible = false;
+                        break;
+                    case 5:
+                        user6s.Visible = false;
+                        break;
+                    case 6:
+                        user3k.Visible = false;
+                        break;
+                    case 7:
+                        user4k.Visible = false;
+                        break;
+                    case 8:
+                        userfh.Visible = false;
+                        break;
+                    case 9:
+                        userss.Visible = false;
+                        break;
+                    case 10:
+                        userls.Visible = false;
+                        break;
+                    case 11:
+                        userya.Visible = false;
+                        break;
+                    case 12:
+                        userch.Visible = false;
+                        break;
+                }
+
+            }
         }
         //Rolls all dice that are labeled 'free'
         public void rollDice(YahtzeeBoard board)
@@ -103,6 +137,7 @@ namespace GamesForClass
         //finds options for user based on currently selected dice
         public void findOptions(YahtzeePlayer plr)
         {
+            hideChecks(-1);
             int[] vals = plr.getBoard().calculateVals();
             bool[] sections = plr.getSections();
             //checks which ones are available
@@ -422,6 +457,9 @@ namespace GamesForClass
         private void confirmButton_Click(object sender, EventArgs e)
         {
             calculatePoints(player);
+            player.setBoard(new YahtzeeBoard());
+            hideChecks(-1);
+            updateBoard(player.getBoard());
         }
 
         /* LABELS */
@@ -519,6 +557,20 @@ namespace GamesForClass
             updateBoard(player.getBoard());
             findOptions(player);
         }
+        /* Click Changes */
+        private void user1s_CheckedChanged(object sender, EventArgs e) { if (user1s.Checked == true) { hideChecks(0); } else { findOptions(player); } }
+        private void user2s_CheckedChanged(object sender, EventArgs e) { if (user2s.Checked == true) { hideChecks(1); } else { findOptions(player); } }
+        private void user3s_CheckedChanged(object sender, EventArgs e) { if (user3s.Checked == true) { hideChecks(2); } else { findOptions(player); } }
+        private void user4s_CheckedChanged(object sender, EventArgs e) { if (user4s.Checked == true) { hideChecks(3); } else { findOptions(player); } }
+        private void user5s_CheckedChanged(object sender, EventArgs e) { if (user5s.Checked == true) { hideChecks(4); } else { findOptions(player); } }
+        private void user6s_CheckedChanged(object sender, EventArgs e) { if (user6s.Checked == true) { hideChecks(5); } else { findOptions(player); } }
+        private void user3k_CheckedChanged(object sender, EventArgs e) { if (user3k.Checked == true) { hideChecks(6); } else { findOptions(player); } }
+        private void user4k_CheckedChanged(object sender, EventArgs e) { if (user4k.Checked == true) { hideChecks(7); } else { findOptions(player); } }
+        private void userfh_CheckedChanged(object sender, EventArgs e) { if (userfh.Checked == true) { hideChecks(8); } else { findOptions(player); } }
+        private void userss_CheckedChanged(object sender, EventArgs e) { if (userss.Checked == true) { hideChecks(9); } else { findOptions(player); } }
+        private void userls_CheckedChanged(object sender, EventArgs e) { if (userls.Checked == true) { hideChecks(10); } else { findOptions(player); } }
+        private void userya_CheckedChanged(object sender, EventArgs e) { if (userya.Checked == true) { hideChecks(11); } else { findOptions(player); } }
+        private void userch_CheckedChanged(object sender, EventArgs e) { if (userch.Checked == true) { hideChecks(12); } else { findOptions(player); } }
     }
 
     public class YahtzeePlayer
