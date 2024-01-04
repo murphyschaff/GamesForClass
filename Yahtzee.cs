@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -140,6 +141,8 @@ namespace GamesForClass
             hideChecks(-1);
             int[] vals = plr.getBoard().calculateVals();
             bool[] sections = plr.getSections();
+            bool changeMade = false;
+            int rolls = plr.getBoard().getRolls();
             //checks which ones are available
             for (int i = 0; i < sections.Length;i++)
             {
@@ -151,6 +154,7 @@ namespace GamesForClass
                         if (sections[i] == false && vals[0] >= 3)
                         {
                             user1s.Visible = true;
+                            changeMade = true;
                         }
                         break;
                     //twos
@@ -158,6 +162,7 @@ namespace GamesForClass
                         if (sections[i] == false && vals[1] >= 3)
                         {
                             user2s.Visible = true;
+                            changeMade = true;
                         }
                         break;
                     //threes
@@ -165,6 +170,7 @@ namespace GamesForClass
                         if (sections[i] == false && vals[2] >= 3)
                         {
                             user3s.Visible = true;
+                            changeMade = true;
                         }
                         break;
                     //fours
@@ -172,6 +178,7 @@ namespace GamesForClass
                         if (sections[i] == false && vals[3] >= 3)
                         {
                             user4s.Visible = true;
+                            changeMade = true;
                         }
                         break;
                     //fives
@@ -179,6 +186,7 @@ namespace GamesForClass
                         if (sections[i] == false && vals[4] >= 3)
                         {
                             user5s.Visible = true;
+                            changeMade = true;
                         }
                         break;
                     //sixes
@@ -186,6 +194,7 @@ namespace GamesForClass
                         if (sections[i] == false && vals[5] >= 3)
                         {
                             user6s.Visible = true;
+                            changeMade = true;
                         }
                         break;
                     //three of a kind
@@ -197,6 +206,7 @@ namespace GamesForClass
                                 if (vals[j] >= 3)
                                 {
                                     user3k.Visible = true;
+                                    changeMade = true;
                                 }
                             }
                         }
@@ -210,6 +220,7 @@ namespace GamesForClass
                                 if (vals[j] >= 4)
                                 {
                                     user4k.Visible = true;
+                                    changeMade = true;
                                 }
                             }
                         }
@@ -229,6 +240,7 @@ namespace GamesForClass
                                         if (vals[k] == 2)
                                         {
                                             userfh.Visible = true;
+                                            changeMade = true;
                                         }
                                     }
                                 }
@@ -242,14 +254,17 @@ namespace GamesForClass
                             if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
                             {
                                 userss.Visible = true;
+                                changeMade = true;
                             }
                             else if (vals[1] == 1 & vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
                             {
                                 userss.Visible = true;
+                                changeMade = true;
                             }
                             else if (vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
                             {
                                 userss.Visible = true;
+                                changeMade = true;
                             }
                         }
                         break;
@@ -260,10 +275,12 @@ namespace GamesForClass
                             if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
                             {
                                 userls.Visible = true;
+                                changeMade = true;
                             }
                             else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
                             {
                                 userls.Visible = true;
+                                changeMade = true;
                             }
                         }
                         break;
@@ -276,6 +293,7 @@ namespace GamesForClass
                                 if (vals[j] == 5)
                                 {
                                     userya.Visible = true;
+                                    changeMade = true;
                                     break;
                                 }
                             }
@@ -286,9 +304,16 @@ namespace GamesForClass
                         if (sections[i] == false && vals[0] != 0 || vals[1] != 0 || vals[2] != 0 || vals[3] != 0 || vals[4] != 0)
                         {
                             userch.Visible = true;
+                            changeMade = true;
                         }
                         break;
                 }
+            }
+            //sees if there are no options left after the third roll
+            if (rolls == 3 && changeMade == false)
+            {
+                plr.getBoard().setNoPts(true);
+                lastRoll(plr, false);
             }
 
         }
@@ -439,7 +464,6 @@ namespace GamesForClass
                     locked[i] = true;
                 }
             }
-
             //set all values back in code
             plr.setPoints(points);
             plr.setSections(sections);
@@ -447,19 +471,133 @@ namespace GamesForClass
             board.setLocked(locked);
             plr.setBoard(board);
         }
+        //opens all options, adds 0 points to the column if selected
+        public void lastRoll(YahtzeePlayer plr, bool final)
+        {
+            bool[] sections = plr.getSections();
+            //runs the open sequence
+            if (!final)
+            {
+                //makes visible all unused categories
+                if (sections[0] == false) { user1s.Visible = false; }
+                if (sections[1] == false) { user2s.Visible = false; }
+                if (sections[2] == false) { user3s.Visible = false; }
+                if (sections[3] == false) { user4s.Visible = false; }
+                if (sections[4] == false) { user5s.Visible = false; }
+                if (sections[5] == false) { user6s.Visible = false; }
+                if (sections[6] == false) { user3k.Visible = false; }
+                if (sections[7] == false) { user4k.Visible = false; }
+                if (sections[8] == false) { userfh.Visible = false; }
+                if (sections[9] == false) { userss.Visible = false; }
+                if (sections[10] == false) { userls.Visible = false; }
+                if (sections[11] == false) { userya.Visible = false; }
+                if (sections[12] == false) { userch.Visible = false; }
+            }
+            //runs the actual selection sequence
+            else
+            {
+                int[] points = plr.getPoints();
+                if (user1s.Checked == true)
+                {
+                    points[0] = 0;
+                    sections[0] = true;
+                }
+                if (user2s.Checked == true)
+                {
+                    points[1] = 0;
+                    sections[1] = true;
+                }
+                if (user3s.Checked == true)
+                {
+                    points[2] = 0;
+                    sections[2] = true;
+                }
+                if (user4s.Checked == true)
+                {
+                    points[3] = 0;
+                    sections[3] = true;
+                }
+                if (user5s.Checked == true)
+                {
+                    points[4] = 0;
+                    sections[4] = true;
+                }
+                if (user6s.Checked == true)
+                {
+                    points[5] = 0;
+                    sections[5] = true;
+                }
+                if (user3k.Checked == true)
+                {
+                    points[6] = 0;
+                    sections[6] = true;
+                }
+                if (user4k.Checked == true)
+                {
+                    points[7] = 0;
+                    sections[7] = true;
+                }
+                if (userfh.Checked == true)
+                {
+                    points[8] = 0;
+                    sections[8] = true;
+                }
+                if (userss.Checked == true)
+                {
+                    points[9] = 0;
+                    sections[9] = true;
+                }
+                if (userls.Checked == true)
+                {
+                    points[10] = 0;
+                    sections[10] = true;
+                }
+                if (userya.Checked == true)
+                {
+                    points[11] = 0;
+                    sections[11] = true;
+                }
+                if (userch.Checked == true)
+                {
+                    points[12] = 0;
+                    sections[12] = true;
+                }
+                plr.setPoints(points);
+            }
+        }
         //roll button action
         private void rollButton_Click(object sender, EventArgs e)
         {
-            rollDice(player.getBoard());
-            updateBoard(player.getBoard());
+            YahtzeeBoard board = player.getBoard();
+            int rolls = board.getRolls();
+            if (rolls < 3)
+            {
+                board.incrRolls();
+                rollDice(board);
+                updateBoard(board);
+            }
+            else
+            {
+                rollButton.Visible = false;
+            }
         }
         //confirm button action
         private void confirmButton_Click(object sender, EventArgs e)
         {
-            calculatePoints(player);
-            player.setBoard(new YahtzeeBoard());
-            hideChecks(-1);
-            updateBoard(player.getBoard());
+            YahtzeeBoard board = player.getBoard();
+            if (board.getNoPts() == false)
+            {
+                calculatePoints(player);
+                player.setBoard(new YahtzeeBoard());
+                hideChecks(-1);
+                updateBoard(player.getBoard());
+            }
+            else
+            {
+                lastRoll(player, true);
+                player.setBoard(new YahtzeeBoard());
+                hideChecks(-1);
+            }
         }
 
         /* LABELS */
@@ -604,9 +742,13 @@ namespace GamesForClass
         private bool[] diceHold = new bool[5];
         private bool[] locked = new bool[5];
         private int[] vals = new int[6];
+        private int rolls;
+        private bool noPts;
         public YahtzeeBoard()
         {
             for (int i = 0; i < diceVals.Length;i++) { diceVals[i] = 0; diceHold[i] = false; locked[i] = false;}
+            rolls = 1;
+            noPts = false;
         }
 
         //getters and setters
@@ -616,6 +758,9 @@ namespace GamesForClass
         public void setHoldDice(bool[] hold) { this.diceHold = hold; }
         public bool[] getLocked() { return locked; }
         public void setLocked(bool[] locked) {  this.locked = locked; }
+        public int getRolls() { return rolls; }
+        public bool getNoPts() { return noPts; }
+        public void setNoPts(bool noPts) { this.noPts = noPts; }
 
 
         //marks a dice as 'free' or 'hold'
@@ -623,6 +768,10 @@ namespace GamesForClass
         public void markHold(int index) { diceHold[index] = true; }
         public void markLocked(int index) { locked[index] = true; }
         public void unlockDice() { for (int i = 0; i < locked.Length; i++) { locked[i] = false; } }
+
+        //increments and resets roll variable
+        public void incrRolls() { rolls++; }
+        public void resetRolls() { rolls = 0; }
 
         public int[] calculateVals()
         {

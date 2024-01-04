@@ -134,9 +134,9 @@
             // 
             // rollButton
             // 
-            this.rollButton.Location = new System.Drawing.Point(596, 501);
+            this.rollButton.Location = new System.Drawing.Point(550, 449);
             this.rollButton.Name = "rollButton";
-            this.rollButton.Size = new System.Drawing.Size(100, 38);
+            this.rollButton.Size = new System.Drawing.Size(183, 63);
             this.rollButton.TabIndex = 9;
             this.rollButton.Text = "Roll";
             this.rollButton.UseVisualStyleBackColor = true;
