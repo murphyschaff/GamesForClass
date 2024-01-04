@@ -117,29 +117,12 @@ namespace GamesForClass
 
             }
         }
-        //Rolls all dice that are labeled 'free'
-        public void rollDice(YahtzeeBoard board)
-        {
-            Random rnd = new Random();
-            int[] diceVal = board.getDiceVals();
-            bool[] hold = board.getHold();
-
-            for (int i  = 0; i < diceVal.Length; i++)
-            {
-                if (hold[i] == false)
-                {
-                    diceVal[i] = rnd.Next(1, 6);
-                }
-            }
-            
-            board.setDiceVals(diceVal);
-            
-        }
+        
         //finds options for user based on currently selected dice
         public void findOptions(YahtzeePlayer plr)
         {
             hideChecks(-1);
-            int[] vals = plr.getBoard().calculateVals();
+            int[] vals = plr.getBoard().calculateVals(false);
             bool[] sections = plr.getSections();
             bool changeMade = false;
             int rolls = plr.getBoard().getRolls();
@@ -325,7 +308,7 @@ namespace GamesForClass
             YahtzeeBoard board = plr.getBoard();
             bool[] hold = board.getHold();
             bool[] locked = board.getLocked();
-            int[] vals = board.calculateVals();
+            int[] vals = board.calculateVals(false);
 
             //finds appropriate sections and marks them complete if done so
             if (user1s.Checked == true)
@@ -570,15 +553,27 @@ namespace GamesForClass
         {
             YahtzeeBoard board = player.getBoard();
             int rolls = board.getRolls();
-            if (rolls < 3)
+            board.incrRolls();
+            //runs the player roll sequence
+            if (rollButton.Text == "Roll")
             {
-                board.incrRolls();
-                rollDice(board);
+                board.rollDice();
                 updateBoard(board);
+                if (rolls >= 2)
+                {
+                    rollButton.Visible = false;
+                }
             }
+            //Start CPU turn
+            else if (rollButton.Text == "Next Turn")
+            {
+                //starts CPU roll sequence
+                rollButton.Text = "Next";
+            }
+            //roll again for CPU
             else
             {
-                rollButton.Visible = false;
+
             }
         }
         //confirm button action
@@ -595,9 +590,10 @@ namespace GamesForClass
             else
             {
                 lastRoll(player, true);
-                player.setBoard(new YahtzeeBoard());
-                hideChecks(-1);
+                player.getBoard().setNoPts(true);
             }
+            rollButton.Text = "Next Turn";
+            rollButton.Visible = true;
         }
 
         /* LABELS */
@@ -734,6 +730,44 @@ namespace GamesForClass
         public int[] getPoints() { return points;}
         public void setPoints(int[] points) {  this.points = points; }
 
+        /* Automatic Player Decision Functions */
+        //rolls dice, makes decision based on what the roll is
+        public void rollAndDecide()
+        {
+            board.rollDice();
+            board.incrRolls();
+            int[] vals = new int[6];
+            int[] diceVals = board.getDiceVals();
+            bool[] hold = board.getHold();
+            //if this is the first roll
+            if (board.getRolls() == 1)
+            {
+                vals = board.calculateVals(true);
+                int index = 0;
+                int num = 0;
+                //looks for values that have more than one instance first
+                for (int i = 0; i < vals.Length; i++)
+                {
+                    if (vals[i] >= 2 && vals[i] > num)
+                    {
+                        index = i;
+                        num = vals[i];
+                    }
+                }
+                if (num >= 2)
+                {
+                    //if there are, it will select those values for the hold
+                    for (int i = 0; i < diceVals.Length; i++)
+                    {
+                        if (diceVals[i] == index + 1)
+                        {
+                            hold[i] = true;
+                        }
+                    }
+                    //check if above 3, decide if do number, 3 or 4 of kind
+                }
+            }
+        }
     }
 
     public class YahtzeeBoard
@@ -747,7 +781,7 @@ namespace GamesForClass
         public YahtzeeBoard()
         {
             for (int i = 0; i < diceVals.Length;i++) { diceVals[i] = 0; diceHold[i] = false; locked[i] = false;}
-            rolls = 1;
+            rolls = 0;
             noPts = false;
         }
 
@@ -773,13 +807,27 @@ namespace GamesForClass
         public void incrRolls() { rolls++; }
         public void resetRolls() { rolls = 0; }
 
-        public int[] calculateVals()
+        //Rolls all dice that are labeled 'free'
+        public void rollDice()
+        {
+            Random rnd = new Random();
+            for (int i = 0; i < diceVals.Length; i++)
+            {
+                if (diceHold[i] == false)
+                {
+                    diceVals[i] = rnd.Next(1, 6);
+                }
+            }
+        }
+        //calculates the number of each value of dice currently in 'held' state
+        //all:true when you want to calculate values of all dice, false if just ones being held
+        public int[] calculateVals(bool all)
         {
             vals = new int[6];
             for (int i = 0; i < diceVals.Length; i++)
             {
                 //only calculates the values being held
-                if (diceHold[i] == true)
+                if (all || diceHold[i] == true)
                 {
                     switch (diceVals[i])
                     {
