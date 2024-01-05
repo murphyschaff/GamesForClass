@@ -752,10 +752,11 @@ namespace GamesForClass
                     holdCtr++;
                 }
             }
-            //if this is the first roll
+            //if this is not the first roll
             if (board.getRolls() != 3)
             {
                 //checks if there is a current value in the hold
+                //aims for the second roll
                 if (holdVals[0] != 0)
                 {
                     //checks if this is a num type
@@ -776,7 +777,63 @@ namespace GamesForClass
                     //straight type
                     else
                     {
-
+                        int[] str = { 0, 0, 0, 0, 0, 0 };
+                        for (int i = 0; i < diceVals.Length; i++)
+                        {
+                            //put hold values in hold into str list, if there is one that is not there it is added to the hold
+                            if (hold[i] == true)
+                            {
+                                str[diceVals[i] -1] = 1;
+                            }
+                            else if (str[diceVals[i]-1] == 0)
+                            {
+                                hold[i] = true;
+                            }
+                        }
+                    }
+                }
+                //first roll should end up here
+                else
+                {
+                    //checks to see which value is the one to keep
+                    bool strType = true;
+                    int val = 0;
+                    int index = 0;
+                    for (int i = 0; i < vals.Length; i++)
+                    {           
+                        if (vals[i] >= 2 && vals[i] > val)
+                        {
+                            strType = false;
+                            val = vals[i];
+                            index = i;
+                        }
+                    }
+                    //AI will attempt to do straights first, as there are less of those types
+                    //straight type
+                    if (strType == true && sections[9] == false || sections[10] == false)
+                    {
+                        //holds a sequence of dice
+                        int[] str = { 0, 0, 0, 0, 0, 0 };
+                        for (int i = 0; i < diceVals.Length; i++)
+                        {
+                            if (str[diceVals[i] - 1] == 0)
+                            {
+                                str[diceVals[i] - 1] = 1;
+                                hold[i] = true;
+                            }
+                        }
+                    }
+                    //num type
+                    else
+                    {
+                        //puts all selected variables into hold
+                        for (int i = 0; i < diceVals.Length; i++)
+                        {
+                            if (diceVals[i] == index + 1)
+                            {
+                                hold[i] = true;
+                            }
+                        }
                     }
                 }
                 return false;
