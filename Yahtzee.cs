@@ -284,7 +284,7 @@ namespace GamesForClass
                         break;
                     //Chance
                     case 12:
-                        if (sections[i] == false && vals[0] != 0 || vals[1] != 0 || vals[2] != 0 || vals[3] != 0 || vals[4] != 0)
+                        if (sections[i] == false && (vals[0] != 0 || vals[1] != 0 || vals[2] != 0 || vals[3] != 0 || vals[4] != 0))
                         {
                             userch.Visible = true;
                             changeMade = true;
@@ -548,15 +548,33 @@ namespace GamesForClass
                 plr.setPoints(points);
             }
         }
+        public void addCPUPoints()
+        {
+            int[] points = CPU.getPoints();
+            String output = "";
+            for (int i = 0; i < points.Length; i++)
+            {
+                output += points[i].ToString() + "\n";
+                if (i == 5)
+                {
+                    output += "\n";
+                }
+            }
+            cpuPoints.Text = output;
+        }
         //roll button action
         private void rollButton_Click(object sender, EventArgs e)
         {
-            YahtzeeBoard board = player.getBoard();
-            int rolls = board.getRolls();
-            board.incrRolls();
             //runs the player roll sequence
-            if (rollButton.Text == "Roll")
+            if (rollButton.Text == "Roll" || rollButton.Text == "Your Turn")
             {
+                if (rollButton.Text == "Your Turn")
+                {
+                    rollButton.Text = "Roll";
+                }
+                YahtzeeBoard board = player.getBoard();
+                int rolls = board.getRolls();
+                board.incrRolls();
                 board.rollDice();
                 updateBoard(board);
                 if (rolls >= 2)
@@ -565,15 +583,37 @@ namespace GamesForClass
                 }
             }
             //Start CPU turn
-            else if (rollButton.Text == "Next Turn")
+            else if (rollButton.Text == "CPU Turn")
             {
                 //starts CPU roll sequence
                 rollButton.Text = "Next";
+                if (CPU.rollAndDecide())
+                {
+                    rollButton.Text = "Your Turn";
+                    addCPUPoints();
+                    updateBoard(CPU.getBoard());
+                    CPU.resetBoard();
+                }
+                else
+                {
+                updateBoard(CPU.getBoard());
+                }
             }
             //roll again for CPU
             else
             {
+                if (CPU.rollAndDecide())
+                {
+                    rollButton.Text = "Your Turn";
+                    addCPUPoints();
+                    updateBoard(CPU.getBoard());
+                    CPU.resetBoard();
+                }
+                else
+                {
+                updateBoard(CPU.getBoard());
 
+                }
             }
         }
         //confirm button action
@@ -592,7 +632,7 @@ namespace GamesForClass
                 lastRoll(player, true);
                 player.getBoard().setNoPts(true);
             }
-            rollButton.Text = "Next Turn";
+            rollButton.Text = "CPU Turn";
             rollButton.Visible = true;
         }
 
@@ -729,6 +769,7 @@ namespace GamesForClass
         public void setBoard(YahtzeeBoard board) { this.board = board; }
         public int[] getPoints() { return points;}
         public void setPoints(int[] points) {  this.points = points; }
+        public void resetBoard() { board = new YahtzeeBoard(); }
 
         /* Automatic Player Decision Functions */
         //rolls dice, makes decision based on what the roll is
@@ -752,7 +793,12 @@ namespace GamesForClass
                     holdCtr++;
                 }
             }
-            //if this is not the first roll
+            //checks to see if a good decision can already be made
+            if (holdCtr >= 4)
+            {
+                return decide(vals, holdVals, diceVals);
+            }
+            //if this is not the last roll
             if (board.getRolls() != 3)
             {
                 //checks if there is a current value in the hold
@@ -791,6 +837,7 @@ namespace GamesForClass
                             }
                         }
                     }
+                    return false;
                 }
                 //first roll should end up here
                 else
@@ -801,7 +848,7 @@ namespace GamesForClass
                     int index = 0;
                     for (int i = 0; i < vals.Length; i++)
                     {           
-                        if (vals[i] >= 2 && vals[i] > val)
+                        if (vals[i] >= 2 && (vals[i] > val || i > index))
                         {
                             strType = false;
                             val = vals[i];
@@ -810,7 +857,7 @@ namespace GamesForClass
                     }
                     //AI will attempt to do straights first, as there are less of those types
                     //straight type
-                    if (strType == true && sections[9] == false || sections[10] == false)
+                    if (strType == true && (sections[9] == false || sections[10] == false))
                     {
                         //holds a sequence of dice
                         int[] str = { 0, 0, 0, 0, 0, 0 };
@@ -841,121 +888,132 @@ namespace GamesForClass
             //After last roll, make decision
             else
             {
-                if (vals[holdVals[0] - 1] > 1)
+                return decide(vals, holdVals, diceVals);
+            }
+        }
+        private bool decide(int[] vals, int[] holdVals, int[] diceVals)
+        {
+            if (vals[holdVals[0] - 1] > 2)
+            {
+                int val = holdVals[0];
+                //makes decision based on what the value is, either goes for the numbers section or the 3k, 4k type
+                //going for 3k, 4k, or yahtzee
+                if (val > 3 && (sections[6] == false || sections[7] == false))
                 {
-                    int val = holdVals[0];
-                    //makes decision based on what the value is, either goes for the numbers section or the 3k, 4k type
-                    //going for 3k, 4k, or yahtzee
-                    if (val > 3 && sections[6] == false || sections[7] == false)
+                    if (sections[7] == false && vals[val - 1] == 4)
                     {
-                        if (sections[7] == false && vals[val - 1] == 4)
-                        {
-                            sections[7] = true;
-                            points[7] = vals[val - 1] * val;
-                            return true;
-                        }
-                        else if (sections[6] == false && vals[val - 1] >= 3)
-                        {
-                            sections[6] = true;
-                            points[6] = vals[val - 1] * val;
-                            return true;
-                        }
+                        sections[7] = true;
+                        points[7] = vals[val - 1] * val;
+                        return true;
                     }
-                    //full house check
-                    if (sections[8] == false && vals[val - 1] == 3)
+                    else if (sections[6] == false && vals[val - 1] >= 3)
                     {
-                        for (int i = 0; i < vals.Length; i++)
-                        {
-                            if (vals[i] == 2)
-                            {
-                                sections[8] = true;
-                                points[8] = 3 * val + 2 * (i + 1);
-                                return true;
-                            }
-                        }
-                    }
-                    //going for value only
-                    else
-                    {
-                        //makes sure there are 3 or more
-                        if (vals[val - 1] >= 3)
-                        {
-                            sections[val - 1] = true;
-                            points[val - 1] = vals[val - 1] * val;
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                //going for a straight
-                else
-                {
-                    //large straight check
-                    if (sections[10] == false)
-                    {
-                        if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
-                        {
-                            sections[10] = true;
-                            points[10] = 1 + 2 + 3 + 4 + 5;
-                            return true;
-                        }
-                        else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
-                        {
-                            sections[10] = true;
-                            points[10] = 2 + 3 + 4 + 5 + 6;
-                            return true;
-                        }
-                    }
-                    //small straight
-                    else if (sections[9] == false)
-                    {
-                        if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
-                        {
-                            sections[9] = true;
-                            points[9] = 1 + 2 + 3 + 4;
-                            return true;
-                        }
-                        else if (vals[1] == 1 & vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
-                        {
-                            sections[9] = true;
-                            points[9] = 2 + 3 + 4 + 5;
-                            return true;
-                        }
-                        else if (vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
-                        {
-                            sections[9] = true;
-                            points[9] = 3 + 4 + 5 + 6;
-                            return true;
-                        }
+                        sections[6] = true;
+                        points[6] = vals[val - 1] * val;
+                        return true;
                     }
                 }
-
-                //if the code makes it here, a decision could not be made. Hense, either chance must be selected, or a random section must be entered as a 0
-                if (sections[12] == false)
+                //yahtzee check
+                if (sections[11] == false && vals[val-1] == 5)
                 {
-                    //chance selected
-                    sections[12] = true;
-                    for (int i = 0; i < diceVals.Length; i++)
-                    {
-                        points[12] += diceVals[i];
-                    }
+                    sections[11] = false;
+                    points[11] = val * 5;
                     return true;
                 }
-                else 
+                //full house check
+                if (sections[8] == false && vals[val - 1] == 3)
                 {
-                    for (int i = 0; i < sections.Length; i++)
+                    for (int i = 0; i < vals.Length; i++)
                     {
-                        if (sections[i] == false)
+                        if (vals[i] == 2)
                         {
-                            sections[i] = true;
-                            points[i] = 0;
+                            sections[8] = true;
+                            points[8] = 3 * val + 2 * (i + 1);
                             return true;
                         }
                     }
                 }
-                //if you still cannot return, something went wrong.
+                //going for value only
+                else
+                {
+                    //makes sure there are 3 or more
+                    if (vals[val - 1] >= 3)
+                    {
+                        sections[val - 1] = true;
+                        points[val - 1] = vals[val - 1] * val;
+                        return true;
+                    }
+                }
                 return false;
             }
+            //going for a straight
+            else
+            {
+                //large straight check
+                if (sections[10] == false)
+                {
+                    if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
+                    {
+                        sections[10] = true;
+                        points[10] = 1 + 2 + 3 + 4 + 5;
+                        return true;
+                    }
+                    else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
+                    {
+                        sections[10] = true;
+                        points[10] = 2 + 3 + 4 + 5 + 6;
+                        return true;
+                    }
+                }
+                //small straight
+                else if (sections[9] == false)
+                {
+                    if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
+                    {
+                        sections[9] = true;
+                        points[9] = 1 + 2 + 3 + 4;
+                        return true;
+                    }
+                    else if (vals[1] == 1 & vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
+                    {
+                        sections[9] = true;
+                        points[9] = 2 + 3 + 4 + 5;
+                        return true;
+                    }
+                    else if (vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
+                    {
+                        sections[9] = true;
+                        points[9] = 3 + 4 + 5 + 6;
+                        return true;
+                    }
+                }
+            }
+
+            //if the code makes it here, a decision could not be made. Hense, either chance must be selected, or a random section must be entered as a 0
+            if (sections[12] == false)
+            {
+                //chance selected
+                sections[12] = true;
+                for (int i = 0; i < diceVals.Length; i++)
+                {
+                    points[12] += diceVals[i];
+                }
+                return true;
+            }
+            else
+            {
+                for (int i = 0; i < sections.Length; i++)
+                {
+                    if (sections[i] == false)
+                    {
+                        sections[i] = true;
+                        points[i] = 0;
+                        return true;
+                    }
+                }
+            }
+            //if you still cannot return, something went wrong.
+            return false;
         }
     }
 
