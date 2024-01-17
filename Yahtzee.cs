@@ -432,7 +432,11 @@ namespace GamesForClass
             String output = "";
             for (int i = 0; i < sections.Length; i++)
             {
-                output += points[i].ToString() + "\n";
+                if (points[i] != -1)
+                {
+                    output += points[i].ToString() + "\n";
+                }
+                else { output += "\n"; }
                 if (i == 5)
                 {
                     output += "\n";
@@ -554,7 +558,14 @@ namespace GamesForClass
             String output = "";
             for (int i = 0; i < points.Length; i++)
             {
-                output += points[i].ToString() + "\n";
+                if (points[i] != -1)
+                {
+                    output += points[i].ToString() + "\n";
+                }
+                else
+                {
+                    output += "\n";
+                }
                 if (i == 5)
                 {
                     output += "\n";
@@ -757,7 +768,7 @@ namespace GamesForClass
             for (int i = 0; i < sections.Length; i++)
             {
                 sections[i] = false;
-                points[i] = 0;
+                points[i] = -1;
             }
             board = new YahtzeeBoard();
         }
@@ -780,176 +791,31 @@ namespace GamesForClass
             board.incrRolls();
             int[] diceVals = board.getDiceVals();
             bool[] hold = board.getHold();
-            int[] holdVals = { 0, 0, 0, 0, 0, 0 };
-            int[] vals = board.calculateVals(true);
+            int[] vals = board.calculateVals(true); //gets number of values currently on the board
 
-            //check for values being held
-            int holdCtr = 0;
-            for (int i = 0; i < hold.Length; i++)
+            //look at dice values
+            //straight check
+            int strVals = 0;
+            for (int i = 0; i < vals.Length; i++)
             {
-                if (hold[i] == true)
+                if (vals[i] >= 1)
                 {
-                    holdVals[holdCtr] = diceVals[i];
-                    holdCtr++;
+                    strVals++;
                 }
             }
-            //checks to see if a good decision can already be made
-            if (holdCtr >= 4)
+            if (strVals > 3 && (sections[10] == false || sections[9] == false))
             {
-                return decide(vals, holdVals, diceVals);
-            }
-            //if this is not the last roll
-            if (board.getRolls() != 3)
-            {
-                //checks if there is a current value in the hold
-                //aims for the second roll
-                if (holdVals[0] != 0)
+                int[] used = { 0, 0, 0, 0, 0 };
+                //adds current straight values to hold
+                for (int i = 0; i < diceVals.Length; i++)
                 {
-                    //checks if this is a num type
-                    if (vals[holdVals[0] - 1] > 1)
+                    if (vals[diceVals[i] -1] >= 1 && used[diceVals[i] - 1] == 0)
                     {
-                        int val = holdVals[0];
-                        for (int i = 0; i < diceVals.Length; i++)
-                        {
-                            if (hold[i] == false)
-                            {
-                                if (diceVals[i] == val)
-                                {
-                                    hold[i] = true;
-                                }
-                            }
-                        }
-                    }
-                    //straight type
-                    else
-                    {
-                        int[] str = { 0, 0, 0, 0, 0, 0 };
-                        for (int i = 0; i < diceVals.Length; i++)
-                        {
-                            //put hold values in hold into str list, if there is one that is not there it is added to the hold
-                            if (hold[i] == true)
-                            {
-                                str[diceVals[i] -1] = 1;
-                            }
-                            else if (str[diceVals[i]-1] == 0)
-                            {
-                                hold[i] = true;
-                            }
-                        }
-                    }
-                    return false;
-                }
-                //first roll should end up here
-                else
-                {
-                    //checks to see which value is the one to keep
-                    bool strType = true;
-                    int val = 0;
-                    int index = 0;
-                    for (int i = 0; i < vals.Length; i++)
-                    {           
-                        if (vals[i] >= 2 && (vals[i] > val || i > index))
-                        {
-                            strType = false;
-                            val = vals[i];
-                            index = i;
-                        }
-                    }
-                    //AI will attempt to do straights first, as there are less of those types
-                    //straight type
-                    if (strType == true && (sections[9] == false || sections[10] == false))
-                    {
-                        //holds a sequence of dice
-                        int[] str = { 0, 0, 0, 0, 0, 0 };
-                        for (int i = 0; i < diceVals.Length; i++)
-                        {
-                            if (str[diceVals[i] - 1] == 0)
-                            {
-                                str[diceVals[i] - 1] = 1;
-                                hold[i] = true;
-                            }
-                        }
-                    }
-                    //num type
-                    else
-                    {
-                        //puts all selected variables into hold
-                        for (int i = 0; i < diceVals.Length; i++)
-                        {
-                            if (diceVals[i] == index + 1)
-                            {
-                                hold[i] = true;
-                            }
-                        }
+                        hold[i] = true;
+                        used[diceVals[i]-1] = 1;
                     }
                 }
-                return false;
-            }
-            //After last roll, make decision
-            else
-            {
-                return decide(vals, holdVals, diceVals);
-            }
-        }
-        private bool decide(int[] vals, int[] holdVals, int[] diceVals)
-        {
-            if (vals[holdVals[0] - 1] > 2)
-            {
-                int val = holdVals[0];
-                //makes decision based on what the value is, either goes for the numbers section or the 3k, 4k type
-                //going for 3k, 4k, or yahtzee
-                if (val > 3 && (sections[6] == false || sections[7] == false))
-                {
-                    if (sections[7] == false && vals[val - 1] == 4)
-                    {
-                        sections[7] = true;
-                        points[7] = vals[val - 1] * val;
-                        return true;
-                    }
-                    else if (sections[6] == false && vals[val - 1] >= 3)
-                    {
-                        sections[6] = true;
-                        points[6] = vals[val - 1] * val;
-                        return true;
-                    }
-                }
-                //yahtzee check
-                if (sections[11] == false && vals[val-1] == 5)
-                {
-                    sections[11] = false;
-                    points[11] = val * 5;
-                    return true;
-                }
-                //full house check
-                if (sections[8] == false && vals[val - 1] == 3)
-                {
-                    for (int i = 0; i < vals.Length; i++)
-                    {
-                        if (vals[i] == 2)
-                        {
-                            sections[8] = true;
-                            points[8] = 3 * val + 2 * (i + 1);
-                            return true;
-                        }
-                    }
-                }
-                //going for value only
-                else
-                {
-                    //makes sure there are 3 or more
-                    if (vals[val - 1] >= 3)
-                    {
-                        sections[val - 1] = true;
-                        points[val - 1] = vals[val - 1] * val;
-                        return true;
-                    }
-                }
-                return false;
-            }
-            //going for a straight
-            else
-            {
-                //large straight check
+                //checks to see if straight already exists
                 if (sections[10] == false)
                 {
                     if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
@@ -987,33 +853,202 @@ namespace GamesForClass
                         return true;
                     }
                 }
-            }
-
-            //if the code makes it here, a decision could not be made. Hense, either chance must be selected, or a random section must be entered as a 0
-            if (sections[12] == false)
-            {
-                //chance selected
-                sections[12] = true;
-                for (int i = 0; i < diceVals.Length; i++)
+                //straight could not be decided on this turn
+                if (board.getRolls() != 3)
                 {
-                    points[12] += diceVals[i];
+                    return false;
                 }
-                return true;
-            }
-            else
-            {
-                for (int i = 0; i < sections.Length; i++)
+                else
                 {
-                    if (sections[i] == false)
+                    //nothing else could be selected, try chance
+                    if (sections[12] == false)
                     {
-                        sections[i] = true;
-                        points[i] = 0;
+                        int tot = 0;
+                        for (int i = 0; i < diceVals.Length; i++)
+                        {
+                            tot += diceVals[i];
+                        }
+                        points[12] = tot;
+                        return true;
+                    }
+                    else
+                    {
+                        //otherwise runs down line and fills in with 0
+                        for (int i = 0; i < sections.Length; i++)
+                        {
+                            if (sections[i] == false)
+                            {
+                                sections[i] = true;
+                                points[i] = 0;
+                                break;
+                            }
+                        }
                         return true;
                     }
                 }
             }
-            //if you still cannot return, something went wrong.
-            return false;
+            else
+            {
+                //value type, either yahtzee, 4k, 3k, or values
+                int two = 0;
+                int three = 0;
+                int four = 0;
+                int yahtzee = 0;
+                for (int i = 0; i < vals.Length; i++)
+                {
+                    switch (vals[i])
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            if (two < i + 1) { two = i + 1; }
+                            break;
+                        case 3:
+                            three = i + 1;
+                            break;
+                        case 4:
+                            four = i + 1;
+                            break;
+                        case 5:
+                            yahtzee = i + 1;
+                            break;
+                    }
+                }
+                //yahtzee
+                if (sections[11] == false && yahtzee > 2)
+                {
+                    sections[11] = true;
+                    points[11] = yahtzee * 5;
+                    return true;
+                }
+                //four kind
+                else if (sections[7] == false && four > 2)
+                {
+                    sections[7] = true;
+                    points[7] = four * 4;
+                    return true;
+                }
+                //full house
+                else if (sections[8] == false && three > 1 && two > 2)
+                {
+                    sections[8] = true;
+                    points[8] = three * 3 + two * 2;
+                    return true;
+                }
+                //three kind
+                else if (sections[6] == false && three > 2)
+                {
+                    sections[6] = true;
+                    points[6] = three * 3;
+                    return true;
+                }
+                else
+                {
+                    //adds 5 or 4 of kind to points board if it exists
+                    if (yahtzee != 0 && sections[yahtzee -1] == false)
+                    {
+                        sections[yahtzee - 1] = true;
+                        points[yahtzee - 1] = yahtzee * 5;
+                        return true;
+                    }
+                    else if (four != 0 && sections[four - 1] == false)
+                    {
+                        sections[four - 1] = true;
+                        points[four - 1] = four * 4;
+                        return true;
+                    }
+                    else
+                    {
+                        //put most promenant three or two into hold, prepare to roll again if not third roll
+                        if (board.getRolls() != 3)
+                        {
+                            bool thr = false;
+                            bool tw = false;
+                            //checks if there is three or two of kind
+                            if (three != 0 && sections[three -1] == false)
+                            {
+                                thr = true;
+                            }
+                            else if (two != 0 && sections[two -1] == false)
+                            {
+                                tw = true;
+                            }
+                            if (thr || tw)
+                            {
+                                for (int i = 0; i < diceVals.Length; i++)
+                                {
+                                    if (thr)
+                                    {
+                                        if (diceVals[i] == three)
+                                        {
+                                            hold[i] = true;
+                                        }
+                                    }
+                                    if (tw)
+                                    {
+                                        if (diceVals[i] == two)
+                                        {
+                                            hold[i] = true;
+                                        }
+                                    }
+                                }
+                            }
+                            //otherwise hold nothing and return false
+                            return false;
+                        }
+                        else
+                        {
+                            //last roll, look to use three of kind
+                            if (three != 0 && (sections[three - 1] == false || sections[6] == false))
+                            {
+                                if (sections[three - 1] == false)
+                                {
+                                    sections[three  - 1] = true;
+                                    points[three - 1] = three * 3;
+                                    return true;
+                                }
+                                else
+                                {
+                                    sections[6] = true;
+                                    points[6] = three * 3;
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                //nothing else could be selected, try chance
+                                if (sections[12] == false)
+                                {
+                                    int tot = 0;
+                                    for (int i = 0; i < diceVals.Length;i++)
+                                    {
+                                        tot += diceVals[i];
+                                    }
+                                    points[12] = tot;
+                                    return true;
+                                }
+                                else
+                                {
+                                    //otherwise runs down line and fills in with 0
+                                    for (int i = 0; i < sections.Length;i++)
+                                    {
+                                        if (sections[i] == false)
+                                        {
+                                            sections[i] = true;
+                                            points[i] = 0;
+                                            break;
+                                        }
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                   
+                }
+            }
         }
     }
 
