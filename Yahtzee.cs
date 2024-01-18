@@ -134,7 +134,7 @@ namespace GamesForClass
                     //Ones
                     case 0:
                         //if it has not been chosen, and there are three or more, make stuff available to choose
-                        if (sections[i] == false && vals[0] >= 3)
+                        if (sections[i] == false && vals[0] >= 1)
                         {
                             user1s.Visible = true;
                             changeMade = true;
@@ -142,7 +142,7 @@ namespace GamesForClass
                         break;
                     //twos
                     case 1:
-                        if (sections[i] == false && vals[1] >= 3)
+                        if (sections[i] == false && vals[1] >= 1)
                         {
                             user2s.Visible = true;
                             changeMade = true;
@@ -150,7 +150,7 @@ namespace GamesForClass
                         break;
                     //threes
                     case 2:
-                        if (sections[i] == false && vals[2] >= 3)
+                        if (sections[i] == false && vals[2] >= 1)
                         {
                             user3s.Visible = true;
                             changeMade = true;
@@ -158,7 +158,7 @@ namespace GamesForClass
                         break;
                     //fours
                     case 3:
-                        if (sections[i] == false && vals[3] >= 3)
+                        if (sections[i] == false && vals[3] >= 1)
                         {
                             user4s.Visible = true;
                             changeMade = true;
@@ -166,7 +166,7 @@ namespace GamesForClass
                         break;
                     //fives
                     case 4:
-                        if (sections[i] == false && vals[4] >= 3)
+                        if (sections[i] == false && vals[4] >= 1)
                         {
                             user5s.Visible = true;
                             changeMade = true;
@@ -174,7 +174,7 @@ namespace GamesForClass
                         break;
                     //sixes
                     case 5:
-                        if (sections[i] == false && vals[5] >= 3)
+                        if (sections[i] == false && vals[5] >= 1)
                         {
                             user6s.Visible = true;
                             changeMade = true;
@@ -296,13 +296,18 @@ namespace GamesForClass
             if (rolls == 3 && changeMade == false)
             {
                 plr.getBoard().setNoPts(true);
-                lastRoll(plr, false);
-                calculatePoints(plr);
+                if (user3k.Checked == false) { user3k.Visible = true; }
+                if (user4k.Checked == false) { user4k.Visible = true; }
+                if (userfh.Checked == false) { userfh.Visible = true; }
+                if (userss.Checked == false) { userss.Visible = true; }
+                if (userls.Checked == false) { userls.Visible = true; }
+                if (userya.Checked == false) { userya.Visible = true; }
             }
 
         }
         //calculates the points from a given round
-        public void calculatePoints(YahtzeePlayer plr)
+        //isZero adds zero points to specified selection
+        public void calculatePoints(YahtzeePlayer plr, bool isZero)
         {
             int[] points = plr.getPoints();
             bool[] sections = plr.getSections();
@@ -322,7 +327,7 @@ namespace GamesForClass
                 points[1] = vals[1] * 2;
                 sections[1] = true;
             }
-            if (user3s.Checked == true && user2s.Visible == true)
+            if (user3s.Checked == true && user3s.Visible == true)
             {
                 points[2] = vals[2] * 3;
                 sections[2] = true;
@@ -348,7 +353,7 @@ namespace GamesForClass
                 {
                     if (vals[i] >= 3)
                     {
-                        points[6] = vals[i] * (i + 1);
+                        if (!isZero) { points[6] = vals[i] * (i + 1); } else { points[6] = 0; }
                         sections[6] = true;
                         break;
                     }
@@ -360,7 +365,7 @@ namespace GamesForClass
                 {
                     if (vals[i] >= 4)
                     {
-                        points[7] = vals[i] * (i + 1);
+                        if (!isZero) { points[7] = vals[i] * (i + 1); } else { points[7] = 0; }
                         sections[7] = true;
                         break;
                     }
@@ -377,7 +382,7 @@ namespace GamesForClass
                         {
                             if (vals[k] == 2)
                             {
-                                points[8] = vals[j] * 3 + vals[k] * 2;
+                                if (!isZero) { points[8] = vals[j] * 3 + vals[k] * 2; } else { points[8] = 0; }
                                 sections[8] = true;
                                 break;
                             }
@@ -388,7 +393,8 @@ namespace GamesForClass
             if (userss.Checked == true && userss.Visible == true)
             {
                 sections[9] = true;
-                if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
+                if (isZero) { points[9] = 0; }
+                else if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
                 {
                     points[9] = 10;
                 }
@@ -400,23 +406,25 @@ namespace GamesForClass
                 {
                     points[9] = 18;
                 }
+                if (isZero) { points[9] = 0; }
             }
             if (userls.Checked == true && userls.Visible == true)
             {
                 sections[10] = true;
-                if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
+                if (isZero) { points[10] = 0; }
+                else if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
                 {
                     points[10] = 15;
                 }
                 else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
                 {
                     points[10] = 20;
-                }
+                } 
             }
             if (userya.Checked == true && userya.Visible == true)
             {
                 sections[11] = true;
-                points[11] = 30;
+                if (!isZero) { points[11] = 30; } else { points[11] = 0; }
             }
             if (userch.Checked == true && userch.Visible == true)
             {
@@ -459,101 +467,7 @@ namespace GamesForClass
             board.setLocked(locked);
             plr.setBoard(board);
         }
-        //need updated execution of lastRoll
-        //opens all options, adds 0 points to the column if selected
-        public void lastRoll(YahtzeePlayer plr, bool final)
-        {
-            bool[] sections = plr.getSections();
-            //runs the open sequence
-            if (!final)
-            {
-                //makes visible all unused categories
-                if (sections[0] == false) { user1s.Visible = true; }
-                if (sections[1] == false) { user2s.Visible = true; }
-                if (sections[2] == false) { user3s.Visible = true; }
-                if (sections[3] == false) { user4s.Visible = true; }
-                if (sections[4] == false) { user5s.Visible = true; }
-                if (sections[5] == false) { user6s.Visible = true; }
-                if (sections[6] == false) { user3k.Visible = true; }
-                if (sections[7] == false) { user4k.Visible = true; }
-                if (sections[8] == false) { userfh.Visible = true; }
-                if (sections[9] == false) { userss.Visible = true; }
-                if (sections[10] == false) { userls.Visible = true; }
-                if (sections[11] == false) { userya.Visible = true; }
-                if (sections[12] == false) { userch.Visible = true; }
-            }
-            //runs the actual selection sequence
-            else
-            {
-                int[] points = plr.getPoints();
-                if (user1s.Checked == true)
-                {
-                    points[0] = 0;
-                    sections[0] = true;
-                }
-                if (user2s.Checked == true)
-                {
-                    points[1] = 0;
-                    sections[1] = true;
-                }
-                if (user3s.Checked == true)
-                {
-                    points[2] = 0;
-                    sections[2] = true;
-                }
-                if (user4s.Checked == true)
-                {
-                    points[3] = 0;
-                    sections[3] = true;
-                }
-                if (user5s.Checked == true)
-                {
-                    points[4] = 0;
-                    sections[4] = true;
-                }
-                if (user6s.Checked == true)
-                {
-                    points[5] = 0;
-                    sections[5] = true;
-                }
-                if (user3k.Checked == true)
-                {
-                    points[6] = 0;
-                    sections[6] = true;
-                }
-                if (user4k.Checked == true)
-                {
-                    points[7] = 0;
-                    sections[7] = true;
-                }
-                if (userfh.Checked == true)
-                {
-                    points[8] = 0;
-                    sections[8] = true;
-                }
-                if (userss.Checked == true)
-                {
-                    points[9] = 0;
-                    sections[9] = true;
-                }
-                if (userls.Checked == true)
-                {
-                    points[10] = 0;
-                    sections[10] = true;
-                }
-                if (userya.Checked == true)
-                {
-                    points[11] = 0;
-                    sections[11] = true;
-                }
-                if (userch.Checked == true)
-                {
-                    points[12] = 0;
-                    sections[12] = true;
-                }
-                plr.setPoints(points);
-            }
-        }
+        
         public void addCPUPoints()
         {
             int[] points = CPU.getPoints();
@@ -590,6 +504,20 @@ namespace GamesForClass
             {
                 if (cpuPoints[i] != -1) { cpuPts += cpuPoints[i]; }
                 if (plrPoints[i] != -1) { plrPts += plrPoints[i]; }
+                //adds bonus points
+                if (i == 6)
+                {
+                    if (cpuPts >= 63)
+                    {
+                        cpuPts += 32;
+                        cpuBonus.Text = "Top Bonus: 32";
+                    }
+                    if (plrPts >= 63)
+                    {
+                        plrPts += 32;
+                        userBonus.Text = "Top Bonus: 32";
+                    }
+                }
             }
 
             cpuTotal.Text = "Total: " + cpuPts.ToString();
@@ -626,6 +554,34 @@ namespace GamesForClass
                 return false;
             }
         }
+        public void resetBoard()
+        {
+            player = new YahtzeePlayer();
+            CPU = new YahtzeePlayer();
+            YahtzeeBoard blank = new YahtzeeBoard();
+            updateBoard(blank);
+
+            cpuPoints.Text = "";
+            userPoints.Text = "";
+            rollButton.Text = "Roll";
+            userPoints.Text = "Total:";
+            cpuPoints.Text = "Total:";
+            cpuBonus.Text = "Top Bonus:";
+            userBonus.Text = "Top Bonus:";
+            user1s.Checked = false;
+            user2s.Checked = false;
+            user3s.Checked = false;
+            user4s.Checked = false;
+            user5s.Checked = false;
+            user6s.Checked = false;
+            user3k.Checked = false;
+            user4k.Checked = false;
+            userss.Checked = false;
+            userls.Checked = false;
+            userfh.Checked = false;
+            userya.Checked = false;
+            userch.Checked = false;
+        }
         //roll button action
         private void rollButton_Click(object sender, EventArgs e)
         {
@@ -635,6 +591,11 @@ namespace GamesForClass
                 if (rollButton.Text == "Your Turn")
                 {
                     rollButton.Text = "Roll";
+                    dice.Enabled = true;
+                    dice1.Enabled = true;
+                    dice2.Enabled = true;
+                    dice3.Enabled = true;
+                    dice4.Enabled = true;
                 }
                 YahtzeeBoard board = player.getBoard();
                 int rolls = board.getRolls();
@@ -651,6 +612,11 @@ namespace GamesForClass
             {
                 //starts CPU roll sequence
                 rollButton.Text = "Next";
+                dice.Enabled = false;
+                dice1.Enabled = false;
+                dice2.Enabled = false;
+                dice3.Enabled = false;
+                dice4.Enabled = false;
                 if (CPU.rollAndDecide())
                 {
                     rollButton.Text = "Your Turn";
@@ -689,27 +655,7 @@ namespace GamesForClass
             //reset board
             else
             {
-                player = new YahtzeePlayer();
-                CPU = new YahtzeePlayer();
-                YahtzeeBoard blank = new YahtzeeBoard();
-                updateBoard(blank);
-
-                cpuPoints.Text = "";
-                userPoints.Text = "";
-                rollButton.Text = "Roll";
-                user1s.Checked = false;
-                user2s.Checked = false;
-                user3s.Checked = false;
-                user4s.Checked = false;
-                user5s.Checked = false;
-                user6s.Checked = false;
-                user3k.Checked = false;
-                user4k.Checked = false;
-                userss.Checked = false;
-                userls.Checked = false;
-                userfh.Checked = false;
-                userya.Checked = false;
-                userch.Checked = false;
+                resetBoard();
             }
         }
         //confirm button action
@@ -719,15 +665,17 @@ namespace GamesForClass
             YahtzeeBoard board = player.getBoard();
             if (board.getNoPts() == false)
             {
-                calculatePoints(player);
+                calculatePoints(player, false);
                 player.setBoard(new YahtzeeBoard());
                 hideChecks(-1);
                 updateBoard(player.getBoard());
             }
             else
             {
-                lastRoll(player, true);
-                player.getBoard().setNoPts(true);
+                calculatePoints(player, true);
+                player.setBoard(new YahtzeeBoard());
+                hideChecks(-1);
+                updateBoard(player.getBoard());
             }
             rollButton.Text = "CPU Turn";
             rollButton.Visible = true;
@@ -850,9 +798,17 @@ namespace GamesForClass
         private void testButton_Click(object sender, EventArgs e)
         {
             YahtzeePlayer test = new YahtzeePlayer();
-            int[] board = { 4,4,4,4,3 };
+            int[] board = { 6,6,6,6,2 };
             test.getBoard().setDiceVals(board);
+            test.getBoard().incrRolls();
+            test.getBoard().incrRolls();
+            test.getBoard().incrRolls();
             test.rollAndDecide();
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            resetBoard();
         }
     }
 
@@ -905,7 +861,6 @@ namespace GamesForClass
             {
                 int[] used = { 0, 0, 0, 0, 0, 0 };
                 int[] usedIndex = { -1, -1, -1, -1, -1, -1 };
-                int gap = 0;
                 //finds the values that make up the straight
                 for (int i = 0; i < diceVals.Length; i++)
                 {
@@ -916,14 +871,14 @@ namespace GamesForClass
                     }
                 }
                 //deicdes which ones to hold, looks for either 1,6 or neither
-                if (used[5] == 1)
+                if (used[5] == 1 && ((used[4] == 1 && used[3] == 1) || (used[3] == 1 && used[2] == 1)))
                 {
                     for (int i = 1; i < usedIndex.Length; i++)
                     {
                         if (usedIndex[i] != -1) { hold[usedIndex[i]] = true; }
                     }
                 }
-                else if (used[0] == 1)
+                else if (used[0] == 1 && ((used[1] == 1 && used[2] == 1) || (used[2] == 1 && used[3] ==1)))
                 {
                     for (int i = 0; i < usedIndex.Length -1; i++)
                     { 
@@ -990,23 +945,56 @@ namespace GamesForClass
                         for (int i = 0; i < diceVals.Length; i++)
                         {
                             tot += diceVals[i];
+                            hold[i] = true;
                         }
                         points[12] = tot;
                         return true;
                     }
                     else
                     {
-                        //otherwise runs down line and fills in with 0
-                        for (int i = 0; i < sections.Length; i++)
+                        //chance cannot be used, try to fill in other digits
+                        if (sections[0] == false || sections[1] == false || sections[2] == false || sections[3] == false || sections[4] == false || sections[5] == false)
                         {
-                            if (sections[i] == false)
+                            int largestValue = 0;
+                            int occ = 0;
+                            for (int i = 0; i < vals.Length; i++)
                             {
-                                sections[i] = true;
-                                points[i] = 0;
-                                break;
+                                if (vals[i] > occ && sections[i] == false) //keeps a section from being selected twice
+                                {
+                                    occ = vals[i];
+                                    largestValue = i;
+                                }
                             }
+                            //adds best value to hold
+                            for (int i = 0; i < diceVals.Length; i++)
+                            {
+                                if (diceVals[i] == largestValue + 1)
+                                {
+                                    hold[i] = true;
+                                }
+                                else
+                                {
+                                    hold[i] = false;
+                                }
+                            }
+                            sections[largestValue] = true;
+                            points[largestValue] = (largestValue + 1) * occ;
+                            return true;
                         }
-                        return true;
+                        else
+                        {
+                            //otherwise runs down line and fills in with 0, starting at 3k
+                            for (int i = 6; i < sections.Length; i++)
+                            {
+                                if (sections[i] == false)
+                                {
+                                    sections[i] = true;
+                                    points[i] = 0;
+                                    break;
+                                }
+                            }
+                            return true;
+                        }
                     }
                 }
             }
@@ -1149,7 +1137,7 @@ namespace GamesForClass
                         else
                         {
                             //last roll, look to use three of kind
-                            if (three != 0 && (sections[three - 1] == false || sections[6] == false))
+                            if (three != 0  && (sections[three - 1] == false || sections[6] == false))
                             {
                                 if (sections[three - 1] == false)
                                 {
@@ -1182,17 +1170,49 @@ namespace GamesForClass
                                 }
                                 else
                                 {
-                                    //otherwise runs down line and fills in with 0
-                                    for (int i = 0; i < sections.Length;i++)
+                                    //chance cannot be used, try to fill in other digits
+                                    if (sections[0] == false || sections[1] == false || sections[2] == false || sections[3] == false || sections[4] == false || sections[5] == false)
                                     {
-                                        if (sections[i] == false)
+                                        int largestValue = 0;
+                                        int occ = 0;
+                                        for (int i = 0; i < vals.Length; i++)
                                         {
-                                            sections[i] = true;
-                                            points[i] = 0;
-                                            break;
+                                            if (vals[i] > occ && sections[i] == false) //keeps a section from being selected twice
+                                            {
+                                                occ = vals[i];
+                                                largestValue = i;
+                                            }
                                         }
+                                        //adds best value to hold
+                                        for (int i = 0; i < diceVals.Length; i++)
+                                        {
+                                            if (diceVals[i] == largestValue + 1)
+                                            {
+                                                hold[i] = true;
+                                            }
+                                            else
+                                            {
+                                                hold[i] = false;
+                                            }
+                                        }
+                                        sections[largestValue] = true;
+                                        points[largestValue] = (largestValue + 1) * occ;
+                                        return true;
                                     }
-                                    return true;
+                                    else
+                                    {
+                                        //otherwise runs down line and fills in with 0, starting at 3k
+                                        for (int i = 6; i < sections.Length;i++)
+                                        {
+                                            if (sections[i] == false)
+                                            {
+                                                sections[i] = true;
+                                                points[i] = 0;
+                                                break;
+                                            }
+                                        }
+                                        return true;
+                                    }
                                 }
                             }
                         }
