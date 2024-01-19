@@ -350,82 +350,43 @@ namespace GamesForClass
             }
             if (user3k.Checked == true && user3k.Visible == true)
             {
-                for (int i = 0; i < vals.Length; i++)
+                int pts = 0;
+                for (int i = 0; i < diceVals.Length; i++)
                 {
-                    if (vals[i] >= 3)
-                    {
-                        if (!isZero) { points[6] = vals[i] * (i + 1); } else { points[6] = 0; }
-                        sections[6] = true;
-                        break;
-                    }
+                    pts += diceVals[i];
                 }
+                sections[6] = true;
+                if (isZero) { points[6] = 0; } else { points[6] = pts; }
             }
             if (user4k.Checked == true && user4k.Visible == true)
             {
-                for (int i = 0; i < vals.Length; i++)
+                int pts = 0;
+                for (int i = 0; i < diceVals.Length; i++)
                 {
-                    if (vals[i] >= 4)
-                    {
-                        if (!isZero) { points[7] = vals[i] * (i + 1); } else { points[7] = 0; }
-                        sections[7] = true;
-                        break;
-                    }
+                    pts += diceVals[i];
                 }
+                sections[7] = true;
+                if (isZero) { points[7] = 0; } else { points[7] = pts; }
             }
             if (userfh.Checked == true && userfh.Visible == true)
             {
-                for (int j = 0; j < vals.Length; j++)
-                {
-                    if (vals[j] == 3)
-                    {
-                        //checks if there is another value that has 2
-                        for (int k = 0; k < vals.Length; k++)
-                        {
-                            if (vals[k] == 2)
-                            {
-                                if (!isZero) { points[8] = vals[j] * 3 + vals[k] * 2; } else { points[8] = 0; }
-                                sections[8] = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+                sections[8] = true;
+                if (isZero) { points[8] = 0; } else { points[8] = 25; }
             }
             if (userss.Checked == true && userss.Visible == true)
             {
                 sections[9] = true;
-                if (isZero) { points[9] = 0; }
-                else if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1)
-                {
-                    points[9] = 10;
-                }
-                else if (vals[1] == 1 & vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
-                {
-                    points[9] = 14;
-                }
-                else
-                {
-                    points[9] = 18;
-                }
-                if (isZero) { points[9] = 0; }
+                if (isZero) { points[9] = 0; } else { points[9] = 30; }
             }
             if (userls.Checked == true && userls.Visible == true)
             {
                 sections[10] = true;
-                if (isZero) { points[10] = 0; }
-                else if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
-                {
-                    points[10] = 15;
-                }
-                else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
-                {
-                    points[10] = 20;
-                } 
+                if (isZero) { points[10] = 0; } else { points[10] = 40; }
             }
             if (userya.Checked == true && userya.Visible == true)
             {
                 sections[11] = true;
-                if (!isZero) { points[11] = diceVals[0] * 5; } else { points[11] = 0; }
+                if (isZero) { points[11] = 0; } else { points[11] = 50; }
             }
             if (userch.Checked == true && userch.Visible == true)
             {
@@ -925,13 +886,13 @@ namespace GamesForClass
                     if (vals[0] == 1 && vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1)
                     {
                         sections[10] = true;
-                        points[10] = 1 + 2 + 3 + 4 + 5;
+                        points[10] = 40;
                         return true;
                     }
                     else if (vals[1] == 1 && vals[2] == 1 && vals[3] == 1 && vals[4] == 1 && vals[5] == 1)
                     {
                         sections[10] = true;
-                        points[10] = 2 + 3 + 4 + 5 + 6;
+                        points[10] = 40;
                         return true;
                     }
                 }
@@ -941,19 +902,19 @@ namespace GamesForClass
                     if (vals[0] >= 1 && vals[1] >= 1 && vals[2] >= 1 && vals[3] >= 1)
                     {
                         sections[9] = true;
-                        points[9] = 1 + 2 + 3 + 4;
+                        points[9] = 30;
                         return true;
                     }
                     else if (vals[1] >= 1 & vals[2] >= 1 && vals[3] >= 1 && vals[4] >= 1)
                     {
                         sections[9] = true;
-                        points[9] = 2 + 3 + 4 + 5;
+                        points[9] = 30;
                         return true;
                     }
                     else if (vals[2] >= 1 && vals[3] >= 1 && vals[4] >= 1 && vals[5] >= 1)
                     {
                         sections[9] = true;
-                        points[9] = 3 + 4 + 5 + 6;
+                        points[9] = 30;
                         return true;
                     }
                 }
@@ -1060,7 +1021,7 @@ namespace GamesForClass
                 {
                     sections[11] = true;
                     setHold(hold, yahtzee, diceVals);
-                    points[11] = yahtzee * 5;
+                    points[11] = 50;
                     return true;
                 }
                 //full house
@@ -1071,7 +1032,7 @@ namespace GamesForClass
                     {
                         hold[i] = true;
                     }
-                    points[8] = three * 3 + two * 2;
+                    points[8] = 25;
                     return true;
                 }
                 else
@@ -1108,7 +1069,12 @@ namespace GamesForClass
                             else
                             {
                                 sections[7] = true;
-                                points[7] = four * 4;
+                                int pts = 0;
+                                for (int i =0; i < diceVals.Length; i++)
+                                {
+                                    pts += diceVals[i];
+                                }
+                                points[7] = pts;
                             }
                             return true;
                         }
@@ -1124,7 +1090,12 @@ namespace GamesForClass
                             else
                             {
                                 sections[6] = true;
-                                points[6] = three * 3;
+                                int pts = 0;
+                                for (int i = 0; i < diceVals.Length; i++)
+                                {
+                                    pts += diceVals[i];
+                                }
+                                points[7] = pts;
                             }
                             return true;
                         }
