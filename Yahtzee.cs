@@ -66,6 +66,7 @@ namespace GamesForClass
                 }
             }
         }
+        #region test
         //hides all check boxes on screen, except one being ignored
         public void hideChecks(int keep)
         {
@@ -117,7 +118,7 @@ namespace GamesForClass
 
             }
         }
-        
+        #endregion
         //finds options for user based on currently selected dice
         public void findOptions(YahtzeePlayer plr)
         {
@@ -467,7 +468,7 @@ namespace GamesForClass
                 if (cpuPoints[i] != -1) { cpuPts += cpuPoints[i]; }
                 if (plrPoints[i] != -1) { plrPts += plrPoints[i]; }
                 //adds bonus points
-                if (i == 6)
+                if (i == 5)
                 {
                     if (cpuPts >= 63)
                     {
@@ -526,10 +527,11 @@ namespace GamesForClass
             cpuPoints.Text = "";
             userPoints.Text = "";
             rollButton.Text = "Roll";
-            userPoints.Text = "Total:";
-            cpuPoints.Text = "Total:";
+            usrTotal.Text = "Total:";
+            cpuTotal.Text = "Total:";
             cpuBonus.Text = "Top Bonus:";
             userBonus.Text = "Top Bonus:";
+            winLabel.Text = "";
             user1s.Checked = false;
             user2s.Checked = false;
             user3s.Checked = false;
@@ -543,6 +545,11 @@ namespace GamesForClass
             userfh.Checked = false;
             userya.Checked = false;
             userch.Checked = false;
+            dice.Enabled = true;
+            dice1.Enabled = true;
+            dice2.Enabled = true;
+            dice3.Enabled = true;
+            dice4.Enabled = true;
         }
         //roll button action
         private void rollButton_Click(object sender, EventArgs e)
@@ -570,8 +577,8 @@ namespace GamesForClass
                     rollButton.Visible = false;
                 }
             }
-            //Start CPU turn
-            else if (rollButton.Text == "CPU Turn")
+            //CPU turn
+            else if (rollButton.Text == "CPU Turn" || rollButton.Text == "Next")
             {
                 //starts CPU roll sequence
                 rollButton.Text = "Next";
@@ -594,25 +601,6 @@ namespace GamesForClass
                 else
                 {
                 updateBoard(CPU.getBoard());
-                }
-            }
-            //roll again for CPU
-            else if (rollButton.Text == "Next")
-            {
-                if (CPU.rollAndDecide())
-                {
-                    rollButton.Text = "Your Turn";
-                    addCPUPoints();
-                    updateBoard(CPU.getBoard());
-                    CPU.resetBoard();
-                    if (checkWin())
-                    {
-                        rollButton.Text = "Reset";
-                    }
-                }
-                else
-                {
-                    updateBoard(CPU.getBoard());
                 }
             }
             //reset board
@@ -761,8 +749,13 @@ namespace GamesForClass
         private void testButton_Click(object sender, EventArgs e)
         {
             YahtzeePlayer test = new YahtzeePlayer();
-            int[] board = { 2,3,4,5,5 };
+            int[] board = { 4,4,4,1,1 };
             test.getBoard().setDiceVals(board);
+            test.getBoard().incrRolls();
+            test.getBoard().incrRolls();
+            test.getBoard().incrRolls();
+            bool[] sections = { true, false, true, true, true, true, true, true, true, false, true, true, true };
+            test.setSections(sections);
             test.rollAndDecide();
         }
 
@@ -832,15 +825,17 @@ namespace GamesForClass
                     }
                 }
                 //deicdes which ones to hold, looks for either 1,6 or neither
-                if (used[5] == 1 && ((used[4] == 1 && used[3] == 1) || (used[3] == 1 && used[2] == 1)))
+                if (used[5] == 1 && ((used[4] == 1 && used[3] == 1) || (used[3] == 1 && used[2] == 1) || (used[4] == 1 && used[2] == 1)))
                 {
+                    clearHold(hold);
                     for (int i = 1; i < usedIndex.Length; i++)
                     {
                         if (usedIndex[i] != -1) { hold[usedIndex[i]] = true; }
                     }
                 }
-                else if (used[0] == 1 && ((used[1] == 1 && used[2] == 1) || (used[2] == 1 && used[3] ==1)))
+                else if (used[0] == 1 && ((used[1] == 1 && used[2] == 1) || (used[2] == 1 && used[3] ==1) || (used[1] == 1 && used[3] == 1)))
                 {
+                    clearHold(hold);
                     for (int i = 0; i < usedIndex.Length -1; i++)
                     { 
                         if (usedIndex[i] != -1) { hold[usedIndex[i]] = true; }
@@ -848,6 +843,7 @@ namespace GamesForClass
                 }
                 else
                 {
+                    clearHold(hold);
                     int gap = 0;
                     //checks to see if there is a close straight in the middle of the range
                     //gap of 2, not a possible straight
@@ -940,39 +936,31 @@ namespace GamesForClass
                     }
                     else
                     {
-                        //chance cannot be used, try to fill in other digits
-                        if (sections[0] == false || sections[1] == false || sections[2] == false || sections[3] == false || sections[4] == false || sections[5] == false)
+                        //attempts to fill in a number
+                        if ((sections[0] == false && vals[0] > 0) || (sections[1] == false && vals[1] > 0) || (sections[2] == false && vals[2] > 0)
+                            || (sections[3] == false && vals[3] > 0) || (sections[4] == false && vals[4] > 0) || (sections[5] == false && vals[5] > 0))
                         {
-                            int largestValue = 0;
-                            int occ = 0;
+                            //find highest value that can still be used
+                            int val = 0;
+                            int num = 0;
                             for (int i = 0; i < vals.Length; i++)
                             {
-                                if (vals[i] > occ && sections[i] == false) //keeps a section from being selected twice
+                                if (vals[i] > val && sections[i] == false)
                                 {
-                                    occ = vals[i];
-                                    largestValue = i;
+                                    val = vals[i];
+                                    num = i;
                                 }
                             }
-                            //adds best value to hold
-                            for (int i = 0; i < diceVals.Length; i++)
-                            {
-                                if (diceVals[i] == largestValue + 1)
-                                {
-                                    hold[i] = true;
-                                }
-                                else
-                                {
-                                    hold[i] = false;
-                                }
-                            }
-                            sections[largestValue] = true;
-                            points[largestValue] = (largestValue + 1) * occ;
+
+                            sections[num] = true;
+                            points[num] = val * (num + 1);
                             return true;
                         }
                         else
                         {
-                            //otherwise runs down line and fills in with 0, starting at 3k
-                            for (int i = 6; i < sections.Length; i++)
+                            //fills in next value with 0, starting at ones
+                            setHold(hold, 0, diceVals);
+                            for (int i = 0; i < sections.Length; i++)
                             {
                                 if (sections[i] == false)
                                 {
@@ -982,6 +970,7 @@ namespace GamesForClass
                                 }
                             }
                             return true;
+
                         }
                     }
                 }
@@ -1017,7 +1006,7 @@ namespace GamesForClass
                 }
                 //yahtzee or full house, take immediately
                 //yahtzee
-                if (sections[11] == false && yahtzee > 2)
+                if (sections[11] == false && yahtzee != 0)
                 {
                     sections[11] = true;
                     setHold(hold, yahtzee, diceVals);
@@ -1025,7 +1014,7 @@ namespace GamesForClass
                     return true;
                 }
                 //full house
-                else if (sections[8] == false && three > 1 && two >= 2)
+                else if (sections[8] == false && three != 0 && two != 0)
                 {
                     sections[8] = true;
                     for (int i = 0; i < hold.Length; i++)
@@ -1040,25 +1029,43 @@ namespace GamesForClass
                     //otherwise look to get as close to yahtzee as possible, sets values to hold
                     if (board.getRolls() != 3)
                     {
-                        //places four, three, or highest two value into hold
-                        if (four != 0)
+                        //if there are still ones in the bottom section to check (except straights)
+                        if (sections[6] == false || sections[7] == false || sections[8] == false || sections[11] == false || sections[12] == false)
                         {
-                            setHold(hold, four, diceVals);
+                            //places four, three, or highest two value into hold
+                            if (four != 0)
+                            {
+                                setHold(hold, four, diceVals);
+                            }
+                            else if (three != 0)
+                            {
+                                setHold(hold, three, diceVals);
+                            }
+                            else if (two != 0)
+                            {
+                                setHold(hold, two, diceVals);
+                            }
+                            return false;
                         }
-                        else if (three != 0)
+                        else
                         {
-                            setHold(hold, three, diceVals);
+                            //now needs to fill in specific numbers, regardless of how many there are
+                            int lrgst = 0;
+                            for (int i = 0; i < vals.Length; i++)
+                            {
+                                if (vals[i] != 0 && lrgst < i + 1 && sections[i] == false)
+                                {
+                                    lrgst = i + 1;
+                                }
+                            }
+                            setHold(hold, lrgst, diceVals);
+                            return false;
                         }
-                        else if (two != 0)
-                        {
-                            setHold(hold, two, diceVals);
-                        }
-                        return false;
                     }
                     else
                     {
                         //four of a kind
-                        if (four != 0 && (sections[7] == false || sections[four - 1] == false))
+                        if (four != 0 && (sections[7] == false || sections[four - 1] == false || sections[6] == false))
                         {
                             setHold(hold, four, diceVals);
                             if (sections[7] == true || (four < 3 && sections[four -1] == false))
@@ -1066,7 +1073,7 @@ namespace GamesForClass
                                 sections[four - 1] = true;
                                 points[four - 1] = four * 4;
                             }
-                            else
+                            else if (sections[7] == false)
                             {
                                 sections[7] = true;
                                 int pts = 0;
@@ -1076,18 +1083,8 @@ namespace GamesForClass
                                 }
                                 points[7] = pts;
                             }
-                            return true;
-                        }
-                        //three of a kind
-                        else if (three != 0 && (sections[6] == false || sections[three-1] == false))
-                        {
-                            setHold(hold, three, diceVals);
-                            if (sections[6] == true || (three < 3 && sections[three-1] == false))
-                            {
-                                sections[three - 1] = true;
-                                points[three - 1] = three * 3;
-                            }
-                            else
+                            //puts in 3k if cannot be put elsewhere
+                            else 
                             {
                                 sections[6] = true;
                                 int pts = 0;
@@ -1095,48 +1092,51 @@ namespace GamesForClass
                                 {
                                     pts += diceVals[i];
                                 }
-                                points[7] = pts;
+                                points[6] = pts;
+                            }
+                            return true;
+                        }
+                        //three of a kind
+                        else if (three != 0 && (sections[6] == false || sections[three-1] == false))
+                        {
+                            if (sections[6] == true || (three < 3 && sections[three-1] == false))
+                            {
+                                setHold(hold, three, diceVals);
+                                sections[three - 1] = true;
+                                points[three - 1] = three * 3;
+                            }
+                            else
+                            {
+                                setHold(hold, three, diceVals);
+                                sections[6] = true;
+                                int pts = 0;
+                                for (int i = 0; i < diceVals.Length; i++)
+                                {
+                                    pts += diceVals[i];
+                                }
+                                points[6] = pts;
                             }
                             return true;
                         }
                         //top section (numbers)
-                        else if (sections[0] == false || sections[1] == false || sections[2] == false || sections[3] == false || sections[4] == false || sections[5] == false)
+                        else if ((sections[0] == false && vals[0] > 0) || (sections[1] == false && vals[1] > 0) || (sections[2] == false && vals[2] > 0)
+                            || (sections[3] == false && vals[3] > 0) || (sections[4] == false && vals[4] > 0) || (sections[5] == false && vals[5] > 0))
                         {
-                            //fills with multiple of 4, 3, 2
-                            if (four != 0) { setHold(hold, four, diceVals); sections[four - 1] = true; points[four - 1] = four * 4; }
-                            else if (three != 0) { 
-                                setHold(hold, three, diceVals); sections[three - 1] = true; points[three - 1] = three * 3;  }
-                            else if (two != 0) 
+                            //find highest value that can still be used
+                            int val = 0;
+                            int num = 0;
+                            for (int i = 0; i < vals.Length; i++)
                             {
-                                //takes the lowest multiple of two
-                                int tmp = 9999;
-                                for (int i = 0; i < vals.Length; i++)
+                                if (vals[i] > val && sections[i] == false)
                                 {
-                                    if (vals[i] == 2 && tmp > i + 1 && sections[i] == false)
-                                    {
-                                        tmp = i;
-                                    }
+                                    val = vals[i];
+                                    num = i;
                                 }
-                                setHold(hold, tmp + 1, diceVals);
-                                sections[tmp] = true;
-                                points[tmp] = (tmp + 1) * 2;                                 
                             }
-                            //fills lowest remaining with one multiple
-                            else
-                            {
-                                int tmp = 99999;
-                                for (int i = 0; i < diceVals.Length; i++)
-                                {
-                                    if (tmp < diceVals[i] && sections[diceVals[i] -1] == false)
-                                    {
-                                        tmp = diceVals[i];
-                                    }
-                                }
-                                setHold(hold, tmp, diceVals);
-                                sections[tmp - 1] = true;
-                                points[tmp - 1] = tmp;
-                            }
-                            return true;                            
+                          
+                            sections[num] = true;
+                            points[num] = val * (num + 1);
+                            return true;
                         }
                         else
                         {
@@ -1144,9 +1144,9 @@ namespace GamesForClass
                             if (sections[12] == false)
                             {
                                 int tot = 0;
-                                for (int i = 0; i < diceVals.Length;i++)
+                                for (int i = 0; i < diceVals.Length; i++)
                                 {
-                                    tot+= diceVals[i];
+                                    tot += diceVals[i];
                                     hold[i] = true;
                                 }
                                 sections[12] = true;
@@ -1157,7 +1157,7 @@ namespace GamesForClass
                             else
                             {
                                 setHold(hold, 0, diceVals);
-                                for (int i = 6; i < sections.Length; i++)
+                                for (int i = 0; i < sections.Length; i++)
                                 {
                                     if (sections[i] == false)
                                     {
@@ -1187,6 +1187,14 @@ namespace GamesForClass
                 {
                     hold[i] = false;
                 }
+            }
+        }
+        //sets all hold values to false
+        private void clearHold(bool[] hold)
+        {
+            for (int i = 0; i < hold.Length; i++)
+            {
+                hold[i] = false;
             }
         }
     }
@@ -1221,8 +1229,6 @@ namespace GamesForClass
         //marks a dice as 'free' or 'hold'
         public void markFree(int index) { diceHold[index] = false; }
         public void markHold(int index) { diceHold[index] = true; }
-        public void markLocked(int index) { locked[index] = true; }
-        public void unlockDice() { for (int i = 0; i < locked.Length; i++) { locked[i] = false; } }
 
         //increments and resets roll variable
         public void incrRolls() { rolls++; }

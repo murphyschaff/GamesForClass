@@ -398,7 +398,7 @@
             // 
             this.winLabel.AutoSize = true;
             this.winLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.winLabel.Location = new System.Drawing.Point(482, 486);
+            this.winLabel.Location = new System.Drawing.Point(428, 429);
             this.winLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.winLabel.Name = "winLabel";
             this.winLabel.Size = new System.Drawing.Size(0, 29);
@@ -474,7 +474,7 @@
             // 
             // resetButton
             // 
-            this.resetButton.Location = new System.Drawing.Point(423, 505);
+            this.resetButton.Location = new System.Drawing.Point(433, 510);
             this.resetButton.Margin = new System.Windows.Forms.Padding(2);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(113, 27);
