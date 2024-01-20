@@ -297,6 +297,12 @@ namespace GamesForClass
             if (rolls == 3 && changeMade == false)
             {
                 plr.getBoard().setNoPts(true);
+                if (user1s.Checked == false) { user1s.Visible = true; }
+                if (user2s.Checked == false) { user2s.Visible = true; }
+                if (user3s.Checked == false) { user3s.Visible = true; }
+                if (user4s.Checked == false) { user4s.Visible = true; }
+                if (user5s.Checked == false) { user5s.Visible = true; }
+                if (user6s.Checked == false) { user6s.Visible = true; }
                 if (user3k.Checked == false) { user3k.Visible = true; }
                 if (user4k.Checked == false) { user4k.Visible = true; }
                 if (userfh.Checked == false) { userfh.Visible = true; }
@@ -321,32 +327,32 @@ namespace GamesForClass
             //finds appropriate sections and marks them complete if done so
             if (user1s.Checked == true && user1s.Visible == true)
             {
-                points[0] = vals[0];
+                if (isZero) { points[0] = 0; } else { points[0] = vals[0]; }
                 sections[0] = true;
             }
             if (user2s.Checked == true && user2s.Visible == true)
             {
-                points[1] = vals[1] * 2;
+                if (isZero) { points[1] = 0; } else { points[1] = vals[1] * 2; }
                 sections[1] = true;
             }
             if (user3s.Checked == true && user3s.Visible == true)
             {
-                points[2] = vals[2] * 3;
+                if (isZero) { points[2] = 0; } else { points[2] = vals[2] * 3; }
                 sections[2] = true;
             }
             if (user4s.Checked == true && user4s.Visible == true)
             {
-                points[3] = vals[3] * 4;
+                if (isZero) { points[3] = 0; } else { points[3] = vals[3] * 4; }
                 sections[3] = true;
             }
             if (user5s.Checked == true && user5s.Visible == true)
             {
-                points[4] = vals[4] * 5;
+                if (isZero) { points[4] = 0; } else { points[4] = vals[4] * 5; }
                 sections[4] = true;
             }
             if (user6s.Checked == true && user6s.Visible == true)
             {
-                points[5] = vals[5] * 6;
+                if (isZero) { points[5] = 0; } else { points[5] = vals[5] * 6; }
                 sections[5] = true;
             }
             if (user3k.Checked == true && user3k.Visible == true)
@@ -924,6 +930,7 @@ namespace GamesForClass
                     //nothing else could be selected, try chance
                     if (sections[12] == false)
                     {
+                        allHold(hold);
                         sections[12] = true;
                         int tot = 0;
                         for (int i = 0; i < diceVals.Length; i++)
@@ -951,7 +958,7 @@ namespace GamesForClass
                                     num = i;
                                 }
                             }
-
+                            setHold(hold, num + 1, diceVals);
                             sections[num] = true;
                             points[num] = val * (num + 1);
                             return true;
@@ -1016,6 +1023,7 @@ namespace GamesForClass
                 //full house
                 else if (sections[8] == false && three != 0 && two != 0)
                 {
+                    allHold(hold);
                     sections[8] = true;
                     for (int i = 0; i < hold.Length; i++)
                     {
@@ -1133,7 +1141,7 @@ namespace GamesForClass
                                     num = i;
                                 }
                             }
-                          
+                            setHold(hold, num + 1, diceVals);
                             sections[num] = true;
                             points[num] = val * (num + 1);
                             return true;
@@ -1149,6 +1157,7 @@ namespace GamesForClass
                                     tot += diceVals[i];
                                     hold[i] = true;
                                 }
+                                allHold(hold);
                                 sections[12] = true;
                                 points[12] = tot;
                                 return true;
@@ -1187,6 +1196,14 @@ namespace GamesForClass
                 {
                     hold[i] = false;
                 }
+            }
+        }
+        //adds every dice to the hold
+        private void allHold(bool[] hold)
+        {
+            for (int i = 0; i < hold.Length; i++)
+            {
+                hold[i] = true;
             }
         }
         //sets all hold values to false

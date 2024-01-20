@@ -414,6 +414,7 @@
             this.testButton.TabIndex = 44;
             this.testButton.Text = "Test";
             this.testButton.UseVisualStyleBackColor = true;
+            this.testButton.Visible = false;
             this.testButton.Click += new System.EventHandler(this.testButton_Click);
             // 
             // cpuBonus
