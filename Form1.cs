@@ -17,6 +17,7 @@ namespace GamesForClass
         private War war;
         private Battleship ship;
         private Yahtzee yahtzee;
+        private Minesweeper masweeper;
         public Form1()
         {
             InitializeComponent();
@@ -44,6 +45,12 @@ namespace GamesForClass
         {
             yahtzee = new Yahtzee();
             yahtzee.Show();
+        }
+        /* Minesweeper */
+        private void minesweeper_Click(object sender, EventArgs e)
+        {
+            masweeper = new Minesweeper();
+            masweeper.Show();
         }
     }
 }
