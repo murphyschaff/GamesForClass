@@ -20,8 +20,8 @@ namespace GamesForClass
         public Minesweeper()
         {
             InitializeComponent();
-            plantBombs(0);
-            printVals(8, 8);
+            plantBombs(2);
+            printVals(16, 30);
         }
 
         //plants bombs and calculates distance to each bomb
@@ -58,7 +58,7 @@ namespace GamesForClass
             {
                 for (int j = 0; j < y; j++)
                 {
-                    values[i, j] = 0;
+                    values[i, j] = -5;
                 }
             }
             //planting bombs randomly
@@ -91,8 +91,8 @@ namespace GamesForClass
                 {
                     adjMine++;
                 }
+                values[0,0] = adjMine;
             }
-            values[0,0] = adjMine;
             //top row
             adjMine = 0;
             for (int i = 1; i < y -1; i++)
@@ -120,8 +120,8 @@ namespace GamesForClass
                     {
                         adjMine++;
                     }
+                    values[0, i] = adjMine;
                 }
-                values[0, i] = adjMine;
             }
             //top right
             adjMine = 0;
@@ -139,8 +139,8 @@ namespace GamesForClass
                 {
                     adjMine++;
                 }
+                values[0, y-1] = adjMine;
             }
-            values[0, y-1] = adjMine;
 
             //left side
             for (int i = 1; i < x-1; i++) 
@@ -168,8 +168,8 @@ namespace GamesForClass
                     {
                         adjMine++;
                     }
+                    values[i,0] = adjMine;
                 }
-                values[i,0] = adjMine;
             }
             //bottom left
             adjMine = 0;
@@ -187,8 +187,8 @@ namespace GamesForClass
                 {
                     adjMine++;
                 }
+                values[x-1, 0] = adjMine;
             }
-            values[x-1, 0] = adjMine;
             //right side
             for (int i = 1; i < x - 1; i++)
             {
@@ -215,8 +215,8 @@ namespace GamesForClass
                     {
                         adjMine++;
                     }
+                    values[i, y-1] = adjMine;
                 }
-                values[i, y-1] = adjMine;
             }
             //bottom right
             adjMine = 0;
@@ -234,8 +234,8 @@ namespace GamesForClass
                 {
                     adjMine++;
                 }
+                values[x - 1, y-1] = adjMine;
             }
-            values[x - 1, y-1] = adjMine;
             //bottom
             for (int i = 1; i < y-1; i++)
             {
@@ -262,13 +262,13 @@ namespace GamesForClass
                     {
                         adjMine++;
                     }
+                    values[x-1, i] = adjMine;
                 }
-                values[x-1, i] = adjMine;
             }
             //middle
-            for (int i = 1; i < x; i++)
+            for (int i = 1; i < x-1; i++)
             {
-                for (int t = 1; x < y; x++)
+                for (int t = 1; t < y-1; t++)
                 {
                     adjMine = 0;
                     if (values[i,t] != -1)
@@ -305,8 +305,8 @@ namespace GamesForClass
                         {
                             adjMine++;
                         }
+                        values[i,t] = adjMine;
                     }
-                    values[i,t] = adjMine;
                 }
             }
         }
