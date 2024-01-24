@@ -20,12 +20,10 @@ namespace GamesForClass
         public Minesweeper()
         {
             InitializeComponent();
-            plantBombs(2);
-            printVals(16, 30);
+            createBoard(2);
+            //printVals(16, 30);
         }
-
-        //plants bombs and calculates distance to each bomb
-        public void plantBombs(int difficulty)
+        public void createBoard(int difficulty)
         {
             int mines = 0;
             int x = 0;
@@ -53,6 +51,7 @@ namespace GamesForClass
                     break;
             }
             values = new int[x, y];
+            buttons = new Button[x, y];
             //creates initial values board
             for (int i = 0; i < x; i++)
             {
@@ -61,6 +60,14 @@ namespace GamesForClass
                     values[i, j] = -5;
                 }
             }
+
+            plantBombs(mines, x, y);
+            placeButtons(x, y);
+        }
+        //plants bombs and calculates distance to each bomb
+        public void plantBombs(int mines, int x, int y)
+        {
+            Random rnd = new Random();
             //planting bombs randomly
             int index = 0;
             while (index < mines)
@@ -309,6 +316,34 @@ namespace GamesForClass
                     }
                 }
             }
+        }
+        //places all buttons onto board
+        public void placeButtons(int x, int y)
+        {
+            //middle is 575, 340
+            int offsetX = 340 - (15 + ((x / 2) * 30));
+            int offsetY = 575 - (15 + ((y / 2) * 30));
+            for (int i = 0; i < x; i++)
+            {
+                for (int j =0; j < y; j++)
+                {
+                    Button newButton = new Button();
+                    String name = i.ToString() + "-" + j.ToString();
+                    newButton.Name = name;
+                    newButton.Size = new Size(30, 30);
+                    newButton.Location = new Point(offsetY + (j * 30) , offsetX + (i * 30));
+                    newButton.Click += Button_Click;
+                    this.Controls.Add(newButton);
+                    buttons[i,j] = newButton;
+                }
+            }
+
+        }
+        //button click function, for all board button clicks
+        private void Button_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            test.Text = button.Name;
         }
         public void printVals(int x, int y)
         {
