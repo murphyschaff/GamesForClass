@@ -39,6 +39,7 @@
             this.resetButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.remainingBombs = new System.Windows.Forms.Label();
+            this.resultsLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // title
@@ -54,11 +55,10 @@
             // test
             // 
             this.test.AutoSize = true;
-            this.test.Location = new System.Drawing.Point(12, 33);
+            this.test.Location = new System.Drawing.Point(18, 18);
             this.test.Name = "test";
-            this.test.Size = new System.Drawing.Size(35, 13);
+            this.test.Size = new System.Drawing.Size(0, 13);
             this.test.TabIndex = 1;
-            this.test.Text = "label1";
             // 
             // background
             // 
@@ -158,11 +158,22 @@
             this.remainingBombs.Size = new System.Drawing.Size(0, 20);
             this.remainingBombs.TabIndex = 10;
             // 
+            // resultsLabel
+            // 
+            this.resultsLabel.AutoSize = true;
+            this.resultsLabel.BackColor = System.Drawing.SystemColors.Control;
+            this.resultsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.resultsLabel.Location = new System.Drawing.Point(801, 593);
+            this.resultsLabel.Name = "resultsLabel";
+            this.resultsLabel.Size = new System.Drawing.Size(0, 39);
+            this.resultsLabel.TabIndex = 11;
+            // 
             // Minesweeper
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1134, 641);
+            this.Controls.Add(this.resultsLabel);
             this.Controls.Add(this.remainingBombs);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.resetButton);
@@ -194,5 +205,6 @@
         private System.Windows.Forms.Button resetButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label remainingBombs;
+        private System.Windows.Forms.Label resultsLabel;
     }
 }

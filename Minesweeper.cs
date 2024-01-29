@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace GamesForClass
 {
@@ -16,12 +17,13 @@ namespace GamesForClass
         private int[,] values;
         private int[,] marks;
         private Button[,] buttons;
-        private int difficulty;
+        private int xLen;
+        private int yLen;
         public Minesweeper()
         {
             InitializeComponent();
         }
-        public void createBoard(int difficulty)
+        private void createBoard(int difficulty)
         {
             int mines = 0;
             int x = 0;
@@ -50,6 +52,8 @@ namespace GamesForClass
             }
             values = new int[x, y];
             buttons = new Button[x, y];
+            xLen = x;
+            yLen = y;
             //creates initial values board
             for (int i = 0; i < x; i++)
             {
@@ -64,7 +68,8 @@ namespace GamesForClass
             remainingBombs.Text = mines.ToString();
         }
         //plants bombs and calculates distance to each bomb
-        public void plantBombs(int mines, int x, int y)
+        //VALUES: -1: BOMB, 0: Not next to any bombs, other numbers: how many adjacent bombs
+        private void plantBombs(int mines, int x, int y)
         {
             Random rnd = new Random();
             //planting bombs randomly
@@ -317,7 +322,7 @@ namespace GamesForClass
             }
         }
         //places all buttons onto board
-        public void placeButtons(int x, int y)
+        private void placeButtons(int x, int y)
         {
             //middle is 575, 340
             int offsetX = 340 - (15 + ((x / 2) * 30));
@@ -332,6 +337,7 @@ namespace GamesForClass
                     newButton.Size = new Size(30, 30);
                     newButton.Location = new Point(offsetY + (j * 30) , offsetX + (i * 30));
                     newButton.MouseDown += Button_Click;
+                    newButton.BackColor = Color.White;
                     newButton.BringToFront();
                     this.Controls.Add(newButton);
                     buttons[i,j] = newButton;
@@ -341,10 +347,222 @@ namespace GamesForClass
 
         }
         //checks user actions when clicking button
-        public void placeFlag(Button button, bool isBomb)
+        private void placeFlag(Button button, bool isBomb)
         {
             String buttonName = button.Name;
-
+            String output = "";
+            int xVal = 0;
+            int yVal;
+            for (int i = 0; i < buttonName.Length; i++)
+            {
+                if (buttonName[i] == '-')
+                {
+                    xVal = (Convert.ToInt32(output));
+                    output = "";
+                }
+                else
+                {
+                    output += buttonName[i];
+                }
+            }
+            yVal = Convert.ToInt32(output);
+            //if the button was right-clicked, sets as bomb
+            if (isBomb)
+            {
+                int rmBombs = Convert.ToInt32(remainingBombs.Text);
+                if (rmBombs > 0)
+                {
+                    remainingBombs.Text = (rmBombs - 1).ToString();
+                }
+                button.Text = "B";
+                button.BackColor = Color.DarkGray;
+            }
+            else
+            {               
+                int val = values[xVal,yVal];
+                //if user marked bomb as safe
+                if (val == -1)
+                {
+                    //explode
+                    explode();
+                    resultsLabel.Text = "You Loose!";
+                    return;
+                }
+                else if (val == 0)
+                {
+                    //run zero clear sequence
+                    button.BackColor = Color.Gray;
+                    button.Enabled = false;
+                    clearZeros(xVal, yVal);
+                    button.Enabled = false;
+                }
+                else
+                {
+                    //mark button with value
+                    button.Text = val.ToString();
+                    button.BackColor = Color.Gray;
+                    button.Enabled = false;
+                }
+            }
+            //run check win sequence
+            checkWin();
+        }
+        //checks to see if the user has won
+        private void checkWin()
+        {
+            bool mrkdBombs = true;
+            int rmBombs = Convert.ToInt32(remainingBombs.Text);
+            if (rmBombs == 0)
+            {
+                for (int i = 0; i < xLen; i++)
+                {
+                    for (int j = 0; j < yLen; j++)
+                    {
+                        if (values[i, j] == -1 && buttons[i, j].Text != "B")
+                        {
+                            //user has not won yet
+                            mrkdBombs = false;
+                            break;
+                        }
+                    }
+                }
+                if (!mrkdBombs)
+                {
+                    resultsLabel.Text = "Mistake Made";
+                }
+                else
+                {
+                    resultsLabel.Text = "You Win!";
+                    for (int i = 0; i < xLen; i++)
+                    {
+                        for (int j = 0; i < yLen; j++)
+                        {
+                            buttons[i,j].Enabled = false;
+                        }
+                    }
+                }
+            }
+        }
+        //recursive function that clears a large swath of board to start
+        private void clearZeros(int xVal, int yVal)
+        {
+            if (yVal < yLen -1)
+            {
+                checkRight(xVal, yVal + 1);
+            }
+            if (yVal > 0)
+            {
+                checkLeft(xVal, yVal - 1);
+            }
+            if (xVal < xLen -1)
+            {
+                checkDown(xVal + 1, yVal);
+            }
+            if (xVal > 0)
+            {
+                checkUp(xVal -1, yVal);
+            }
+        }
+        //checks the button to the right for 0 or value that is not bomb
+        private void checkRight(int xVal, int yVal)
+        {
+            int val = values[xVal, yVal];
+            Button button = buttons[xVal, yVal];
+            button.Enabled = false;
+            button.BackColor = Color.Gray;
+            if (val == 0 && yVal < yLen - 1)
+            {
+                checkRight(xVal, yVal + 1);
+            }
+            else
+            {
+                button.Text = val.ToString();
+            }
+        }
+        //checks the button to the left for 0 or value that is not bomb
+        private void checkLeft(int xVal, int yVal)
+        {
+            int val = values[xVal, yVal];
+            Button button = buttons[xVal, yVal];
+            button.Enabled = false;
+            button.BackColor = Color.Gray;
+            if (val == 0 && yVal > 0)
+            {
+                checkLeft(xVal, yVal - 1);
+            }
+            else
+            {
+                button.Text = val.ToString();
+            }
+        }
+        //checks the button beneath for 0 or value that is not bomb
+        private void checkDown(int xVal, int yVal)
+        {
+            int val = values[xVal, yVal];
+            Button button = buttons[xVal, yVal];
+            button.Enabled = false;
+            button.BackColor = Color.Gray;
+            if (val == 0)
+            {
+                if (xVal < xLen - 1)
+                {
+                    checkDown(xVal +1, yVal);
+                }
+                if (yVal < yLen -1)
+                {
+                    checkRight(xVal, yVal + 1);
+                }
+                if (yVal > 0)
+                {
+                    checkLeft(xVal, yVal - 1);
+                }
+            }
+            else
+            {
+                button.Text = val.ToString();
+            }
+        }
+        //checks the button above for 0 or value that is not bomb
+        private void checkUp(int xVal, int yVal)
+        {
+            int val = values[xVal, yVal];
+            Button button = buttons[xVal, yVal];
+            button.Enabled = false;
+            button.BackColor = Color.Gray;
+            if (val == 0)
+            {
+                if (xVal > 0)
+                {
+                    checkUp(xVal - 1, yVal);
+                }
+                if (yVal < yLen - 1)
+                {
+                    checkRight(xVal, yVal + 1);
+                }
+                if (yVal > 0)
+                {
+                    checkLeft(xVal, yVal - 1);
+                }
+            }
+            else
+            {
+                button.Text = val.ToString();
+            }
+        }
+        //causes loss, explodes and shows all bombs on board
+        private void explode()
+        {
+            for (int i = 0; i < xLen; i++)
+            {
+                for (int j = 0; j < yLen; j++)
+                {
+                    if (values[i,j] == -1)
+                    {
+                        buttons[i, j].Text = "B";
+                        buttons[i, j].ForeColor = Color.Red;
+                    }
+                }
+            }
         }
         //button click function, for all board button clicks
         private void Button_Click(object sender, MouseEventArgs e)
@@ -359,7 +577,7 @@ namespace GamesForClass
             placeFlag(button, isBomb);
         }
         //prints all data in values to a test label (testing purposes only)
-        public void printVals(int x, int y)
+        private void printVals(int x, int y)
         {
             String output = "";
             for (int i = 0; i < x; i++)
@@ -373,7 +591,7 @@ namespace GamesForClass
             test.Text = output;
         }
         //unchecks other check boxes
-        public void uncheckBox(int skip)
+        private void uncheckBox(int skip)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -398,6 +616,7 @@ namespace GamesForClass
         private void startButton_Click(object sender, EventArgs e)
         {
             int difficulty;
+            startButton.Enabled = false;
             //gets selected difficulty, easy, medium, hard
             if (easyCheck.Checked)
             {
