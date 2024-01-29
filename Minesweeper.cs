@@ -20,8 +20,6 @@ namespace GamesForClass
         public Minesweeper()
         {
             InitializeComponent();
-            createBoard(2);
-            //printVals(16, 30);
         }
         public void createBoard(int difficulty)
         {
@@ -63,6 +61,7 @@ namespace GamesForClass
 
             plantBombs(mines, x, y);
             placeButtons(x, y);
+            remainingBombs.Text = mines.ToString();
         }
         //plants bombs and calculates distance to each bomb
         public void plantBombs(int mines, int x, int y)
@@ -332,19 +331,34 @@ namespace GamesForClass
                     newButton.Name = name;
                     newButton.Size = new Size(30, 30);
                     newButton.Location = new Point(offsetY + (j * 30) , offsetX + (i * 30));
-                    newButton.Click += Button_Click;
+                    newButton.MouseDown += Button_Click;
+                    newButton.BringToFront();
                     this.Controls.Add(newButton);
                     buttons[i,j] = newButton;
                 }
             }
+            background.SendToBack();
+
+        }
+        //checks user actions when clicking button
+        public void placeFlag(Button button, bool isBomb)
+        {
+            String buttonName = button.Name;
 
         }
         //button click function, for all board button clicks
-        private void Button_Click(object sender, EventArgs e)
+        private void Button_Click(object sender, MouseEventArgs e)
         {
             Button button = (Button)sender;
-            test.Text = button.Name;
+            bool isBomb = false;
+            if (e.Button == MouseButtons.Right)
+            {
+                isBomb = true;
+                test.Text = button.Name;
+            }
+            placeFlag(button, isBomb);
         }
+        //prints all data in values to a test label (testing purposes only)
         public void printVals(int x, int y)
         {
             String output = "";
@@ -358,7 +372,52 @@ namespace GamesForClass
             }
             test.Text = output;
         }
-
+        //unchecks other check boxes
+        public void uncheckBox(int skip)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                if (skip != i)
+                {
+                    switch (i)
+                    {
+                        //easy
+                        case 0:
+                            easyCheck.Checked = false; break;
+                        //medium
+                        case 1:
+                            mediumCheck.Checked = false; break;
+                        //hard
+                        case 2:
+                            hardCheck.Checked = false; break;
+                    }
+                }
+            }
+        }
+        //starts the game sequence
+        private void startButton_Click(object sender, EventArgs e)
+        {
+            int difficulty;
+            //gets selected difficulty, easy, medium, hard
+            if (easyCheck.Checked)
+            {
+                difficulty = 0;
+            }
+            else if (mediumCheck.Checked)
+            {
+                difficulty = 1;
+            }
+            else
+            {
+                difficulty = 2;
+            }
+            //runs creation sequence
+            createBoard(difficulty);
+        }
+        //check box changes
+        private void easyCheck_CheckedChanged(object sender, EventArgs e) { if (easyCheck.Checked) { uncheckBox(0); } }
+        private void mediumCheck_CheckedChanged(object sender, EventArgs e) { if (mediumCheck.Checked) { uncheckBox(1); } }
+        private void hardCheck_CheckedChanged(object sender, EventArgs e) { if (hardCheck.Checked) { uncheckBox(2); } }
     }
     
 
