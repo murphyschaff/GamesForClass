@@ -15,7 +15,8 @@ namespace GamesForClass
     public partial class Minesweeper : Form
     {
         private int[,] values;
-        private int[,] marks;
+        private bool placed = false;
+        private int mines;
         private Button[,] buttons;
         private int xLen;
         private int yLen;
@@ -25,7 +26,6 @@ namespace GamesForClass
         }
         private void createBoard(int difficulty)
         {
-            int mines = 0;
             int x = 0;
             int y = 0;
             Random rnd = new Random();
@@ -62,23 +62,21 @@ namespace GamesForClass
                     values[i, j] = -5;
                 }
             }
-
-            plantBombs(mines, x, y);
             placeButtons(x, y);
             remainingBombs.Text = mines.ToString();
         }
         //plants bombs and calculates distance to each bomb
         //VALUES: -1: BOMB, 0: Not next to any bombs, other numbers: how many adjacent bombs
-        private void plantBombs(int mines, int x, int y)
+        private void plantBombs(int noX, int noY)
         {
             Random rnd = new Random();
             //planting bombs randomly
             int index = 0;
             while (index < mines)
             {
-                int xVal = rnd.Next(x);
-                int yVal = rnd.Next(y);
-                if (values[xVal, yVal] != -1)
+                int xVal = rnd.Next(xLen);
+                int yVal = rnd.Next(yLen);
+                if (values[xVal, yVal] != -1 && (xVal != noX && yVal != noY))
                 {
                     values[xVal, yVal] = -1;
                     index++;
@@ -106,7 +104,7 @@ namespace GamesForClass
             }
             //top row
             adjMine = 0;
-            for (int i = 1; i < y -1; i++)
+            for (int i = 1; i < yLen -1; i++)
             {
                 adjMine = 0;
                 if (values[0,i] != -1)
@@ -136,25 +134,25 @@ namespace GamesForClass
             }
             //top right
             adjMine = 0;
-            if (values[0, y-1] != -1)
+            if (values[0, yLen-1] != -1)
             {
-                if (values[0, y-2] == -1)
+                if (values[0, yLen-2] == -1)
                 {
                     adjMine++;
                 }
-                if (values[1, y-2] == -1)
+                if (values[1, yLen -2] == -1)
                 {
                     adjMine++;
                 }
-                if (values[1, y-1] == -1)
+                if (values[1, yLen -1] == -1)
                 {
                     adjMine++;
                 }
-                values[0, y-1] = adjMine;
+                values[0, yLen -1] = adjMine;
             }
 
             //left side
-            for (int i = 1; i < x-1; i++) 
+            for (int i = 1; i < xLen-1; i++) 
             {
                 adjMine = 0;
                 if (values[i, 0] != -1)
@@ -184,102 +182,102 @@ namespace GamesForClass
             }
             //bottom left
             adjMine = 0;
-            if (values[x-1,0] != -1)
+            if (values[xLen-1,0] != -1)
             {
-                if (values[x-2, 0] == -1)
+                if (values[xLen-2, 0] == -1)
                 {
                     adjMine++;
                 }
-                if (values[x-2, 1] == -1)
+                if (values[xLen-2, 1] == -1)
                 {
                     adjMine++;
                 }
-                if (values[x-1,1] == -1)
+                if (values[xLen-1,1] == -1)
                 {
                     adjMine++;
                 }
-                values[x-1, 0] = adjMine;
+                values[xLen-1, 0] = adjMine;
             }
             //right side
-            for (int i = 1; i < x - 1; i++)
+            for (int i = 1; i < xLen - 1; i++)
             {
                 adjMine = 0;
-                if (values[i, y-1] != -1)
+                if (values[i, yLen -1] != -1)
                 {
-                    if (values[i - 1, y-1] == -1)
+                    if (values[i - 1, yLen -1] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[i - 1, y-2] == -1)
+                    if (values[i - 1, yLen -2] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[i, y-2] == -1)
+                    if (values[i, yLen -2] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[i + 1, y-2] == -1)
+                    if (values[i + 1, yLen -2] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[i + 1, y-1] == -1)
+                    if (values[i + 1, yLen -1] == -1)
                     {
                         adjMine++;
                     }
-                    values[i, y-1] = adjMine;
+                    values[i, yLen -1] = adjMine;
                 }
             }
             //bottom right
             adjMine = 0;
-            if (values[x - 1, y-1] != -1)
+            if (values[xLen - 1, yLen -1] != -1)
             {
-                if (values[x - 2, y - 1] == -1)
+                if (values[xLen - 2, yLen - 1] == -1)
                 {
                     adjMine++;
                 }
-                if (values[x - 2, y-2] == -1)
+                if (values[xLen - 2, yLen -2] == -1)
                 {
                     adjMine++;
                 }
-                if (values[x - 1, y-2] == -1)
+                if (values[xLen - 1, yLen -2] == -1)
                 {
                     adjMine++;
                 }
-                values[x - 1, y-1] = adjMine;
+                values[xLen - 1, yLen -1] = adjMine;
             }
             //bottom
-            for (int i = 1; i < y-1; i++)
+            for (int i = 1; i < yLen -1; i++)
             {
                 adjMine = 0;
-                if (values[x-1, i] != -1)
+                if (values[xLen-1, i] != -1)
                 {
-                    if (values[x-1, i-1] == -1)
+                    if (values[xLen -1, i-1] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[x-2, i-1] == -1)
+                    if (values[xLen-2, i-1] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[x-2, i] == -1)
+                    if (values[xLen -2, i] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[x-2, i+1] == -1)
+                    if (values[xLen -2, i+1] == -1)
                     {
                         adjMine++;
                     }
-                    if (values[x-1, i+1] == -1)
+                    if (values[xLen -1, i+1] == -1)
                     {
                         adjMine++;
                     }
-                    values[x-1, i] = adjMine;
+                    values[xLen -1, i] = adjMine;
                 }
             }
             //middle
-            for (int i = 1; i < x-1; i++)
+            for (int i = 1; i < xLen -1; i++)
             {
-                for (int t = 1; t < y-1; t++)
+                for (int t = 1; t < yLen -1; t++)
                 {
                     adjMine = 0;
                     if (values[i,t] != -1)
@@ -391,10 +389,7 @@ namespace GamesForClass
                 else if (val == 0)
                 {
                     //run zero clear sequence
-                    button.BackColor = Color.Gray;
-                    button.Enabled = false;
                     clearZeros(xVal, yVal);
-                    button.Enabled = false;
                 }
                 else
                 {
@@ -446,104 +441,32 @@ namespace GamesForClass
         //recursive function that clears a large swath of board to start
         private void clearZeros(int xVal, int yVal)
         {
-            if (yVal < yLen -1)
-            {
-                checkRight(xVal, yVal + 1);
-            }
-            if (yVal > 0)
-            {
-                checkLeft(xVal, yVal - 1);
-            }
-            if (xVal < xLen -1)
-            {
-                checkDown(xVal + 1, yVal);
-            }
-            if (xVal > 0)
-            {
-                checkUp(xVal -1, yVal);
-            }
-        }
-        //checks the button to the right for 0 or value that is not bomb
-        private void checkRight(int xVal, int yVal)
-        {
-            int val = values[xVal, yVal];
             Button button = buttons[xVal, yVal];
+            int val = values[xVal, yVal];
             button.Enabled = false;
             button.BackColor = Color.Gray;
-            if (val == 0 && yVal < yLen - 1)
-            {
-                checkRight(xVal, yVal + 1);
-            }
-            else
-            {
-                button.Text = val.ToString();
-            }
-        }
-        //checks the button to the left for 0 or value that is not bomb
-        private void checkLeft(int xVal, int yVal)
-        {
-            int val = values[xVal, yVal];
-            Button button = buttons[xVal, yVal];
-            button.Enabled = false;
-            button.BackColor = Color.Gray;
-            if (val == 0 && yVal > 0)
-            {
-                checkLeft(xVal, yVal - 1);
-            }
-            else
-            {
-                button.Text = val.ToString();
-            }
-        }
-        //checks the button beneath for 0 or value that is not bomb
-        private void checkDown(int xVal, int yVal)
-        {
-            int val = values[xVal, yVal];
-            Button button = buttons[xVal, yVal];
-            button.Enabled = false;
-            button.BackColor = Color.Gray;
+            button.Text = "";
+            //if the value is 0, check above, below, right, and left if not already checked. does not check diagonals
             if (val == 0)
             {
-                if (xVal < xLen - 1)
+                if (xVal < xLen -1 && buttons[xVal + 1, yVal].Enabled == true)
                 {
-                    checkDown(xVal +1, yVal);
+                    clearZeros(xVal + 1, yVal);
                 }
-                if (yVal < yLen -1)
+                if (xVal > 0 && buttons[xVal - 1, yVal].Enabled == true)
                 {
-                    checkRight(xVal, yVal + 1);
+                    clearZeros(xVal -1, yVal);
                 }
-                if (yVal > 0)
+                if (yVal < yLen -1 && buttons[xVal, yVal + 1].Enabled == true)
                 {
-                    checkLeft(xVal, yVal - 1);
+                    clearZeros(xVal, yVal + 1);
                 }
-            }
-            else
-            {
-                button.Text = val.ToString();
-            }
-        }
-        //checks the button above for 0 or value that is not bomb
-        private void checkUp(int xVal, int yVal)
-        {
-            int val = values[xVal, yVal];
-            Button button = buttons[xVal, yVal];
-            button.Enabled = false;
-            button.BackColor = Color.Gray;
-            if (val == 0)
-            {
-                if (xVal > 0)
+                if (yVal > 0 && buttons[xVal, yVal -1].Enabled == true)
                 {
-                    checkUp(xVal - 1, yVal);
-                }
-                if (yVal < yLen - 1)
-                {
-                    checkRight(xVal, yVal + 1);
-                }
-                if (yVal > 0)
-                {
-                    checkLeft(xVal, yVal - 1);
+                    clearZeros(xVal, yVal - 1);
                 }
             }
+            //places number onto button, stops recursion
             else
             {
                 button.Text = val.ToString();
@@ -558,9 +481,10 @@ namespace GamesForClass
                 {
                     if (values[i,j] == -1)
                     {
+                        buttons[i, j].BackColor = Color.Red;
                         buttons[i, j].Text = "B";
-                        buttons[i, j].ForeColor = Color.Red;
                     }
+                    buttons[i, j].Enabled = false;
                 }
             }
         }
@@ -568,11 +492,34 @@ namespace GamesForClass
         private void Button_Click(object sender, MouseEventArgs e)
         {
             Button button = (Button)sender;
+            if (!placed)
+            {
+                placed = true;
+                //plants bomb if this is the first button clicked
+                //prevents first button from being a bomb
+                String buttonName = button.Name;
+                String output = "";
+                int xVal = 0;
+                int yVal;
+                for (int i = 0; i < buttonName.Length; i++)
+                {
+                    if (buttonName[i] == '-')
+                    {
+                        xVal = (Convert.ToInt32(output));
+                        output = "";
+                    }
+                    else
+                    {
+                        output += buttonName[i];
+                    }
+                }
+                yVal = Convert.ToInt32(output);
+                plantBombs(xVal, yVal);
+            }
             bool isBomb = false;
             if (e.Button == MouseButtons.Right)
             {
                 isBomb = true;
-                test.Text = button.Name;
             }
             placeFlag(button, isBomb);
         }
@@ -617,6 +564,10 @@ namespace GamesForClass
         {
             int difficulty;
             startButton.Enabled = false;
+            easyCheck.Enabled = false;
+            mediumCheck.Enabled = false;
+            hardCheck.Enabled = false;
+            label1.Enabled = false;
             //gets selected difficulty, easy, medium, hard
             if (easyCheck.Checked)
             {
@@ -637,6 +588,26 @@ namespace GamesForClass
         private void easyCheck_CheckedChanged(object sender, EventArgs e) { if (easyCheck.Checked) { uncheckBox(0); } }
         private void mediumCheck_CheckedChanged(object sender, EventArgs e) { if (mediumCheck.Checked) { uncheckBox(1); } }
         private void hardCheck_CheckedChanged(object sender, EventArgs e) { if (hardCheck.Checked) { uncheckBox(2); } }
+        //reset button click
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            //removes all generated buttons from board
+            for (int i = 0; i < xLen; i++)
+            {
+                for (int j = 0; j < yLen; j++)
+                {
+                    this.Controls.Remove(buttons[i, j]);
+                }
+            }
+            remainingBombs.Text = "";
+            resultsLabel.Text = "";
+            startButton.Enabled = true;
+            easyCheck.Enabled = true;
+            mediumCheck.Enabled = true;
+            hardCheck.Enabled = true;
+            label1.Enabled = true;
+            placed = false;
+        }
     }
     
 
