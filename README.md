@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 0.5: Minesweeper Release
+## Version 0.5.1
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v0_5
+Release Executable is located under Releases, GamesForClass_v0_5_1
 
 # Game Instructions
 ## Tic Tac Toe
@@ -20,6 +20,17 @@ Clicking "Roll" when it is your turn will roll each dice on the board. You can c
 To start a game of minesweeper, select your difficulty on the bottom left. Click "Start Game" once you have selected the difficulty you want to play. Easy is a 8x8 board with 10 mines, Medium is a 16x16 board with 40 mines, and Hard is a 30x16 board with 99 mines. Select "Start Game" to spawn the board, and click a individual button to start. Right clicking a button will mark the space as a mine, where left clicking will reveal the value of the space. Left clicking on a bomb tile will cause the mine to explode, ending the game. To reset the game, click the "Reset" button. 
 
 # Release Notes
+## Release v0.5.1
++ Features
+    + Minesweeper
+        + Secret Addition
++ Bug Fixes
+    + Minesweeper
+        + Changed win condition to make it hard to cheat
+        + Fixed out-of-bounds error when winning
+    + Yahtzee
+        + Fixed bug where 0 points would be added to category even if valid points were present.
+
 ## Release v0.5: Minesweeper Release
 + Added Game Minesweeper
     + Added game functionality

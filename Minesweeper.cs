@@ -367,11 +367,6 @@ namespace GamesForClass
             //if the button was right-clicked, sets as bomb
             if (isBomb)
             {
-                int rmBombs = Convert.ToInt32(remainingBombs.Text);
-                if (rmBombs > 0)
-                {
-                    remainingBombs.Text = (rmBombs - 1).ToString();
-                }
                 button.Text = "B";
                 button.BackColor = Color.DarkGray;
             }
@@ -400,7 +395,31 @@ namespace GamesForClass
                 }
             }
             //run check win sequence
+            calcMinesRemaining();
             checkWin();
+        }
+        //calculates the number of bombs remaining on the board
+        private void calcMinesRemaining()
+        {
+            int markedMines = 0;
+            for (int i = 0; i < xLen; i++)
+            {
+                for (int j = 0; j < yLen; j++)
+                {
+                    if (buttons[i,j].Text == "B" && buttons[i,j].BackColor == Color.DarkGray)
+                    {
+                        markedMines++;
+                    }
+                }
+            }
+            if (mines - markedMines >= 0) 
+            { 
+                remainingBombs.Text = (mines - markedMines).ToString();
+            }
+            else
+            {
+                resultsLabel.Text = "Mistake Made";
+            }
         }
         //checks to see if the user has won
         private void checkWin()
@@ -413,7 +432,8 @@ namespace GamesForClass
                 {
                     for (int j = 0; j < yLen; j++)
                     {
-                        if (values[i, j] == -1 && buttons[i, j].Text != "B")
+                        //checks to make sure all non bomb spaces have been selected
+                        if (values[i, j] != -1 && buttons[i, j].Enabled == true)
                         {
                             //user has not won yet
                             mrkdBombs = false;
@@ -421,18 +441,14 @@ namespace GamesForClass
                         }
                     }
                 }
-                if (!mrkdBombs)
-                {
-                    resultsLabel.Text = "Mistake Made";
-                }
-                else
+                if (mrkdBombs)
                 {
                     resultsLabel.Text = "You Win!";
                     for (int i = 0; i < xLen; i++)
                     {
-                        for (int j = 0; i < yLen; j++)
+                        for (int j = 0; j < yLen; j++)
                         {
-                            buttons[i,j].Enabled = false;
+                            buttons[i, j].Enabled = false;
                         }
                     }
                 }
@@ -607,6 +623,20 @@ namespace GamesForClass
             hardCheck.Enabled = true;
             label1.Enabled = true;
             placed = false;
+        }
+        //secret button, shows where all mines are located on board
+        private void title_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < xLen; i++)
+            {
+                for (int j = 0; j < yLen; j++)
+                {
+                    if (values[i,j] == -1)
+                    {
+                        buttons[i, j].Text = "B";
+                    }
+                }
+            }
         }
     }
     

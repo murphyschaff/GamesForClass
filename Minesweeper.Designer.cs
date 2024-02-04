@@ -51,6 +51,7 @@
             this.title.Size = new System.Drawing.Size(324, 55);
             this.title.TabIndex = 0;
             this.title.Text = "Minesweeper!";
+            this.title.Click += new System.EventHandler(this.title_Click);
             // 
             // test
             // 

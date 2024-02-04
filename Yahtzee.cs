@@ -66,7 +66,6 @@ namespace GamesForClass
                 }
             }
         }
-        #region test
         //hides all check boxes on screen, except one being ignored
         public void hideChecks(int keep)
         {
@@ -118,7 +117,6 @@ namespace GamesForClass
 
             }
         }
-        #endregion
         //finds options for user based on currently selected dice
         public void findOptions(YahtzeePlayer plr)
         {
@@ -127,6 +125,7 @@ namespace GamesForClass
             bool[] sections = plr.getSections();
             bool changeMade = false;
             int rolls = plr.getBoard().getRolls();
+            plr.getBoard().setNoPts(false);
             //checks which ones are available
             for (int i = 0; i < sections.Length;i++)
             {
