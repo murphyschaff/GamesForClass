@@ -24,51 +24,287 @@ namespace GamesForClass
     {
         BattleshipPlayer player = new BattleshipPlayer();
         BattleshipPlayer CPU = new BattleshipPlayer();
+        private int dimention = 9;
+        private Button[,] cpuButtons;
+        private Button[,] plrButtons;
         public Battleship()
         {
             InitializeComponent();
+            createButtons();
         }
         public void initBattleship()
         {
             player = new BattleshipPlayer();
             CPU = new BattleshipPlayer();
-
         }
-        //Updates graphics on board, depends on if board is being updated when player placing ships
-        public void updateBoard(bool isplayer)
+        //adds buttons to board on initilization
+        private void createButtons()
         {
-            if (isplayer) {
-                if (placePlayerShip())
+            cpuButtons = new Button[dimention, dimention];
+            plrButtons = new Button[dimention, dimention];
+            int buttonSize = 40;
+            int[] CPUstart = { 63, 103 };
+            int[] PLRstart = { 611, 103 };
+            for (int i = 0; i < dimention; i++)
+            {
+                for (int j = 0; j < dimention; j++)
                 {
-                    //places down the new board results into label (NEEDS MORE SPACES AND NEW LINES)
-                    String[,] board = player.getBoard();
-                    String output = "";
-                    for (int i = 0;i < 9; i++)
-                    {
-                        output += board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
-                    }
-                    label2.Text = output;
+                    //CPU buttons
+                    Button cpuButton = new Button();
+                    String name = "cpu" + i.ToString() + "-" + j.ToString();
+                    cpuButton.Name = name;
+                    cpuButton.Size = new Size(buttonSize, buttonSize);
+                    cpuButton.Location = new Point(CPUstart[0] + (buttonSize * i), CPUstart[1] + (buttonSize * j));
+                    cpuButton.MouseDown += CPUButtonClick;
+                    cpuButton.BackColor = Color.DeepSkyBlue;
+                    cpuButton.BringToFront();
+                    this.Controls.Add(cpuButton);
+                    cpuButton.Enabled = false;
+                    cpuButtons[i, j] = cpuButton;
+
+                    //player buttons
+                    Button plrButton = new Button();
+                    name = "plr" + i.ToString() + "-" + j.ToString();
+                    plrButton.Name = name;
+                    plrButton.Size = new Size(buttonSize, buttonSize);
+                    plrButton.Location = new Point(PLRstart[0] + (buttonSize * i), PLRstart[1] + (buttonSize * j));
+                    plrButton.MouseDown += PLRButtonClick;
+                    plrButton.BackColor = Color.DeepSkyBlue;
+                    plrButton.BringToFront();
+                    this.Controls.Add(plrButton);
+                    plrButtons[i, j] = plrButton;
+                }
+            }
+        }
+        //when the player selects a button on the CPU board
+        private void CPUButtonClick(object sender, MouseEventArgs e)
+        {
+            playerFeedback.Text = "test";
+        }
+        //when the player selects a button
+        private void PLRButtonClick(object sender, MouseEventArgs e)
+        {
+            Button button = (Button)sender;
+            String selectedShip = shipSelection.Text;
+            int size;
+            if (selectedShip == "Select Ship")
+            {
+                playerFeedback.Text = "Please select a ship to place";
+                return;
+            }
+            else if (selectedShip == "Aircraft Carrier (Size: 4)")
+            {
+                size = 4;
+                playerFeedback.Text = "";
+            }
+            else if (selectedShip == "Battleship (Size: 3)")
+            {
+                size = 3;
+                playerFeedback.Text = "";
+            }
+            else if (selectedShip == "Destroyer (Size: 2)")
+            {
+                size = 2;
+                playerFeedback.Text = "";
+            }
+            //submarine
+            else
+            {
+                size = 1;
+                playerFeedback.Text = "";
+            }
+
+            if (button.Text != "")
+            {
+                if (button.Text == "S")
+                {
+                    changeButtonEnable(plrButtons, true);
+                    changeButtonSurround(button, size, 1);
                 }
             }
             else
             {
-                //Player board
+                changeButtonEnable(plrButtons, false);
+                changeButtonSurround(button, size, 0);
+            }
+        }
+        /* changes button surround to specified type */
+        //shipType: 0: Aircraft carrier, 1: battleship, 2: destroyer, 3: submarine
+        //placeType: 0: adds directions and 's' for starting place, 1: removes all options
+        public void changeButtonSurround(Button center, int shipSize, int placeType)
+        {
+            String buttonName = center.Name;
+            String output = "";
+            int xVal = 0;
+            int yVal;
+            for (int i = 3; i < buttonName.Length; i++)
+            {
+                if (buttonName[i] == '-')
+                {
+                    xVal = (Convert.ToInt32(output));
+                    output = "";
+                }
+                else
+                {
+                    output += buttonName[i];
+                }
+            }
+            yVal = Convert.ToInt32(output);
+            //sets corresponding buttons
+            //middle
+            if (placeType == 0) { center.Text = "S"; center.Enabled = true; } else { center.Text = ""; }
+            //top
+            if (xVal - shipSize >= 0)
+            {
+                //top left
+                if (yVal - shipSize >= 0)
+                {
+                    if (placeType == 0)
+                    {
+                        plrButtons[xVal - 1, yVal - 1].Text = "UL";
+                        plrButtons[xVal - 1, yVal - 1].Enabled = true;
+                    }
+                    else
+                    {
+                        plrButtons[xVal - 1, yVal - 1].Text = "";
+                    }
+                }
+                //top right
+                if (shipSize + yVal <= dimention)
+                {
+                    if (placeType == 0)
+                    {
+                        plrButtons[xVal - 1, yVal + 1].Text = "DL";
+                        plrButtons[xVal - 1, yVal + 1].Enabled = true;
+                    }
+                    else
+                    {
+                        plrButtons[xVal - 1, yVal + 1].Text = "";
+                    }
+                }
+                //top
+                if (placeType == 0)
+                {
+                    plrButtons[xVal - 1, yVal].Text = "L";
+                    plrButtons[xVal - 1, yVal].Enabled = true;
+                }
+                else
+                {
+                    plrButtons[xVal - 1, yVal].Text = "";
+                }
+            }
+            //right
+            if (shipSize + xVal <= dimention)
+            {
+                //top right
+                if (yVal - shipSize >= 0)
+                {
+                    if (placeType == 0)
+                    {
+                        plrButtons[xVal + 1, yVal - 1].Text = "UR";
+                        plrButtons[xVal + 1, yVal - 1].Enabled = true;
+                    }
+                    else
+                    {
+                        plrButtons[xVal + 1, yVal - 1].Text = "";
+                    }
+                }
+                //bottom right
+                if (shipSize + yVal <= dimention)
+                {
+                    if (placeType == 0)
+                    {
+                        plrButtons[xVal + 1, yVal + 1].Text = "BR";
+                        plrButtons[xVal + 1, yVal + 1].Enabled = true;
+                    }
+                    else
+                    {
+                        plrButtons[xVal + 1, yVal + 1].Text = "";
+                    }
+                }
+                //right
+                if (placeType == 0)
+                {
+                    plrButtons[xVal + 1, yVal].Text = "R";
+                    plrButtons[xVal + 1, yVal].Enabled = true;
+                }
+                else
+                {
+                    plrButtons[xVal + 1, yVal].Text = "";
+                }
+            }
+            //up
+            if (yVal - shipSize >= 0)
+            {
+                if (placeType == 0)
+                {
+                    plrButtons[xVal, yVal -1].Text = "U";
+                    plrButtons[xVal, yVal - 1].Enabled = true;
+                }
+                else
+                {
+                    plrButtons[xVal, yVal - 1].Text = "";
+                }
+            }
+            //down
+            if (shipSize + yVal <= dimention)
+            {
+                if (placeType == 0)
+                {
+                    plrButtons[xVal, yVal + 1].Text = "B";
+                    plrButtons[xVal, yVal + 1].Enabled = true;
+                }
+                else
+                {
+                    plrButtons[xVal, yVal + 1].Text = "";
+                }
+            }   
+        }
+        //Marks all buttons in given array as enabled or disabled
+        private void changeButtonEnable(Button[,] array, bool enabled)
+        {
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                for (int j = 0;  j < array.GetLength(1); j++)
+                {
+                    array[i, j].Enabled = enabled;
+                }
+            }
+        }
+        /* places player ship on board */
+        public bool placePlayerShip(int type, int direction)
+        {
+            int shipSize;
+            String shipLetter;
+            switch (type)
+            {
+                case 0: shipSize = 4; shipLetter = "A"; break;
+                case 1: shipSize = 3; shipLetter = "B"; break;
+                case 2: shipSize = 2; shipLetter = "D"; break;
+                case 3: shipSize = 1; shipLetter = "S"; break;
+            }
+            //find current ship direction
+            return false;
+            
+        }
+        //Updates graphics on board, depends on if board is being updated when player placing ships
+        public void updateBoard(bool isplayer)
+        {
+            if (isplayer) 
+            {
+                //shows everything on board for player, places ships
                 String[,] board = player.getBoard();
-                String output = "";
-                for (int i = 0; i < 9; i++)
+                for (int i =0; i < dimention; i++)
                 {
-                    output += board[i, 0] + "__" + board[i,1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
+                    for (int j =0; j < dimention; j++)
+                    {
+                        plrButtons[i, j].Text = board[i, j];
+                    }
                 }
-                label2.Text = output;
+            }
+            else
+            {
                 
-                //CPU board
-                board = CPU.getBoard();
-                output = "";
-                for (int i = 0; i < 9; i++)
-                {
-                    output += board[i, 0] + "__" + board[i, 1] + "__" + board[i, 2] + "__" + board[i, 3] + "__" + board[i, 4] + "__" + board[i, 5] + "__" + board[i, 6] + "__" + board[i, 7] + "__" + board[i, 8] + "\n";
-                }
-                label1.Text = output;
             }
         }
         //Places guess on board, tells player if it was a hit or not (Assumes valid coordinates)
@@ -124,16 +360,10 @@ namespace GamesForClass
             if (playersunk > 5)
             {
                 label11.Text = label11.Text + "\nThe CPU has sunk all your ships. You loose";
-                button2.Visible = false;
-                textBox2.Visible = false;
-                label5.Visible = false;
             }
             else if (cpusunk > 5)
             {
                 label11.Text = label11.Text + "\nYou have sunk all CPU ships. You Win!!!!";
-                button2.Visible = false;
-                textBox2.Visible = false;
-                label5.Visible = false;
             }
 
         }
@@ -147,54 +377,6 @@ namespace GamesForClass
             else
             {
                 return true;
-            }
-        }
-        /* places player ship on board */
-        public bool placePlayerShip()
-        {
-            String shipType = domainUpDown1.Text;
-            String expr = @"[0-9]";
-            MatchCollection mc = Regex.Matches(textBox1.Text, expr);
-            int[] startCoords = new int[2];
-            int[] endCoords = new int[2];
-            int i = 0;
-            int counter = 0;
-
-            //gets coordinates from UI
-            foreach (Match m in mc)
-            {
-                GroupCollection group = m.Groups;
-                if (i < 2)
-                {
-                    startCoords[i] = Convert.ToInt32(group[0].Value);
-
-                }
-                else
-                {
-                    endCoords[i-2] = Convert.ToInt32(group[0].Value);
-                }
-                i++;
-                counter++;
-            }
-            
-            //makes sure correct number of coordinates was entered
-            if (counter == 4)
-            {
-                //checks validity of coordinates based on ship type
-                if (validatePlaceCoords(shipType, startCoords, endCoords))
-                {
-                    label6.Text = "Ship Placed!";
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                label6.Text = "Please enter correct number of coordinates (4 total numbers)";
-                return false;
             }
         }
 
@@ -227,12 +409,12 @@ namespace GamesForClass
             if (startX > 9 || endX > 9 || startY > 9 || endY > 9)
             {
                 output = false;
-                label6.Text = "Ship outside of boundaries";
+                playerFeedback.Text = "Ship outside of boundaries";
             }
             else if (startX < 1 || endX < 1 || startY < 1 || endY < 1)
             {
                 output = false;
-                label6.Text = "Ship outside of boundaries";
+                playerFeedback.Text = "Ship outside of boundaries";
             }
             //if the slope is not flat or vertical
             else if (Math.Abs(startX - endX) != 0 && Math.Abs(startY - endY) != 0)
@@ -240,13 +422,13 @@ namespace GamesForClass
                 if (Math.Abs(startX - endX) / Math.Abs(startY - endY) != 1)
                 {
                     output = false; 
-                    label6.Text = "Slope is too steep to place ship";
+                    playerFeedback.Text = "Slope is too steep to place ship";
                 }
             }
             else if (shipType == "Select Ship")
             {
                 output = false;
-                label6.Text = "Please select a ship";
+                playerFeedback.Text = "Please select a ship";
             }
             else
             {
@@ -269,11 +451,11 @@ namespace GamesForClass
                     if (length != 4)
                     {
                     output = false;
-                    label6.Text = "Wrong length for selected ship";
+                    playerFeedback.Text = "Wrong length for selected ship";
                     }
                     if (numShips[0] == 1)
                     {
-                        label6.Text = "You have placed the max number of ships of this type";
+                        playerFeedback.Text = "You have placed the max number of ships of this type";
                         output = false;
                     }
                     shipName = "Aircraft Carrier";
@@ -285,11 +467,11 @@ namespace GamesForClass
                     if (length != 3)
                     {
                         output = false;
-                        label6.Text = "Wrong length for selected ship";
+                        playerFeedback.Text = "Wrong length for selected ship";
                     }
                     if (numShips[1] == 2)
                     {
-                        label6.Text = "You have placed the max number of ships of this type";
+                        playerFeedback.Text = "You have placed the max number of ships of this type";
                         output = false;
                     }
                     shipName = "Battleship";
@@ -301,11 +483,11 @@ namespace GamesForClass
                     if (length != 2)
                     {
                         output = false;
-                        label6.Text = "Wrong length for selected ship";
+                        playerFeedback.Text = "Wrong length for selected ship";
                     }
                     if (numShips[2] == 2)
                     {
-                        label6.Text = "You have placed the max number of ships of this type";
+                        playerFeedback.Text = "You have placed the max number of ships of this type";
                         output = false;
                     }
                     shipName = "Destroyer";
@@ -317,11 +499,11 @@ namespace GamesForClass
                     if (length != 1)
                     {
                         output = false;
-                        label6.Text = "Wrong length for selected ship";
+                        playerFeedback.Text = "Wrong length for selected ship";
                     }
                     if (numShips[3] == 1)
                     {
-                        label6.Text = "You have placed the max number of ships of this type";
+                        playerFeedback.Text = "You have placed the max number of ships of this type";
                         output = false;
                     }
                     shipName = "Submarine";
@@ -339,7 +521,7 @@ namespace GamesForClass
                     if (!player.addShip(startCoord, endCoord, type, ship, letter, true))
                     {
                         output = false;
-                        label6.Text = "A ship already exists in this space.";
+                        playerFeedback.Text = "A ship already exists in this space.";
                     }
                     else
                     {
@@ -362,11 +544,8 @@ namespace GamesForClass
             if (numShips[0] == 1 && numShips[1] == 2 && numShips[2] == 2 && numShips[3] == 1)
             {
                 button3.Visible = true;
-                button1.Visible = false;
-                textBox1.Visible = false;
-                domainUpDown1.Visible = false;
-                label4.Visible = false;
-                label6.Visible = false;
+                shipSelection.Visible = false;
+                playerFeedback.Visible = false;
             }
         }
         //Start game function
@@ -375,78 +554,23 @@ namespace GamesForClass
             button3.Visible = false;
             //for testing purposes, user can see CPU placed ships
             CPU.placeShips(false);
-            button2.Visible = true;
-            textBox2.Visible = true;
-            label5.Visible = true;
             updateBoard(false);
         }
         //button that runs the make guess sequence
         private void button2_Click(object sender, EventArgs e)
         {
-            String expr = @"[0-9]";
-            MatchCollection mc = Regex.Matches(textBox2.Text, expr);
-            int[] coords = new int[2];
-            int i = 0;
-            int counter = 0;
-            //gets coordinates from UI
-            foreach (Match m in mc)
-            {
-                GroupCollection group = m.Groups;
-                if (counter < 2)
-                {
-                    coords[i] = Convert.ToInt32(group[0].Value);
-                }
-                i++;
-                counter++;
-            }
-            if (counter == 2)
-            {
-                //player is making guess, send CPU
-                if (valGuessCoords(coords))
-                {
-                    makeGuess(CPU, coords);
-                }
-                else
-                {
-                    label11.Text = "Please enter valid coordinates";
-                }
-            } 
-            else
-            {
-                label11.Text = "Please enter valid coordinates";
-            }
+            
         }
         //auto place ships
         private void button5_Click(object sender, EventArgs e)
         {
-            button1.Visible = false;
-            button3.Visible = true;
-            button5.Visible = false;
-            label4.Visible = false;
-            domainUpDown1.Visible = false;
-            label6.Visible = false;
-            textBox1.Visible = false;
+            
             player.placeShips(true);
             updateBoard(false);
         }
         //reset button sequence
         private void button4_Click(object sender, EventArgs e)
         {
-            button1.Visible = true;
-            button5.Visible = true;
-            label4.Visible = true;
-            domainUpDown1.Visible = true;
-            label6.Visible = true;
-            textBox1.Visible = true;
-
-            button2.Visible = false;
-            textBox2.Visible = false;
-            label5.Visible = false;
-
-            label1.Text = "";
-            label2.Text = "";
-            label11.Text = "";
-
             initBattleship();
         }
     }
