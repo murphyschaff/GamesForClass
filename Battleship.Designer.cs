@@ -35,7 +35,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
+            this.guessFeedback = new System.Windows.Forms.Label();
             this.playerFeedback = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.autoPlaceShips = new System.Windows.Forms.Button();
@@ -115,13 +115,13 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // label11
+            // guessFeedback
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(416, 484);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(0, 13);
-            this.label11.TabIndex = 17;
+            this.guessFeedback.AutoSize = true;
+            this.guessFeedback.Location = new System.Drawing.Point(416, 484);
+            this.guessFeedback.Name = "guessFeedback";
+            this.guessFeedback.Size = new System.Drawing.Size(0, 13);
+            this.guessFeedback.TabIndex = 17;
             // 
             // playerFeedback
             // 
@@ -171,7 +171,7 @@
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.autoPlaceShips);
             this.Controls.Add(this.label12);
-            this.Controls.Add(this.label11);
+            this.Controls.Add(this.guessFeedback);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
@@ -196,7 +196,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label guessFeedback;
         private System.Windows.Forms.Label playerFeedback;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button autoPlaceShips;

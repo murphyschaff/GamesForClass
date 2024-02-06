@@ -80,7 +80,27 @@ namespace GamesForClass
         //when the player selects a button on the CPU board
         private void CPUButtonClick(object sender, MouseEventArgs e)
         {
-            playerFeedback.Text = "test";
+            //gets coordinates of button
+            Button button = (Button)sender;
+            String buttonName = button.Name;
+            String output = "";
+            int xVal = 0;
+            int yVal;
+            for (int i = 3; i < buttonName.Length; i++)
+            {
+                if (buttonName[i] == '-')
+                {
+                    xVal = (Convert.ToInt32(output));
+                    output = "";
+                }
+                else
+                {
+                    output += buttonName[i];
+                }
+            }
+            yVal = Convert.ToInt32(output);
+            int[] coords = { xVal, yVal };
+            makeGuess(CPU, coords);
         }
         //when the player selects a button
         private void PLRButtonClick(object sender, MouseEventArgs e)
@@ -154,7 +174,7 @@ namespace GamesForClass
                 size = 1;
                 playerFeedback.Text = "";
             }
-
+            //sets button text based on what is there
             if (button.Text != "")
             {
                 if (button.Text == "C")
@@ -188,6 +208,15 @@ namespace GamesForClass
                 changeButtonEnable(plrButtons, false);
                 changeButtonSurround(button, xVal, yVal, size);
             }
+
+            //if all ships are placed, enables start game
+            if (numShips[0] == 1 && numShips[1] == 2 && numShips[2] == 2 & numShips[3] == 1)
+            {
+                startButton.Visible = true;
+                autoPlaceShips.Visible = false;
+                shipSelection.Visible = false;
+                playerFeedback.Text = "Ready to start!";
+            }
         }
         /* changes button surround to specified type */
         //shipType: 0: Aircraft carrier, 1: battleship, 2: destroyer, 3: submarine
@@ -204,6 +233,7 @@ namespace GamesForClass
                 return;
             }
             center.Text = "C";
+            center.Enabled = true;
             //top
             if (Math.Abs(xVal - shipSize) >= 0)
             {
@@ -306,11 +336,11 @@ namespace GamesForClass
                     {
                         if (board[i, j] == "")
                         {
-                            if (fleet[i,j].getName() != "None")
+                            if (fleet[i, j].getName() != "None")
                             {
                                 plrButtons[i, j].Text = fleet[i, j].getLetter();
-                                plrButtons[i,j].Enabled = false;
-                                if (fleet[i,j].isSunk())
+                                plrButtons[i, j].Enabled = false;
+                                if (fleet[i, j].isSunk())
                                 {
                                     plrButtons[i, j].BackColor = Color.Red;
                                 }
@@ -319,19 +349,30 @@ namespace GamesForClass
                                     plrButtons[i, j].BackColor = Color.Gray;
                                 }
                             }
-                            else if (plrButtons[i,j].Text != "")
+                            else if (plrButtons[i, j].Text != "" && guessFeedback.Text != "")
                             {
                                 plrButtons[i, j].Enabled = true;
                                 plrButtons[i, j].Text = "";
                             }
                             else
                             {
-                                plrButtons[i, j].Enabled = true;
+                                if (guessFeedback.Text == "") { plrButtons[i, j].Enabled = true; }
                             }
                         }
                         else
                         {
-                            plrButtons[i, j].Enabled = true;
+                            if (board[i,j] == "H" || board[i,j] == "O")
+                            {
+                                if (board[i,j] == "H")
+                                {
+                                    plrButtons[i, j].BackColor = Color.Yellow;
+                                }
+                            }
+                            else
+                            {
+                                plrButtons[i, j].Enabled = true;
+
+                            }
                             plrButtons[i, j].Text = board[i, j];
                         }
                     }
@@ -354,7 +395,7 @@ namespace GamesForClass
                             }
                             else
                             {
-                                cpuButtons[i, j].BackColor = Color.Gray;
+                                cpuButtons[i, j].BackColor = Color.Yellow;
                             }
                             cpuButtons[i, j].Enabled = false;
                         }
@@ -371,13 +412,11 @@ namespace GamesForClass
         {
             String[,] board = user.getBoard();
             Ship[,] fleet = user.getFleet();
-            coords[0] = coords[0] - 1;
-            coords[1] = coords[1] - 1;
 
             //checks if the space has been guessed already
             if (board[coords[0], coords[1]] == "O" || board[coords[0], coords[1]] == "H")
             {
-                label11.Text = "You have already selected this space";
+                guessFeedback.Text = "You have already selected this space";
                 return;
             }
             //Is a hit
@@ -388,45 +427,47 @@ namespace GamesForClass
                 ship.hit();
                 if (ship.isSunk())
                 {
-                    label11.Text = String.Format("You sunk a {0}!", ship.getName());
+                    guessFeedback.Text = String.Format("You sunk a {0}!", ship.getName());
                     CPU.setSunkShips(CPU.getSunkShips() + 1);
                 }
                 else
                 {
-                    label11.Text = "You hit a ship!";
+                    guessFeedback.Text = "You hit a ship!";
                 }
             }
             else
             {
                 board[coords[0], coords[1]] = "O";
-                label11.Text = "You missed.";
+                guessFeedback.Text = "You missed.";
             }
 
             //AI makes guess
             if (CPU.guess(player))
             {
-                label11.Text = label11.Text + "\nCPU hit a ship!";
+                guessFeedback.Text = guessFeedback.Text + "\nCPU hit a ship!";
             }
             else
             {
-                label11.Text = label11.Text + "\nCPU missed.";
+                guessFeedback.Text = guessFeedback.Text + "\nCPU missed.";
             }
 
             updateBoard(false);
+            updateBoard(true);
             //check for win condition
             int playersunk = player.getSunkShips();
             int cpusunk = CPU.getSunkShips();
             if (playersunk > 5)
             {
-                label11.Text = label11.Text + "\nThe CPU has sunk all your ships. You loose";
+                guessFeedback.Text = guessFeedback.Text + "\nThe CPU has sunk all your ships. You loose";
             }
             else if (cpusunk > 5)
             {
-                label11.Text = label11.Text + "\nYou have sunk all CPU ships. You Win!!!!";
+                guessFeedback.Text = guessFeedback.Text + "\nYou have sunk all CPU ships. You Win!!!!";
             }
 
         }
         /* BUTTON FUNCTIONS */
+        #region button functions
         private void button4_Click(object sender, EventArgs e)
         {
             initBattleship();
@@ -449,8 +490,10 @@ namespace GamesForClass
             startButton.Visible = false;
             CPU.placeShips();
             changeButtonEnable(cpuButtons, true);
+            changeButtonEnable(plrButtons, false);
             updateBoard(false);
         }
+        #endregion
     }
     /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
@@ -490,8 +533,6 @@ namespace GamesForClass
             int type;
             int count = 0;
             Random rnd = new Random();
-            int[] start = new int[2];
-            int[] end = new int[2];
             //places ships onto board
             while (count < 6)
             {
