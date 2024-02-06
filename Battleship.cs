@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using System.Diagnostics.Eventing.Reader;
 using System.Diagnostics.Contracts;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 
 namespace GamesForClass
 {
@@ -84,59 +85,13 @@ namespace GamesForClass
         //when the player selects a button
         private void PLRButtonClick(object sender, MouseEventArgs e)
         {
+            //gets name of button and finds the corresponding coordinates
             Button button = (Button)sender;
-            String selectedShip = shipSelection.Text;
-            int size;
-            if (selectedShip == "Select Ship")
-            {
-                playerFeedback.Text = "Please select a ship to place";
-                return;
-            }
-            else if (selectedShip == "Aircraft Carrier (Size: 4)")
-            {
-                size = 4;
-                playerFeedback.Text = "";
-            }
-            else if (selectedShip == "Battleship (Size: 3)")
-            {
-                size = 3;
-                playerFeedback.Text = "";
-            }
-            else if (selectedShip == "Destroyer (Size: 2)")
-            {
-                size = 2;
-                playerFeedback.Text = "";
-            }
-            //submarine
-            else
-            {
-                size = 1;
-                playerFeedback.Text = "";
-            }
-
-            if (button.Text != "")
-            {
-                if (button.Text == "S")
-                {
-                    changeButtonEnable(plrButtons, true);
-                    changeButtonSurround(button, size, 1);
-                }
-            }
-            else
-            {
-                changeButtonEnable(plrButtons, false);
-                changeButtonSurround(button, size, 0);
-            }
-        }
-        /* changes button surround to specified type */
-        //shipType: 0: Aircraft carrier, 1: battleship, 2: destroyer, 3: submarine
-        //placeType: 0: adds directions and 's' for starting place, 1: removes all options
-        public void changeButtonSurround(Button center, int shipSize, int placeType)
-        {
-            String buttonName = center.Name;
+            String buttonName = button.Name;
             String output = "";
             int xVal = 0;
             int yVal;
+            int[] numShips = player.getNumShips();
             for (int i = 3; i < buttonName.Length; i++)
             {
                 if (buttonName[i] == '-')
@@ -150,142 +105,192 @@ namespace GamesForClass
                 }
             }
             yVal = Convert.ToInt32(output);
+            //gets user ship selection
+            String selectedShip = shipSelection.Text;
+            int size;
+            if (selectedShip == "Select Ship")
+            {
+                playerFeedback.Text = "Please select a ship to place";
+                return;
+            }
+            else if (selectedShip == "Aircraft Carrier (Size: 4)")
+            {
+                if (numShips[0] > 0)
+                {
+                    playerFeedback.Text = "You have already placed the maximum number of Aircraft Carriers (1)";
+                    return;
+                }
+                size = 4;
+                playerFeedback.Text = "";
+            }
+            else if (selectedShip == "Battleship (Size: 3)")
+            {
+                if (numShips[1] > 1)
+                {
+                    playerFeedback.Text = "You have already placed the maximum number of Battleships (2)";
+                    return;
+                }
+                size = 3;
+                playerFeedback.Text = "";
+            }
+            else if (selectedShip == "Destroyer (Size: 2)")
+            {
+                if (numShips[2] > 1)
+                {
+                    playerFeedback.Text = "You have already placed the maximum number of Destroyers (2)";
+                    return;
+                }
+                size = 2;
+                playerFeedback.Text = "";
+            }
+            //submarine
+            else
+            {
+                if (numShips[3] > 0)
+                {
+                    playerFeedback.Text = "You have already placed the maximum number of Submarines (1)";
+                    return;
+                }
+                size = 1;
+                playerFeedback.Text = "";
+            }
+
+            if (button.Text != "")
+            {
+                if (button.Text == "C")
+                {
+                    updateBoard(true);
+                }
+                else
+                {
+                    //find corresponding direction
+                    int direction = 0;
+                    switch(button.Text)
+                    {
+                        case "UL": direction = 1; xVal++; yVal++; break;
+                        case "U": direction = 2; yVal++; break;
+                        case "UR": direction = 3; xVal--; yVal++; break;
+                        case "L": direction = 4; xVal++; break;
+                        case "R": direction = 5; xVal--; break;
+                        case "DL": direction= 6; xVal++; yVal--; break;
+                        case "D": direction = 7; yVal--; break;
+                        case "DR": direction = 8; xVal--; yVal--; break;
+                        case "P": direction = 8; break;
+                    }
+                    changeButtonSurround(button, xVal, yVal, size);
+                    //ship is to be placed
+                    player.addShipNew(xVal, yVal, size, direction);
+                    updateBoard(true);
+                }
+            }
+            else
+            {
+                changeButtonEnable(plrButtons, false);
+                changeButtonSurround(button, xVal, yVal, size);
+            }
+        }
+        /* changes button surround to specified type */
+        //shipType: 0: Aircraft carrier, 1: battleship, 2: destroyer, 3: submarine
+        //placeType: 0: adds directions and 's' for starting place, 1: removes all options
+        public void changeButtonSurround(Button center, int xVal, int yVal, int shipSize)
+        {
             //sets corresponding buttons
             //middle
-            if (placeType == 0) { center.Text = "S"; center.Enabled = true; } else { center.Text = ""; }
+            //checks to see if the ship is a submarine
+            if (shipSize == 1)
+            {
+                center.Text = "P";
+                center.Enabled = true;
+                return;
+            }
+            center.Text = "C";
             //top
-            if (xVal - shipSize >= 0)
+            if (Math.Abs(xVal - shipSize) >= 0)
             {
                 //top left
-                if (yVal - shipSize >= 0)
+                if (Math.Abs(yVal - shipSize) >= 0)
                 {
-                    if (placeType == 0)
+                    if (player.checkForShip(xVal, yVal, shipSize, 1))
                     {
                         plrButtons[xVal - 1, yVal - 1].Text = "UL";
                         plrButtons[xVal - 1, yVal - 1].Enabled = true;
-                    }
-                    else
-                    {
-                        plrButtons[xVal - 1, yVal - 1].Text = "";
                     }
                 }
                 //top right
                 if (shipSize + yVal <= dimention)
                 {
-                    if (placeType == 0)
+                    if (player.checkForShip(xVal, yVal, shipSize, 6))
                     {
                         plrButtons[xVal - 1, yVal + 1].Text = "DL";
                         plrButtons[xVal - 1, yVal + 1].Enabled = true;
                     }
-                    else
-                    {
-                        plrButtons[xVal - 1, yVal + 1].Text = "";
-                    }
+
                 }
                 //top
-                if (placeType == 0)
+                if (player.checkForShip(xVal, yVal, shipSize, 4))
                 {
                     plrButtons[xVal - 1, yVal].Text = "L";
                     plrButtons[xVal - 1, yVal].Enabled = true;
-                }
-                else
-                {
-                    plrButtons[xVal - 1, yVal].Text = "";
                 }
             }
             //right
             if (shipSize + xVal <= dimention)
             {
                 //top right
-                if (yVal - shipSize >= 0)
+                if (Math.Abs(yVal - shipSize) >= 0)
                 {
-                    if (placeType == 0)
+                    if (player.checkForShip(xVal, yVal, shipSize, 3))
                     {
                         plrButtons[xVal + 1, yVal - 1].Text = "UR";
                         plrButtons[xVal + 1, yVal - 1].Enabled = true;
-                    }
-                    else
-                    {
-                        plrButtons[xVal + 1, yVal - 1].Text = "";
                     }
                 }
                 //bottom right
                 if (shipSize + yVal <= dimention)
                 {
-                    if (placeType == 0)
+                    if (player.checkForShip(xVal, yVal, shipSize, 8))
                     {
-                        plrButtons[xVal + 1, yVal + 1].Text = "BR";
+                        plrButtons[xVal + 1, yVal + 1].Text = "DR";
                         plrButtons[xVal + 1, yVal + 1].Enabled = true;
-                    }
-                    else
-                    {
-                        plrButtons[xVal + 1, yVal + 1].Text = "";
                     }
                 }
                 //right
-                if (placeType == 0)
+                if (player.checkForShip(xVal, yVal, shipSize, 5))
                 {
                     plrButtons[xVal + 1, yVal].Text = "R";
                     plrButtons[xVal + 1, yVal].Enabled = true;
                 }
-                else
-                {
-                    plrButtons[xVal + 1, yVal].Text = "";
-                }
             }
             //up
-            if (yVal - shipSize >= 0)
+            if (Math.Abs(yVal - shipSize) >= 0)
             {
-                if (placeType == 0)
+                if (player.checkForShip(xVal, yVal, shipSize, 2))
                 {
                     plrButtons[xVal, yVal -1].Text = "U";
                     plrButtons[xVal, yVal - 1].Enabled = true;
-                }
-                else
-                {
-                    plrButtons[xVal, yVal - 1].Text = "";
                 }
             }
             //down
             if (shipSize + yVal <= dimention)
             {
-                if (placeType == 0)
+                if (player.checkForShip(xVal, yVal, shipSize, 7))
                 {
-                    plrButtons[xVal, yVal + 1].Text = "B";
+                    plrButtons[xVal, yVal + 1].Text = "D";
                     plrButtons[xVal, yVal + 1].Enabled = true;
-                }
-                else
-                {
-                    plrButtons[xVal, yVal + 1].Text = "";
                 }
             }   
         }
-        //Marks all buttons in given array as enabled or disabled
+        //Marks all not ship buttons in given array as enabled or disabled
         private void changeButtonEnable(Button[,] array, bool enabled)
         {
             for (int i = 0; i < array.GetLength(0); i++)
             {
                 for (int j = 0;  j < array.GetLength(1); j++)
                 {
+                    //if (array[i,j].Text != "A" || array[i,j].Text != "B" || array[i,j].Text != "D" || array[i,j].Text != "S")
                     array[i, j].Enabled = enabled;
                 }
             }
-        }
-        /* places player ship on board */
-        public bool placePlayerShip(int type, int direction)
-        {
-            int shipSize;
-            String shipLetter;
-            switch (type)
-            {
-                case 0: shipSize = 4; shipLetter = "A"; break;
-                case 1: shipSize = 3; shipLetter = "B"; break;
-                case 2: shipSize = 2; shipLetter = "D"; break;
-                case 3: shipSize = 1; shipLetter = "S"; break;
-            }
-            //find current ship direction
-            return false;
-            
         }
         //Updates graphics on board, depends on if board is being updated when player placing ships
         public void updateBoard(bool isplayer)
@@ -294,17 +299,71 @@ namespace GamesForClass
             {
                 //shows everything on board for player, places ships
                 String[,] board = player.getBoard();
+                Ship[,] fleet = player.getFleet();
                 for (int i =0; i < dimention; i++)
                 {
                     for (int j =0; j < dimention; j++)
                     {
-                        plrButtons[i, j].Text = board[i, j];
+                        if (board[i, j] == "")
+                        {
+                            if (fleet[i,j].getName() != "None")
+                            {
+                                plrButtons[i, j].Text = fleet[i, j].getLetter();
+                                plrButtons[i,j].Enabled = false;
+                                if (fleet[i,j].isSunk())
+                                {
+                                    plrButtons[i, j].BackColor = Color.Red;
+                                }
+                                else
+                                {
+                                    plrButtons[i, j].BackColor = Color.Gray;
+                                }
+                            }
+                            else if (plrButtons[i,j].Text != "")
+                            {
+                                plrButtons[i, j].Enabled = true;
+                                plrButtons[i, j].Text = "";
+                            }
+                            else
+                            {
+                                plrButtons[i, j].Enabled = true;
+                            }
+                        }
+                        else
+                        {
+                            plrButtons[i, j].Enabled = true;
+                            plrButtons[i, j].Text = board[i, j];
+                        }
                     }
                 }
             }
             else
             {
-                
+                String[,] board = CPU.getBoard();
+                Ship[,] fleet = CPU.getFleet();
+                for (int i = 0; i < dimention; i++)
+                {
+                    for (int j = 0; j < dimention; j++)
+                    {
+                        cpuButtons[i,j].Text = board[i,j];
+                        if (board[i,j] == "H")
+                        {
+                            if (fleet[i,j].isSunk())
+                            {
+                                cpuButtons[i, j].BackColor = Color.Red;
+                            }
+                            else
+                            {
+                                cpuButtons[i, j].BackColor = Color.Gray;
+                            }
+                            cpuButtons[i, j].Enabled = false;
+                        }
+                        else if (board[i,j] == "O")
+                        {
+                            cpuButtons[i, j].Enabled = false;
+                        }
+                    }
+                }
             }
         }
         //Places guess on board, tells player if it was a hit or not (Assumes valid coordinates)
@@ -367,211 +426,30 @@ namespace GamesForClass
             }
 
         }
-        //makes sure guess coordinates are within the board
-        public bool valGuessCoords(int[] coords)
-        {
-            if (coords[0] < 1 || coords[1] < 1 || coords[0] > 9 || coords[1] > 9)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        //makes sure placement of ship coordinates are within boundaries, and if the placement is diagonal that the slope is 1
-        public bool validatePlaceCoords(String shipType, int[] startCoord, int[] endCoord)
-        {
-            bool output = true;
-            int startX = startCoord[0];
-            int endX = endCoord[0];
-            int startY = startCoord[1];
-            int endY = endCoord[1];
-            int type;
-            int index = 0;
-            int[] numShips = player.getNumShips();
-
-            if (startX - endX == 0)
-            {
-                type = 1;
-            }
-            else if (startY - endY == 0)
-            {
-                type = 2;
-            }
-            else
-            {
-                type = 3;
-            }
-            
-            //not outside of board
-            if (startX > 9 || endX > 9 || startY > 9 || endY > 9)
-            {
-                output = false;
-                playerFeedback.Text = "Ship outside of boundaries";
-            }
-            else if (startX < 1 || endX < 1 || startY < 1 || endY < 1)
-            {
-                output = false;
-                playerFeedback.Text = "Ship outside of boundaries";
-            }
-            //if the slope is not flat or vertical
-            else if (Math.Abs(startX - endX) != 0 && Math.Abs(startY - endY) != 0)
-            {
-                if (Math.Abs(startX - endX) / Math.Abs(startY - endY) != 1)
-                {
-                    output = false; 
-                    playerFeedback.Text = "Slope is too steep to place ship";
-                }
-            }
-            else if (shipType == "Select Ship")
-            {
-                output = false;
-                playerFeedback.Text = "Please select a ship";
-            }
-            else
-            {
-                //makes sure length matches type of ship requested
-                //calculates length
-                int length;
-                if (Math.Abs(startX - endX) == 0)
-                {
-                    length = Math.Abs(startY - endY) + 1;
-                }
-                else 
-                {
-                    length = Math.Abs(startX - endX) + 1;
-                }
-                String shipName = "";
-                String letter = "";
-                //does checks
-                if (shipType == "Aircraft Carrier (Size: 4)")
-                {
-                    if (length != 4)
-                    {
-                    output = false;
-                    playerFeedback.Text = "Wrong length for selected ship";
-                    }
-                    if (numShips[0] == 1)
-                    {
-                        playerFeedback.Text = "You have placed the max number of ships of this type";
-                        output = false;
-                    }
-                    shipName = "Aircraft Carrier";
-                    letter = "A";
-                    index = 0;
-                }
-                else if (shipType == "Battleship (Size: 3)")
-                {
-                    if (length != 3)
-                    {
-                        output = false;
-                        playerFeedback.Text = "Wrong length for selected ship";
-                    }
-                    if (numShips[1] == 2)
-                    {
-                        playerFeedback.Text = "You have placed the max number of ships of this type";
-                        output = false;
-                    }
-                    shipName = "Battleship";
-                    letter = "B";
-                    index = 1;
-                }
-                else if (shipType == "Destroyer (Size: 2)")
-                {
-                    if (length != 2)
-                    {
-                        output = false;
-                        playerFeedback.Text = "Wrong length for selected ship";
-                    }
-                    if (numShips[2] == 2)
-                    {
-                        playerFeedback.Text = "You have placed the max number of ships of this type";
-                        output = false;
-                    }
-                    shipName = "Destroyer";
-                    letter = "D";
-                    index = 2;
-                }
-                else if (shipType == "Submarine (Size: 1)")
-                {
-                    if (length != 1)
-                    {
-                        output = false;
-                        playerFeedback.Text = "Wrong length for selected ship";
-                    }
-                    if (numShips[3] == 1)
-                    {
-                        playerFeedback.Text = "You have placed the max number of ships of this type";
-                        output = false;
-                    }
-                    shipName = "Submarine";
-                    letter = "S";
-                    index = 3;
-                }
-                Ship ship = new Ship(length, shipName);
-                //makes sure a ship is not already there
-                startCoord[0] = startCoord[0] - 1;
-                startCoord[1] = startCoord[1] - 1;
-                endCoord[0] = endCoord[0] - 1;
-                endCoord[1] = endCoord[1] - 1;
-                if (output)
-                {
-                    if (!player.addShip(startCoord, endCoord, type, ship, letter, true))
-                    {
-                        output = false;
-                        playerFeedback.Text = "A ship already exists in this space.";
-                    }
-                    else
-                    {
-                        numShips[index] = numShips[index] + 1;
-                        player.setNumShips(numShips);
-                    }
-                }
-            }
-
-            return output;
-        }
         /* BUTTON FUNCTIONS */
-        // Place ship function. Allows the player to place a ship
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //need to stop player from overwriting ships
-            button5.Visible = false;
-            int[] numShips = player.getNumShips();
-            updateBoard(true);
-            if (numShips[0] == 1 && numShips[1] == 2 && numShips[2] == 2 && numShips[3] == 1)
-            {
-                button3.Visible = true;
-                shipSelection.Visible = false;
-                playerFeedback.Visible = false;
-            }
-        }
-        //Start game function
-        private void button3_Click(object sender, EventArgs e)
-        {
-            button3.Visible = false;
-            //for testing purposes, user can see CPU placed ships
-            CPU.placeShips(false);
-            updateBoard(false);
-        }
-        //button that runs the make guess sequence
-        private void button2_Click(object sender, EventArgs e)
-        {
-            
-        }
-        //auto place ships
-        private void button5_Click(object sender, EventArgs e)
-        {
-            
-            player.placeShips(true);
-            updateBoard(false);
-        }
-        //reset button sequence
         private void button4_Click(object sender, EventArgs e)
         {
             initBattleship();
+            autoPlaceShips.Visible = true;
+            shipSelection.Visible = true;
+        }
+        //automatically places player ships
+        private void autoPlaceShips_Click(object sender, EventArgs e)
+        {
+            player.placeShips();
+            startButton.Visible = true;
+            autoPlaceShips.Visible = false;
+            shipSelection.Visible = false;
+            updateBoard(true);
+        }
+        //places CPU ships, starts game
+        private void startButton_Click(object sender, EventArgs e)
+        {
+            autoPlaceShips.Visible = false;
+            startButton.Visible = false;
+            CPU.placeShips();
+            changeButtonEnable(cpuButtons, true);
+            updateBoard(false);
         }
     }
     /* BattleshipPlayer class. Represents the players, holds board data */
@@ -585,12 +463,12 @@ namespace GamesForClass
         private int sunkShips = 0;
         public BattleshipPlayer()
         {
-            Ship blankShip = new Ship(0, "None");
+            Ship blankShip = new Ship(0, "None", "N");
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    board[i,j] = "_";
+                    board[i,j] = "";
                     fleet[i, j] = blankShip;
                 }
             }
@@ -605,9 +483,11 @@ namespace GamesForClass
         public int getSunkShips() { return sunkShips; }
         public void setSunkShips(int sunkShips) { this.sunkShips = sunkShips; }
         /* AI places ships onto board */
-        public void placeShips(bool visual)
+        public void placeShips()
         {
-            int x, y, type;
+            int x = 0;
+            int y = 0;
+            int type;
             int count = 0;
             Random rnd = new Random();
             int[] start = new int[2];
@@ -618,126 +498,150 @@ namespace GamesForClass
                 //aircraft carrier
                 if (count == 0)
                 {
-                    //gets placement type, 1-3 (vertical, horizontal, diagonal)
-                    type = rnd.Next(1, 3);
+                    //gets placement type, 1-8 for each direction mentioned:
+                    /* 1 2 3
+                     * 4   5
+                     * 6 7 8 */
+                    type = rnd.Next(1, 8);
                     switch (type)
                     {
-                        //x remains the same
                         case 1:
-                            x = rnd.Next(0, 8);
-                            y = rnd.Next(0, 5);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x;
-                            end[1] = y + 3;
+                            x = rnd.Next(3, 8);
+                            y = rnd.Next(3, 8);
                             break;
-                        //y remains the same
                         case 2:
-                            x = rnd.Next(0, 5);
-                            y = rnd.Next(0, 8);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x + 3;
-                            end[1] = y;
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(3, 8); 
                             break;
-                        //diagonal
                         case 3:
                             x = rnd.Next(0, 5);
+                            y = rnd.Next(3, 8);    
+                            break;
+                        case 4:
+                            x = rnd.Next(3, 8);
+                            y = rnd.Next(0, 8);
+                            break;
+                        case 5:
+                            x = rnd.Next(0, 5);
+                            y = rnd.Next(0, 8);
+                            break;
+                        case 6:
+                            x = rnd.Next(3, 8);
                             y = rnd.Next(0, 5);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x + 3;
-                            end[1] = y + 3;
+                            break;
+                        case 7:
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(0, 5);
+                            break;
+                        case 8:
+                            x = rnd.Next(0, 5);
+                            y = rnd.Next(0, 5);
                             break;
                     }
-                    Ship ac = new Ship(4, "Aircraft Carrier");
                     //checks if the ship can be placed, places it if it can
-                    if (addShip(start, end, type, ac, "A", visual))
+                    if (checkForShip(x, y, 4, type))
                     {
+                        addShipNew(x, y, 4, type);
                         count++;
                     }
                 }
                 //Battleship
                 else if (count < 3)
                 {
-                    //gets placement type, 1-3 (vertical, horizontal, diagonal)
-                    type = rnd.Next(1, 3);
+                    //gets placement type, 1-8 for each direction mentioned:
+                    /* 1 2 3
+                     * 4   5
+                     * 6 7 8 */
+                    type = rnd.Next(1, 8);
                     switch (type)
                     {
-                        //x remains the same
                         case 1:
-                            x = rnd.Next(0, 8);
-                            y = rnd.Next(0, 6);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x;
-                            end[1] = y + 2;
+                            x = rnd.Next(2, 8);
+                            y = rnd.Next(2, 8);
                             break;
-                        //y remains the same
                         case 2:
-                            x = rnd.Next(0, 6);
-                            y = rnd.Next(0, 8);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x + 2;
-                            end[1] = y;
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(2, 8);
                             break;
-                        //diagonal
                         case 3:
                             x = rnd.Next(0, 6);
+                            y = rnd.Next(2, 8);
+                            break;
+                        case 4:
+                            x = rnd.Next(2, 8);
+                            y = rnd.Next(0, 8);
+                            break;
+                        case 5:
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(0, 8);
+                            break;
+                        case 6:
+                            x = rnd.Next(2, 8);
                             y = rnd.Next(0, 6);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x + 2;
-                            end[1] = y + 2;
+                            break;
+                        case 7:
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(0, 6);
+                            break;
+                        case 8:
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(0, 6);
                             break;
                     }
-                    Ship ac = new Ship(3, "Battleship");
                     //checks if the ship can be placed, places it if it can
-                    if (addShip(start, end, type, ac, "B", visual))
+                    if (checkForShip(x, y, 3, type))
                     {
+                        addShipNew(x, y, 3, type);
                         count++;
                     }
                 }
                 //Destroyer
                 else if (count < 5)
                 {
-                    //gets placement type, 1-3 (vertical, horizontal, diagonal)
-                    type = rnd.Next(1, 3);
+                    //gets placement type, 1-8 for each direction mentioned:
+                    /* 1 2 3
+                     * 4   5
+                     * 6 7 8 */
+                    type = rnd.Next(1, 8);
                     switch (type)
                     {
-                        //x remains the same
                         case 1:
-                            x = rnd.Next(0, 8);
-                            y = rnd.Next(0, 7);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x;
-                            end[1] = y + 1;
+                            x = rnd.Next(1, 8);
+                            y = rnd.Next(1, 8);
                             break;
-                        //y remains the same
                         case 2:
-                            x = rnd.Next(0, 7);
-                            y = rnd.Next(0, 8);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x + 1;
-                            end[1] = y;
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(1, 8);
                             break;
-                        //diagonal
                         case 3:
                             x = rnd.Next(0, 7);
+                            y = rnd.Next(1, 8);
+                            break;
+                        case 4:
+                            x = rnd.Next(1, 8);
+                            y = rnd.Next(0, 8);
+                            break;
+                        case 5:
+                            x = rnd.Next(0, 7);
+                            y = rnd.Next(0, 8);
+                            break;
+                        case 6:
+                            x = rnd.Next(1, 8);
                             y = rnd.Next(0, 7);
-                            start[0] = x;
-                            start[1] = y;
-                            end[0] = x + 1;
-                            end[1] = y + 1;
+                            break;
+                        case 7:
+                            x = rnd.Next(0, 8);
+                            y = rnd.Next(0, 7);
+                            break;
+                        case 8:
+                            x = rnd.Next(0, 7);
+                            y = rnd.Next(0, 7);
                             break;
                     }
-                    Ship ac = new Ship(2, "Destroyer");
                     //checks if the ship can be placed, places it if it can
-                    if (addShip(start, end, type, ac, "D", visual))
+                    if (checkForShip(x, y, 2, type))
                     {
+                        addShipNew(x, y, 2, type);
                         count++;
                     }
                 }
@@ -746,81 +650,199 @@ namespace GamesForClass
                 {
                     x = rnd.Next(0, 8);
                     y = rnd.Next(0, 8);
-                    start[0] = x;
-                    end[0] = x;
-                    start[1] = y;
-                    end[1] = y;
-                    Ship ac = new Ship(1, "Submarine");
-                    if (addShip(start, end, 1, ac, "S", visual))
+                    if (checkForShip(x,y,1,1))
                     {
+                        addShipNew(x, y, 1, 1);
                         count++;
                     }
                 }
             }
         }
-        //checks current ship placement, places ship if it is able to (false, unable to place)
-        //visual: if the ship is actually placed onto the visual board
-        public bool addShip(int[] start, int[] end, int type, Ship ship, String letter, bool visual)
+        //looks to see if there is already a ship in a desired location, and makes sure potential ship is within bounds
+        //direction example
+        /* 1 2 3
+         * 4   5
+         * 6 7 8 */
+        public bool checkForShip(int startX, int startY, int size, int direction)
         {
-            int x, y;
-            switch (type)
+            //both x and y change
+            int dimention = fleet.GetLength(0);
+            switch (direction)
             {
-                //no change in x
                 case 1:
-                    x = start[0];
-                    //check for already placed ship
-                    for (int i = start[1]; i <= end[1]; i++)
+                    for (int i = 0; i < size; i++)
                     {
-                        if (fleet[x, i].getName() != "None")
+                        if (startX - i < 0 || startY - i < 0)
+                        {
+                            return false;
+                        }
+                        if (fleet[startX - i, startY - i].getName() != "None")
                         {
                             return false;
                         }
                     }
-                    //place ship if there was not one there already
-                    for (int i = start[1]; i <= end[1]; i++)
-                    {
-                        if (visual) { board[x, i] = letter; }
-                        fleet[x, i] = ship;
-
-                    }
                     return true;
-                //no change in y
                 case 2:
-                    y = start[1];
-                    for (int i = start[0]; i <= end[0]; i++)
+                    for (int i = 0; i < size; i++)
                     {
-                        if (fleet[i, y].getName() != "None")
+                        if (startY - i < 0)
                         {
                             return false;
                         }
-                    }
-                    for (int i = start[0]; i <= end[0]; i++)
-                    {
-                        if (visual) { board[i, y] = letter; }
-                        fleet[i, y] = ship;
+                        if (fleet[startX, startY - i].getName() != "None")
+                        {
+                            return false;
+                        }
                     }
                     return true;
-                //diagonal
                 case 3:
-                    int j = start[1];
-                    for (int i = start[0]; i <= end[0]; i++)
+                    for (int i = 0; i < size; i++)
                     {
-                        if (fleet[i, j].getName() != "None")
+                        if (startX + i >= dimention || startY - i < 0)
                         {
                             return false;
                         }
-                        j++;
+                        if (fleet[startX + i, startY - i].getName() != "None")
+                        {
+                            return false;
+                        }
                     }
-                    j = start[1];
-                    for (int i = start[0]; i <= end[0]; i++)
+                    return true;
+                case 4:
+                    for (int i = 0; i < size; i++)
                     {
-                        if (visual) { board[i, j] = letter; }
-                        fleet[i, j] = ship;
-                        j++;
+                        if (startX - i < 0)
+                        {
+                            return false;
+                        }
+                        if (fleet[startX - i, startY].getName() != "None")
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                case 5:
+                    for (int i = 0; i < size; i++)
+                    {
+                        if (startX + i >= dimention)
+                        {
+                            return false;
+                        }
+                        if (fleet[startX + i, startY].getName() != "None")
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                case 6:
+                    for (int i = 0; i < size; i++)
+                    {
+                        if (startX - i < 0 || startY + i >= dimention)
+                        {
+                            return false;
+                        }
+                        if (fleet[startX - i, startY + i].getName() != "None")
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                case 7:
+                    for (int i = 0; i < size; i++)
+                    {
+                        if (startY + i >= dimention)
+                        {
+                            return false;
+                        }
+                        if (fleet[startX, startY + i].getName() != "None")
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                case 8:
+                    for (int i = 0; i < size; i++)
+                    {
+                        if (startX + i >= dimention || startY + i >= dimention)
+                        {
+                            return false;
+                        }
+                        if (fleet[startX + i, startY + i].getName() != "None")
+                        {
+                            return false;
+                        }
                     }
                     return true;
             }
             return false;
+        }
+        //adds ships to fleet, marks said ship as complete
+        public void addShipNew(int startX, int startY, int size, int direction)
+        {
+            //creates new ship object to be added to fleet
+            String name = "";
+            String letter = "";
+            //sets name, letter, and adds 1 to numShips
+            switch (size)
+            {
+                case 1: name = "Submarine"; letter = "S"; numShips[3]++; break;
+                case 2: name = "Destroyer"; letter = "D"; numShips[2]++;  break;
+                case 3: name = "Battleship"; letter = "B"; numShips[1]++; break;
+                case 4: name = "Aircraft Carrier"; letter = "A"; numShips[0]++ ; break;
+            }
+            Ship newShip = new Ship(size, name, letter);
+            //adds the ship in the corresponding direction
+            switch (direction)
+            {
+                case 1:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX - i, startY - i] = newShip;
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX, startY - i] = newShip;
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX + i, startY - i] = newShip;
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX - i, startY] = newShip;
+                    }
+                    break;
+                case 5:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX + i, startY] = newShip;
+                    }
+                    break;
+                case 6:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX - i, startY + i] = newShip;
+                    }
+                    break;
+                case 7:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX, startY + i] = newShip;
+                    }
+                    break;
+                case 8:
+                    for (int i = 0; i < size; i++)
+                    {
+                        fleet[startX + i, startY + i] = newShip;
+                    }
+                    break;
+            }
         }
         
         //Algorithm to make a guess on the board
@@ -1263,49 +1285,35 @@ namespace GamesForClass
     public class Ship
     {
         private int size;
-        private int[] health;
+        private int health;
         private String name;
-        public Ship(int size, String name)
+        private String letter;
+        public Ship(int size, String name, string letter)
         {
             this.size = size;
-            health = new int[size];
-            for (int i = 0; i < size; i++)
-            {
-                health[i] = 0;
-            }
-
+            health = size;
             this.name = name;
+            this.letter = letter;
         }
 
         //Getters and setters
         public int getSize() { return size; }
         public void setSize(int size) {  this.size = size; }
         public String getName() { return name; }
-        //checks if the ship is sunk. If each value of the ship is 1, then it is sunk
+        public String getLetter() { return letter; }
+        //checks if the ship is sunk. If there is zero health remaining, then it is sunk
         public bool isSunk()
         {
-            for (int i = 0; i < size; i++)
+            if (health == 0)
             {
-                if (health[i] == 0)
-                {
-                    return false;
-                }
+                return true;
             }
-            return true;
+            return false;
         }
         //'hits' the ship
         public void hit()
         {
-            int counter = 0;
-            while (counter < size)
-            {
-                if (health[counter] == 0)
-                {
-                    health[counter] = 1;
-                    break;
-                }
-                counter++;
-            }
+            health--;
         }
     }
 }
