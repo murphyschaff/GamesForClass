@@ -40,6 +40,11 @@
             this.label12 = new System.Windows.Forms.Label();
             this.autoPlaceShips = new System.Windows.Forms.Button();
             this.startButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.userShipInfo = new System.Windows.Forms.Label();
+            this.cpuShipInfo = new System.Windows.Forms.Label();
+            this.test = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label3
@@ -163,11 +168,62 @@
             this.startButton.Visible = false;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 456);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(273, 29);
+            this.label1.TabIndex = 22;
+            this.label1.Text = "Enemy Ship Information:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(579, 456);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(250, 29);
+            this.label2.TabIndex = 23;
+            this.label2.Text = "Your Ship Information:";
+            // 
+            // userShipInfo
+            // 
+            this.userShipInfo.AutoSize = true;
+            this.userShipInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.userShipInfo.Location = new System.Drawing.Point(579, 485);
+            this.userShipInfo.Name = "userShipInfo";
+            this.userShipInfo.Size = new System.Drawing.Size(0, 29);
+            this.userShipInfo.TabIndex = 24;
+            // 
+            // cpuShipInfo
+            // 
+            this.cpuShipInfo.AutoSize = true;
+            this.cpuShipInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cpuShipInfo.Location = new System.Drawing.Point(22, 492);
+            this.cpuShipInfo.Name = "cpuShipInfo";
+            this.cpuShipInfo.Size = new System.Drawing.Size(0, 29);
+            this.cpuShipInfo.TabIndex = 25;
+            // 
+            // test
+            // 
+            this.test.AutoSize = true;
+            this.test.Location = new System.Drawing.Point(50, 20);
+            this.test.Name = "test";
+            this.test.Size = new System.Drawing.Size(0, 13);
+            this.test.TabIndex = 26;
+            // 
             // Battleship
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1013, 617);
+            this.Controls.Add(this.test);
+            this.Controls.Add(this.cpuShipInfo);
+            this.Controls.Add(this.userShipInfo);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.autoPlaceShips);
             this.Controls.Add(this.label12);
@@ -201,5 +257,10 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button autoPlaceShips;
         private System.Windows.Forms.Button startButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label userShipInfo;
+        private System.Windows.Forms.Label cpuShipInfo;
+        private System.Windows.Forms.Label test;
     }
 }

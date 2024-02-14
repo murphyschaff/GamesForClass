@@ -330,6 +330,8 @@ namespace GamesForClass
                 //shows everything on board for player, places ships
                 String[,] board = player.getBoard();
                 Ship[,] fleet = player.getFleet();
+                int sunkShips = player.getSunkShips();
+                test.Text = sunkShips.ToString();
                 for (int i =0; i < dimention; i++)
                 {
                     for (int j =0; j < dimention; j++)
@@ -442,7 +444,7 @@ namespace GamesForClass
             }
 
             //AI makes guess
-            if (CPU.guess(player))
+            if (CPU.newGuess(player))
             {
                 guessFeedback.Text = guessFeedback.Text + "\nCPU hit a ship!";
             }
@@ -500,10 +502,12 @@ namespace GamesForClass
     {
         private String[,] board = new String[9,9];
         Ship[,] fleet = new Ship[9, 9];
-        //keeps track of previous guess, 0: last guess was mark, 1&2: X,y coords of previous guess, 3: direction type, 4&5: first found local, 6: ship direction
-        private int[] guesses = { -1, -1, -1, -1, -1, -1, -1 };
+        //keeps track of previous guess, 0&1: X,y coords of first guess, 2: direction type, 3&4: current guess coordinates
+        private int[] guesses = { -1, -1, -1, -1, -1, -1 };
+        //0: Aircraft carriers, 1: battleships, 2: destroyers, 3: submarines
         private int[] numShips = { 0, 0, 0, 0 };
         private int sunkShips = 0;
+        private int guessStatus = 0;
         public BattleshipPlayer()
         {
             Ship blankShip = new Ship(0, "None", "N");
@@ -885,7 +889,242 @@ namespace GamesForClass
                     break;
             }
         }
-        
+        //new guess algorithm
+        //user: player whose board is being guessed on
+        public bool newGuess(BattleshipPlayer user)
+        {
+            String[,] usrBoard = user.getBoard();
+            Ship[,] usrFleet = user.getFleet();
+            Random rnd = new Random();
+            int x = 0;
+            int y = 0;
+            switch (guessStatus)
+            {
+                //finding random coordinate, as no previous guess was correct
+                case 0:
+                    bool find = true;
+                    //runs until valid coordinates found
+                    while (find)
+                    {
+                        x = rnd.Next(0, 8);
+                        y = rnd.Next(0, 8);
+                        if (usrBoard[x, y] != "H" && usrBoard[x, y] != "O")
+                        {
+                            find = false;
+                        }
+                    }
+                    //the ship was hit, change guessStatus to 1 to find direction and register as a hit
+                    if (usrFleet[x, y].getName() != "None")
+                    {
+                        usrBoard[x, y] = "H";
+                        //0 & 1: X,y coords of first guess, 2: direction type, 3 & 4: current guess coordinates
+                        guesses[0] = x;
+                        guesses[1] = y;
+                        //checks to see if the ship was sunk
+                        if (usrFleet[x, y].isSunk() == true)
+                        {
+                            changeNumShips(usrFleet[x, y]);
+                        }
+                        else
+                        {
+                            guessStatus = 1;
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        usrBoard[x, y] = "O";
+                        return false;
+                    }
+                //Finding a direction to try and sink the ship
+                case 1:
+                    x = guesses[0];
+                    y = guesses[1];
+                    int[] results = getDirectionCoords(usrBoard, x, y);
+                    x = results[1];
+                    y = results[2];
+                    if (results[0] != -1)
+                    {
+                        //means the ship was hit
+                        if (usrFleet[results[1], results[2]].getName() != "None")
+                        {
+                            //sets direction, changes status to 2
+                            usrBoard[x,y] = "H";
+                            guesses[2] = results[0];
+                            guesses[3] = x;
+                            guesses[4] = y;
+                            usrFleet[x, y].hit();
+                            //checks to see if the ship was sunk
+                            if (usrFleet[x, y].isSunk() == true)
+                            {
+                                changeNumShips(usrFleet[x, y]);
+                                guessStatus = 0;
+                            }
+                            else
+                            {
+                                guessStatus = 2;
+                            }
+                            return true;
+                        }
+                        else
+                        {
+                            //direction was wrong, mark as miss
+                            usrBoard[x, y] = "O";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        //all surrounds are unavailable, try random direction again
+                        guessStatus = 0;
+                        return false;
+                    }
+                //'hunts' ship until it is sunk
+                case 2:
+                    int[] newCoords = getCoords(guesses[2], guesses[3], guesses[4]);
+                    if (newCoords[0] != -1)
+                    {
+                        x = newCoords[0];
+                        y = newCoords[1];
+                        if (usrBoard[x,y] != "H" && usrBoard[x,y] != "O")
+                        {
+                            if (usrFleet[x,y].getName() != "None")
+                            {
+                                //ship was hit, continue on current path
+                                usrBoard[x, y] = "H";
+                                guesses[3] = x;
+                                guesses[4] = y;
+                                usrFleet[x, y].hit();
+                                //check if ship was sunk
+                                if (usrFleet[x, y].isSunk() == true)
+                                {
+                                    changeNumShips(usrFleet[x,y]);
+                                    guessStatus = 0;
+                                }
+                                return true;
+                            }
+                            else
+                            {
+                                //miss, flip direction and return false
+                                guesses[2] = flipDirection(guesses[2]);
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //try random direction again
+                        guessStatus = 0;
+                        return newGuess(user);
+                    }
+                    break;
+            }
+            return true;
+        }
+        //gets new coordinates to be tested by the algorithm
+        //0: new x coord, 1: new y coord
+        private int[] getCoords(int dir, int x, int y)
+        {
+            switch (dir)
+            {
+                case 1:
+                    x--;
+                    y--;
+                    break;
+                case 2:
+                    y--;
+                    break;
+                case 3:
+                    x++;
+                    y--;
+                    break;
+                case 4:
+                    x--;
+                    break;
+                case 5:
+                    x++;
+                    break;
+                case 6:
+                    x--;
+                    y++;
+                    break;
+                case 7:
+                    y++;
+                    break;
+                case 8:
+                    x++;
+                    y++;
+                    break;
+            }
+            int[] ret = { 0, 0 };
+            if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+            {
+                ret[0] = x;
+                ret[1] = y;
+                return ret;
+            }
+            else
+            {
+                ret[0] = -1;
+                return ret;
+            }
+        }
+        //gets 'random' direciton based on x,y and makes sure in bounds and not already used
+        private int[] getDirectionCoords(String[,] usrBoard, int x, int y)
+        {
+            int[] directions = { 2, 7, 4, 5, 1, 3, 6, 8 };
+            //0: direction number, 1: x coord, 2: y coord
+            int[] ret = { 0,0,0 };
+            for (int i = 0; i < directions.Length; i++)
+            {
+                switch (directions[i])
+                {
+                    case 1:
+                        x--;
+                        y--;
+                        break;
+                    case 2:
+                        y--;
+                        break;
+                    case 3:
+                        x++;
+                        y--;
+                        break;
+                    case 4:
+                        x--;
+                        break;
+                    case 5:
+                        x++;
+                        break;
+                    case 6:
+                        x--;
+                        y++;
+                        break;
+                    case 7:
+                        y++;
+                        break;
+                    case 8:
+                        x++;
+                        y++;
+                        break;
+                }
+                //makes sure the guess is in bounds
+                if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+                {
+                    //means that the spot was not already used
+                    if (usrBoard[x, y] != "H" && usrBoard[x,y] != "O")
+                    {
+                        ret[0] = directions[i];
+                        ret[1] = x;
+                        ret[2] = y;
+                        return ret;
+                    }
+                }
+            }
+            //no direction could be found, try a random spot on board again
+            ret[0] = -1;
+            return ret;
+        }
         //Algorithm to make a guess on the board
         public bool guess(BattleshipPlayer user)
         {
@@ -963,6 +1202,7 @@ namespace GamesForClass
                                         guesses[i] = -1;
                                     }
                                     sunkShips++;
+                                    changeNumShips(opfleet[status[1], status[2]]);
                                 }
                             }
                             else
@@ -991,6 +1231,7 @@ namespace GamesForClass
                                     guesses[i] = -1;
                                 }
                                 sunkShips++;
+                                changeNumShips(opfleet[status[1], status[2]]);
                             }
                         }
                         else
@@ -1017,6 +1258,7 @@ namespace GamesForClass
                                         guesses[i] = -1;
                                     }
                                     sunkShips++;
+                                    changeNumShips(opfleet[status[1], status[2]]);
                                 }
                             }
                             else
@@ -1104,6 +1346,7 @@ namespace GamesForClass
                                         guesses[i] = -1;
                                     }
                                     sunkShips++;
+                                    changeNumShips(opfleet[status[1], status[2]]);
                                 }
                             }
                             else
@@ -1224,6 +1467,10 @@ namespace GamesForClass
             }
         }
         //checks the bounds of coordinates, makes sure spot was not already taken
+        //index 0: 0 if used already, 1 if free. 1: x coord, 2: y coord
+        /* 1 2 3
+         * 4   5
+         * 6 7 8 */
         public int[] checkGuessBounds(int direction, int x, int y, String[,] usrboard, bool mov)
         {
             int[] output = new int[3];
@@ -1236,28 +1483,28 @@ namespace GamesForClass
                     cY = y - 1;
                     break;
                 case 2:
-                    cX = x - 1;
-                    cY = y;
-                    break;
-                case 3:
-                    cX = x - 1;
-                    cY = y + 1;
-                    break;
-                case 4:
                     cX = x;
                     cY = y - 1;
                     break;
+                case 3:
+                    cX = x + 1;
+                    cY = y - 1;
+                    break;
+                case 4:
+                    cX = x - 1;
+                    cY = y;
+                    break;
                 case 5:
-                    cX = x;
-                    cY = y + 1;
+                    cX = x + 1;
+                    cY = y;
                     break;
                 case 6:
-                    cX = x + 1;
+                    cX = x - 1;
                     cY = y - 1;
                     break;
                 case 7:
-                    cX = x + 1;
-                    cY = y;
+                    cX = x;
+                    cY = y + 1;
                     break;
                 case 8:
                     cX = x + 1;
@@ -1320,6 +1567,22 @@ namespace GamesForClass
                     return 1;
             }
             return 0;
+        }
+        //changes number of ships that have not been sunk
+        private void changeNumShips(Ship ship)
+        {
+            String letter = ship.getLetter();
+            switch (letter)
+            {
+                case "A":
+                    numShips[0]--; break;
+                case "B":
+                    numShips[1]--; break;
+                case "D":
+                    numShips[2]--; break;
+                case "S":
+                    numShips[3]--; break;
+            }
         }
     }
     //Class that represents the individual ship
