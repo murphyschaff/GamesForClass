@@ -81,7 +81,7 @@
             // 
             this.guessFeedback.AutoSize = true;
             this.guessFeedback.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.guessFeedback.Location = new System.Drawing.Point(391, 551);
+            this.guessFeedback.Location = new System.Drawing.Point(391, 566);
             this.guessFeedback.Name = "guessFeedback";
             this.guessFeedback.Size = new System.Drawing.Size(0, 31);
             this.guessFeedback.TabIndex = 17;
@@ -89,7 +89,7 @@
             // playerFeedback
             // 
             this.playerFeedback.AutoSize = true;
-            this.playerFeedback.Location = new System.Drawing.Point(730, 581);
+            this.playerFeedback.Location = new System.Drawing.Point(696, 581);
             this.playerFeedback.Name = "playerFeedback";
             this.playerFeedback.Size = new System.Drawing.Size(0, 13);
             this.playerFeedback.TabIndex = 10;

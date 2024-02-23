@@ -222,7 +222,14 @@ namespace GamesForClass
             {
                 if (button.Text == "C")
                 {
-                    changeButtonSurround(button, xVal, yVal, size, true);
+                    if (size == 1)
+                    {
+                        lookAtSub(button, xVal, yVal, true);
+                    }
+                    else
+                    {
+                        changeButtonSurround(button, xVal, yVal, size, true);
+                    }
                     updateBoard(true);
                 }
                 else
@@ -241,7 +248,14 @@ namespace GamesForClass
                         case "DR": direction = 8; xVal--; yVal--; break;
                         case "P": direction = 8; break;
                     }
-                    changeButtonSurround(button, xVal, yVal, size, true);
+                    if (size == 1)
+                    {
+                        lookAtSub(button, xVal, yVal, true);
+                    }
+                    else
+                    {
+                        changeButtonSurround(button, xVal, yVal, size, true);
+                    }
                     //ship is to be placed
                     player.addShipNew(xVal, yVal, size, direction);
                     updateBoard(true);
@@ -250,7 +264,14 @@ namespace GamesForClass
             else
             {
                 changeButtonEnable(plrButtons, false);
-                changeButtonSurround(button, xVal, yVal, size, false);
+                if (size == 1)
+                {
+                    lookAtSub(button, xVal, yVal, false);
+                }
+                else
+                {
+                    changeButtonSurround(button, xVal, yVal, size, false);
+                }
             }
 
             //if all ships are placed, enables start game
@@ -262,20 +283,68 @@ namespace GamesForClass
                 playerFeedback.Text = "Ready to start!";
             }
         }
+        /* Specifically allows for placement of submarine */
+        public void lookAtSub(Button center, int xVal, int yVal, bool remove)
+        {
+            //if the values are supposed to be removed
+            if (remove)
+            {
+                //the player did not want to place the submarine
+                if (center.Text == "C")
+                {
+                    if (yVal == 1 && plrButtons[xVal, 0].Text == "P")
+                    {
+                        plrButtons[xVal, 0].Text = "";
+                    }
+                    else
+                    {
+                        if (yVal == dimention -1)
+                        {
+                            plrButtons[xVal, yVal - 1].Text = "";
+                        }
+                        else
+                        {
+                            plrButtons[xVal, yVal + 1].Text = "";
+                        }
+                    } 
+                }
+                //The user wants to place the submarine
+                else
+                {
+                    if (yVal == 0)
+                    {
+                        plrButtons[xVal, yVal + 1].Text = "";
+                    }
+                    else
+                    {
+                        plrButtons[xVal, yVal - 1].Text = "";
+                    }
+                }
+                center.Text = "";
+            }
+            //if the values are supposed to be added
+            else
+            {
+                center.Text = "P";
+                center.Enabled = true;
+                if (yVal == 0)
+                {
+                    plrButtons[xVal, yVal + 1].Text = "C";
+                    plrButtons[xVal, yVal + 1].Enabled = true;
+                }
+                else
+                {
+                    plrButtons[xVal, yVal - 1].Text = "C";
+                    plrButtons[xVal, yVal - 1].Enabled = true;
+                }
+            }
+            
+        }
         /* changes button surround to specified type */
-        //shipType: 0: Aircraft carrier, 1: battleship, 2: destroyer, 3: submarine
-        //placeType: 0: adds directions and 's' for starting place, 1: removes all options
         public void changeButtonSurround(Button center, int xVal, int yVal, int shipSize, bool remove)
         {
             //sets corresponding buttons
             //middle
-            //checks to see if the ship is a submarine
-            if (shipSize == 1)
-            {
-                center.Text = "P";
-                center.Enabled = true;
-                return;
-            }
             if (!remove) { center.Text = "C"; } else { center.Text = ""; }
             center.Enabled = true;
             //top
@@ -567,6 +636,7 @@ namespace GamesForClass
         {
             autoPlaceShips.Visible = false;
             startButton.Visible = false;
+            playerFeedback.Text = "";
             CPU.placeShips();
             changeButtonEnable(cpuButtons, true);
             changeButtonEnable(plrButtons, false);
@@ -641,40 +711,40 @@ namespace GamesForClass
                     /* 1 2 3
                      * 4   5
                      * 6 7 8 */
-                    type = rnd.Next(1, 8);
+                    type = rnd.Next(1, 9);
                     switch (type)
                     {
                         case 1:
-                            x = rnd.Next(3, 8);
-                            y = rnd.Next(3, 8);
+                            x = rnd.Next(3, 9);
+                            y = rnd.Next(3, 9);
                             break;
                         case 2:
-                            x = rnd.Next(0, 8);
-                            y = rnd.Next(3, 8); 
+                            x = rnd.Next(0, 9);
+                            y = rnd.Next(3, 9); 
                             break;
                         case 3:
-                            x = rnd.Next(0, 5);
-                            y = rnd.Next(3, 8);    
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(3, 9);    
                             break;
                         case 4:
-                            x = rnd.Next(3, 8);
-                            y = rnd.Next(0, 8);
+                            x = rnd.Next(3, 9);
+                            y = rnd.Next(0, 9);
                             break;
                         case 5:
-                            x = rnd.Next(0, 5);
-                            y = rnd.Next(0, 8);
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(0, 9);
                             break;
                         case 6:
-                            x = rnd.Next(3, 8);
-                            y = rnd.Next(0, 5);
+                            x = rnd.Next(3, 9);
+                            y = rnd.Next(0, 6);
                             break;
                         case 7:
-                            x = rnd.Next(0, 8);
-                            y = rnd.Next(0, 5);
+                            x = rnd.Next(0, 9);
+                            y = rnd.Next(0, 6);
                             break;
                         case 8:
-                            x = rnd.Next(0, 5);
-                            y = rnd.Next(0, 5);
+                            x = rnd.Next(0, 6);
+                            y = rnd.Next(0, 6);
                             break;
                     }
                     //checks if the ship can be placed, places it if it can
@@ -996,14 +1066,35 @@ namespace GamesForClass
             int y = 0;
             switch (guessStatus)
             {
+                //Checks to see if there is an unsunk, but hit ship on the board
+                case -1:
+                    //looks through board, if a unsunk ship is found changes to find direction and makes guess
+                    for (int i = 0; i < usrBoard.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < usrBoard.GetLength(1); j++)
+                        {
+                            if (usrBoard[i,j] == "H" && usrFleet[i,j].isSunk() == false)
+                            {
+                                guessStatus = 1;
+                                guesses[0] = i;
+                                guesses[1] = j;
+                            }
+                        }
+                    }
+                    //if one is not found, changes to random and makes guess
+                    if (guessStatus != 1)
+                    {
+                        guessStatus = 0;
+                    }
+                    return newGuess(user);
                 //finding random coordinate, as no previous guess was correct
                 case 0:
                     bool find = true;
                     //runs until valid coordinates found
                     while (find)
                     {
-                        x = rnd.Next(0, 8);
-                        y = rnd.Next(0, 8);
+                        x = rnd.Next(0, 9);
+                        y = rnd.Next(0, 9);
                         if (usrBoard[x, y] != "H" && usrBoard[x, y] != "O")
                         {
                             find = false;
@@ -1021,6 +1112,7 @@ namespace GamesForClass
                         if (usrFleet[x, y].isSunk() == true)
                         {
                             changeNumShips(user, usrFleet[x, y]);
+                            guessStatus = -1;
                         }
                         else
                         {
@@ -1031,6 +1123,7 @@ namespace GamesForClass
                     else
                     {
                         usrBoard[x, y] = "O";
+                        guessStatus = 0;
                         return false;
                     }
                 //Finding a direction to try and sink the ship
@@ -1056,7 +1149,7 @@ namespace GamesForClass
                             if (usrFleet[x, y].isSunk() == true)
                             {
                                 changeNumShips(user, usrFleet[x, y]);
-                                guessStatus = 0;
+                                guessStatus = -1;
                             }
                             else
                             {
@@ -1097,7 +1190,7 @@ namespace GamesForClass
                                 if (usrFleet[x, y].isSunk() == true)
                                 {
                                     changeNumShips(user, usrFleet[x,y]);
-                                    guessStatus = 0;
+                                    guessStatus = -1;
                                 }
                                 return true;
                             }
@@ -1116,13 +1209,23 @@ namespace GamesForClass
                             if (guesses[5] == guesses[2])
                             {
                                 //both directions tried, return to random guessing
-                                guessStatus = 0;
+                                guessStatus = -1;
                                 return newGuess(user);
                             }
                             else
                             {
                                 //jumps over current coordinate guess and checks again
                                 newCoords = getCoords(guesses[2], x, y);
+                                if (newCoords[0] != -1)
+                                {
+                                    guesses[3] = newCoords[1];
+                                    guesses[4] += newCoords[2];                                     
+                                }
+                                else
+                                {
+                                    //check to see if there is a unsunk ship that was found
+                                    guessStatus = -1;
+                                }
                                 return newGuess(user);
                             }
                         }
@@ -1166,13 +1269,23 @@ namespace GamesForClass
                                 if (guesses[5] == guesses[2])
                                 {
                                     //both directions tried, return to random guessing
-                                    guessStatus = 0;
+                                    guessStatus = -1;
                                     return newGuess(user);
                                 }
                                 else
                                 {
                                     //jumps over current coordinate guess and checks again
                                     newCoords = getCoords(guesses[2], x, y);
+                                    if (newCoords[0] != -1)
+                                    {
+                                        guesses[3] = newCoords[1];
+                                        guesses[4] += newCoords[2];
+                                    }
+                                    else
+                                    {
+                                        //check to see if there is a unsunk ship that was found
+                                        guessStatus = -1;
+                                    }
                                     return newGuess(user);
                                 }
                             }
@@ -1184,7 +1297,6 @@ namespace GamesForClass
                             return newGuess(user);
                         }
                     }
-                    break;
             }
             return true;
         }
