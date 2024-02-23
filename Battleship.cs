@@ -44,16 +44,56 @@ namespace GamesForClass
             cpuButtons = new Button[dimention, dimention];
             plrButtons = new Button[dimention, dimention];
             int buttonSize = 40;
+            int textSize = 20;
+            int buttonTextSize = 12;
             int[] CPUstart = { 63, 103 };
             int[] PLRstart = { 611, 103 };
             for (int i = 0; i < dimention; i++)
             {
+                //adds x lables
+                Label cpuLabel = new Label();
+                cpuLabel.Name = i.ToString() + "cpulabelx";
+                cpuLabel.Font = new Font("Microsoft Sans Sarif", textSize);
+                cpuLabel.TextAlign = ContentAlignment.MiddleCenter;
+                cpuLabel.Size = new Size(buttonSize, buttonSize);
+                cpuLabel.Text = (i + 1).ToString();
+                cpuLabel.Location = new Point(CPUstart[0] + (buttonSize * i), CPUstart[1] - buttonSize);
+                this.Controls.Add(cpuLabel);
+
+                Label plrLabel = new Label();
+                plrLabel.Name = i.ToString() + "plrlabelx";
+                plrLabel.Font = new Font("Microsoft Sans Sarif", textSize);
+                plrLabel.TextAlign = ContentAlignment.MiddleCenter;
+                plrLabel.Size = new Size(buttonSize, buttonSize);
+                plrLabel.Text = (i + 1).ToString();
+                plrLabel.Location = new Point(PLRstart[0] + (buttonSize * i), PLRstart[1] - buttonSize);
+                this.Controls.Add(plrLabel);
+                //adds y labels
+                Label cpuylabel = new Label();
+                cpuylabel.Name = i.ToString() + "cpulabely";
+                cpuylabel.Font = new Font("Microsoft Sans Sarif", textSize);
+                cpuylabel.TextAlign = ContentAlignment.MiddleCenter;
+                cpuylabel.Size = new Size(buttonSize, buttonSize);
+                cpuylabel.Text = (i + 1).ToString();
+                cpuylabel.Location = new Point(CPUstart[0] - buttonSize, CPUstart[1] + (buttonSize * i));
+                this.Controls.Add(cpuylabel);
+
+                Label plryLabel = new Label();
+                plryLabel.Name = i.ToString() + "plrlabely";
+                plryLabel.Font = new Font("Microsoft Sans Sarif", textSize);
+                plryLabel.TextAlign = ContentAlignment.MiddleCenter;
+                plryLabel.Size = new Size(buttonSize, buttonSize);
+                plryLabel.Text = (i + 1).ToString();
+                plryLabel.Location = new Point(PLRstart[0] - buttonSize, PLRstart[1] + (buttonSize * i));
+                this.Controls.Add(plryLabel);
+
                 for (int j = 0; j < dimention; j++)
                 {
                     //CPU buttons
                     Button cpuButton = new Button();
                     String name = "cpu" + i.ToString() + "-" + j.ToString();
                     cpuButton.Name = name;
+                    cpuButton.Font = new Font("Microsoft Sans Sarif", buttonTextSize);
                     cpuButton.Size = new Size(buttonSize, buttonSize);
                     cpuButton.Location = new Point(CPUstart[0] + (buttonSize * i), CPUstart[1] + (buttonSize * j));
                     cpuButton.MouseDown += CPUButtonClick;
@@ -67,6 +107,7 @@ namespace GamesForClass
                     Button plrButton = new Button();
                     name = "plr" + i.ToString() + "-" + j.ToString();
                     plrButton.Name = name;
+                    plrButton.Font = new Font("Microsoft Sans Sarif", buttonTextSize);
                     plrButton.Size = new Size(buttonSize, buttonSize);
                     plrButton.Location = new Point(PLRstart[0] + (buttonSize * i), PLRstart[1] + (buttonSize * j));
                     plrButton.MouseDown += PLRButtonClick;
@@ -76,6 +117,8 @@ namespace GamesForClass
                     plrButtons[i, j] = plrButton;
                 }
             }
+            userShipInfo.Text = "Aircraft Carriers: 0 Battleships: 0\nDestroyers: 0 Submarines: 0";
+            cpuShipInfo.Text = "Aircraft Carriers: 0 Battleships: 0\nDestroyers: 0 Submarines: 0";
         }
         //when the player selects a button on the CPU board
         private void CPUButtonClick(object sender, MouseEventArgs e)
@@ -179,6 +222,7 @@ namespace GamesForClass
             {
                 if (button.Text == "C")
                 {
+                    changeButtonSurround(button, xVal, yVal, size, true);
                     updateBoard(true);
                 }
                 else
@@ -197,7 +241,7 @@ namespace GamesForClass
                         case "DR": direction = 8; xVal--; yVal--; break;
                         case "P": direction = 8; break;
                     }
-                    changeButtonSurround(button, xVal, yVal, size);
+                    changeButtonSurround(button, xVal, yVal, size, true);
                     //ship is to be placed
                     player.addShipNew(xVal, yVal, size, direction);
                     updateBoard(true);
@@ -206,7 +250,7 @@ namespace GamesForClass
             else
             {
                 changeButtonEnable(plrButtons, false);
-                changeButtonSurround(button, xVal, yVal, size);
+                changeButtonSurround(button, xVal, yVal, size, false);
             }
 
             //if all ships are placed, enables start game
@@ -221,7 +265,7 @@ namespace GamesForClass
         /* changes button surround to specified type */
         //shipType: 0: Aircraft carrier, 1: battleship, 2: destroyer, 3: submarine
         //placeType: 0: adds directions and 's' for starting place, 1: removes all options
-        public void changeButtonSurround(Button center, int xVal, int yVal, int shipSize)
+        public void changeButtonSurround(Button center, int xVal, int yVal, int shipSize, bool remove)
         {
             //sets corresponding buttons
             //middle
@@ -232,7 +276,7 @@ namespace GamesForClass
                 center.Enabled = true;
                 return;
             }
-            center.Text = "C";
+            if (!remove) { center.Text = "C"; } else { center.Text = ""; }
             center.Enabled = true;
             //top
             if (Math.Abs(xVal - shipSize) >= 0)
@@ -242,7 +286,7 @@ namespace GamesForClass
                 {
                     if (player.checkForShip(xVal, yVal, shipSize, 1))
                     {
-                        plrButtons[xVal - 1, yVal - 1].Text = "UL";
+                        if (!remove) { plrButtons[xVal - 1, yVal - 1].Text = "UL"; } else { plrButtons[xVal - 1, yVal - 1].Text = ""; }
                         plrButtons[xVal - 1, yVal - 1].Enabled = true;
                     }
                 }
@@ -251,7 +295,7 @@ namespace GamesForClass
                 {
                     if (player.checkForShip(xVal, yVal, shipSize, 6))
                     {
-                        plrButtons[xVal - 1, yVal + 1].Text = "DL";
+                        if (!remove) { plrButtons[xVal - 1, yVal + 1].Text = "DL"; } else { plrButtons[xVal - 1, yVal + 1].Text = ""; }
                         plrButtons[xVal - 1, yVal + 1].Enabled = true;
                     }
 
@@ -259,7 +303,7 @@ namespace GamesForClass
                 //top
                 if (player.checkForShip(xVal, yVal, shipSize, 4))
                 {
-                    plrButtons[xVal - 1, yVal].Text = "L";
+                    if (!remove) { plrButtons[xVal - 1, yVal].Text = "L"; } else { plrButtons[xVal - 1, yVal].Text = ""; }
                     plrButtons[xVal - 1, yVal].Enabled = true;
                 }
             }
@@ -271,7 +315,7 @@ namespace GamesForClass
                 {
                     if (player.checkForShip(xVal, yVal, shipSize, 3))
                     {
-                        plrButtons[xVal + 1, yVal - 1].Text = "UR";
+                        if (!remove) { plrButtons[xVal + 1, yVal - 1].Text = "UR"; } else { plrButtons[xVal + 1, yVal - 1].Text = ""; }
                         plrButtons[xVal + 1, yVal - 1].Enabled = true;
                     }
                 }
@@ -280,14 +324,14 @@ namespace GamesForClass
                 {
                     if (player.checkForShip(xVal, yVal, shipSize, 8))
                     {
-                        plrButtons[xVal + 1, yVal + 1].Text = "DR";
+                        if (!remove) { plrButtons[xVal + 1, yVal + 1].Text = "DR"; } else { plrButtons[xVal + 1, yVal + 1].Text = ""; }
                         plrButtons[xVal + 1, yVal + 1].Enabled = true;
                     }
                 }
                 //right
                 if (player.checkForShip(xVal, yVal, shipSize, 5))
                 {
-                    plrButtons[xVal + 1, yVal].Text = "R";
+                    if (!remove) { plrButtons[xVal + 1, yVal].Text = "R"; } else { plrButtons[xVal + 1, yVal].Text = ""; }
                     plrButtons[xVal + 1, yVal].Enabled = true;
                 }
             }
@@ -296,7 +340,7 @@ namespace GamesForClass
             {
                 if (player.checkForShip(xVal, yVal, shipSize, 2))
                 {
-                    plrButtons[xVal, yVal -1].Text = "U";
+                    if (!remove) { plrButtons[xVal, yVal - 1].Text = "U"; } else { plrButtons[xVal, yVal - 1].Text = ""; }
                     plrButtons[xVal, yVal - 1].Enabled = true;
                 }
             }
@@ -305,10 +349,20 @@ namespace GamesForClass
             {
                 if (player.checkForShip(xVal, yVal, shipSize, 7))
                 {
-                    plrButtons[xVal, yVal + 1].Text = "D";
+                    if (!remove) { plrButtons[xVal, yVal + 1].Text = "D"; } else { plrButtons[xVal, yVal + 1].Text = ""; }
                     plrButtons[xVal, yVal + 1].Enabled = true;
                 }
             }   
+        }
+        public void changeButtonBackColor(Button[,] buttons, Color color)
+        {
+            for (int i = 0; i < dimention; i++)
+            {
+                for (int j = 0; j < dimention; j++)
+                {
+                    buttons[i,j].BackColor = color;
+                }
+            }
         }
         //Marks all not ship buttons in given array as enabled or disabled
         private void changeButtonEnable(Button[,] array, bool enabled)
@@ -322,6 +376,17 @@ namespace GamesForClass
                 }
             }
         }
+        private void removeButtonText(Button[,] array, Button[,] array2)
+        {
+            for (int i = 0; i < dimention; i++)
+            {
+                for (int j = 0; j < dimention; j++)
+                {
+                    array[i, j].Text = "";
+                    array2[i, j].Text = "";
+                }
+            }
+        }
         //Updates graphics on board, depends on if board is being updated when player placing ships
         public void updateBoard(bool isplayer)
         {
@@ -330,8 +395,6 @@ namespace GamesForClass
                 //shows everything on board for player, places ships
                 String[,] board = player.getBoard();
                 Ship[,] fleet = player.getFleet();
-                int sunkShips = player.getSunkShips();
-                test.Text = sunkShips.ToString();
                 for (int i =0; i < dimention; i++)
                 {
                     for (int j =0; j < dimention; j++)
@@ -342,14 +405,7 @@ namespace GamesForClass
                             {
                                 plrButtons[i, j].Text = fleet[i, j].getLetter();
                                 plrButtons[i, j].Enabled = false;
-                                if (fleet[i, j].isSunk())
-                                {
-                                    plrButtons[i, j].BackColor = Color.Red;
-                                }
-                                else
-                                {
-                                    plrButtons[i, j].BackColor = Color.Gray;
-                                }
+                                plrButtons[i, j].BackColor = Color.Gray;                               
                             }
                             else if (plrButtons[i, j].Text != "" && guessFeedback.Text != "")
                             {
@@ -365,7 +421,11 @@ namespace GamesForClass
                         {
                             if (board[i,j] == "H" || board[i,j] == "O")
                             {
-                                if (board[i,j] == "H")
+                                if (fleet[i,j].isSunk() && board[i,j] != "O")
+                                {
+                                    plrButtons[i,j].BackColor = Color.Red;
+                                }
+                                else if (board[i,j] == "H")
                                 {
                                     plrButtons[i, j].BackColor = Color.Yellow;
                                 }
@@ -407,7 +467,12 @@ namespace GamesForClass
                         }
                     }
                 }
+            //Updates both player and CPU ship status
             }
+            int[] plrShips = player.getNumShips();
+            int[] cpuShips = CPU.getNumShips();
+            userShipInfo.Text = "Aircraft Carriers: " + plrShips[0].ToString() + " Battleships: " + plrShips[1].ToString() + "\nDestroyers: " + plrShips[2].ToString() + " Submarines: " + plrShips[3].ToString();
+            cpuShipInfo.Text = "Aircraft Carriers: " + cpuShips[0].ToString() + " Battleships: " + cpuShips[1].ToString() + "\nDestroyers: " + cpuShips[2].ToString() + " Submarines: " + cpuShips[3].ToString();
         }
         //Places guess on board, tells player if it was a hit or not (Assumes valid coordinates)
         public void makeGuess(BattleshipPlayer user, int[] coords)
@@ -430,7 +495,7 @@ namespace GamesForClass
                 if (ship.isSunk())
                 {
                     guessFeedback.Text = String.Format("You sunk a {0}!", ship.getName());
-                    CPU.setSunkShips(CPU.getSunkShips() + 1);
+                    CPU.changeNumShips(CPU, ship);
                 }
                 else
                 {
@@ -456,15 +521,19 @@ namespace GamesForClass
             updateBoard(false);
             updateBoard(true);
             //check for win condition
-            int playersunk = player.getSunkShips();
-            int cpusunk = CPU.getSunkShips();
-            if (playersunk > 5)
+            int[] plrShips = player.getNumShips();
+            int[] cpuShips = CPU.getNumShips();
+            if (cpuShips[0] == 0 && cpuShips[1] == 0 && cpuShips[2] == 0 && cpuShips[3] == 0)
             {
-                guessFeedback.Text = guessFeedback.Text + "\nThe CPU has sunk all your ships. You loose";
+                guessFeedback.Text = "You Win!";
+                changeButtonEnable(plrButtons, false);
+                changeButtonEnable(cpuButtons, false);
             }
-            else if (cpusunk > 5)
+            else if (plrShips[0] == 0 && plrShips[1] == 0 && plrShips[2] == 0 && plrShips[3] == 0)
             {
-                guessFeedback.Text = guessFeedback.Text + "\nYou have sunk all CPU ships. You Win!!!!";
+                guessFeedback.Text = "You Loose.";
+                changeButtonEnable(plrButtons, false);
+                changeButtonEnable(cpuButtons, false);
             }
 
         }
@@ -473,6 +542,11 @@ namespace GamesForClass
         private void button4_Click(object sender, EventArgs e)
         {
             initBattleship();
+            guessFeedback.Text = "";
+            removeButtonText(plrButtons, cpuButtons);
+            changeButtonEnable(plrButtons, true);
+            changeButtonBackColor(plrButtons, Color.DeepSkyBlue);
+            changeButtonBackColor(cpuButtons, Color.DeepSkyBlue);
             autoPlaceShips.Visible = true;
             shipSelection.Visible = true;
         }
@@ -480,10 +554,13 @@ namespace GamesForClass
         private void autoPlaceShips_Click(object sender, EventArgs e)
         {
             player.placeShips();
+            //clears all text on screen
+            removeButtonText(plrButtons, cpuButtons);
             startButton.Visible = true;
             autoPlaceShips.Visible = false;
             shipSelection.Visible = false;
             updateBoard(true);
+            changeButtonEnable(plrButtons, false);
         }
         //places CPU ships, starts game
         private void startButton_Click(object sender, EventArgs e)
@@ -496,14 +573,30 @@ namespace GamesForClass
             updateBoard(false);
         }
         #endregion
+        //activates cheat mode (shhh dont tell anyone)
+        private void label3_Click(object sender, EventArgs e)
+        {
+            //shows location of CPU ships on board
+            Ship[,] fleet = CPU.getFleet();
+            for (int i = 0; i < dimention; i++)
+            {
+                for (int j = 0; j < dimention; j++)
+                {
+                    if (fleet[i,j].getName() != "None")
+                    {
+                        cpuButtons[i, j].Text = fleet[i, j].getLetter();
+                    }
+                }
+            }
+        }
     }
     /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
     {
         private String[,] board = new String[9,9];
         Ship[,] fleet = new Ship[9, 9];
-        //keeps track of previous guess, 0&1: X,y coords of first guess, 2: direction type, 3&4: current guess coordinates
-        private int[] guesses = { -1, -1, -1, -1, -1, -1 };
+        //keeps track of previous guess, 0&1: X,y coords of first guess, 2: direction type, 3&4: current guess coordinates, 5: original guess direction
+        private int[] guesses = { -1, -1, -1, -1, -1, -1, -1 };
         //0: Aircraft carriers, 1: battleships, 2: destroyers, 3: submarines
         private int[] numShips = { 0, 0, 0, 0 };
         private int sunkShips = 0;
@@ -526,10 +619,11 @@ namespace GamesForClass
         public Ship[,] getFleet() { return fleet; }
         public void setFleet(Ship[,] ships) {  this.fleet = ships; }
         public int[] getNumShips() { return numShips; }
-        public void setNumShips(int[] numShips) { this.numShips = numShips; }
+        public void setNumShips(int[] numShips) { this.numShips =  numShips; }
         public int getSunkShips() { return sunkShips; }
         public void setSunkShips(int sunkShips) { this.sunkShips = sunkShips; }
         /* AI places ships onto board */
+        #region ship placement
         public void placeShips()
         {
             int x = 0;
@@ -889,6 +983,8 @@ namespace GamesForClass
                     break;
             }
         }
+        #endregion
+        #region guess algorithm
         //new guess algorithm
         //user: player whose board is being guessed on
         public bool newGuess(BattleshipPlayer user)
@@ -917,13 +1013,14 @@ namespace GamesForClass
                     if (usrFleet[x, y].getName() != "None")
                     {
                         usrBoard[x, y] = "H";
+                        usrFleet[x, y].hit();
                         //0 & 1: X,y coords of first guess, 2: direction type, 3 & 4: current guess coordinates
                         guesses[0] = x;
                         guesses[1] = y;
                         //checks to see if the ship was sunk
                         if (usrFleet[x, y].isSunk() == true)
                         {
-                            changeNumShips(usrFleet[x, y]);
+                            changeNumShips(user, usrFleet[x, y]);
                         }
                         else
                         {
@@ -951,13 +1048,14 @@ namespace GamesForClass
                             //sets direction, changes status to 2
                             usrBoard[x,y] = "H";
                             guesses[2] = results[0];
+                            guesses[5] = results[0];
                             guesses[3] = x;
                             guesses[4] = y;
                             usrFleet[x, y].hit();
                             //checks to see if the ship was sunk
                             if (usrFleet[x, y].isSunk() == true)
                             {
-                                changeNumShips(usrFleet[x, y]);
+                                changeNumShips(user, usrFleet[x, y]);
                                 guessStatus = 0;
                             }
                             else
@@ -998,7 +1096,7 @@ namespace GamesForClass
                                 //check if ship was sunk
                                 if (usrFleet[x, y].isSunk() == true)
                                 {
-                                    changeNumShips(usrFleet[x,y]);
+                                    changeNumShips(user, usrFleet[x,y]);
                                     guessStatus = 0;
                                 }
                                 return true;
@@ -1006,16 +1104,85 @@ namespace GamesForClass
                             else
                             {
                                 //miss, flip direction and return false
+                                usrBoard[x, y] = "O";
                                 guesses[2] = flipDirection(guesses[2]);
+                                guesses[3] = guesses[0];
+                                guesses[4] = guesses[1];
                                 return false;
+                            }
+                        }
+                        else
+                        {
+                            if (guesses[5] == guesses[2])
+                            {
+                                //both directions tried, return to random guessing
+                                guessStatus = 0;
+                                return newGuess(user);
+                            }
+                            else
+                            {
+                                //jumps over current coordinate guess and checks again
+                                newCoords = getCoords(guesses[2], x, y);
+                                return newGuess(user);
                             }
                         }
                     }
                     else
                     {
-                        //try random direction again
-                        guessStatus = 0;
-                        return newGuess(user);
+                        //flips direction and trys again
+                        guesses[2] = flipDirection(guesses[2]);
+                        newCoords = getCoords(guesses[2], guesses[0], guesses[1]);
+                        if (newCoords[0] != -1)
+                        {
+                            x = newCoords[0];
+                            y = newCoords[1];
+                            if (usrBoard[x, y] != "H" && usrBoard[x, y] != "O")
+                            {
+                                if (usrFleet[x, y].getName() != "None")
+                                {
+                                    //ship was hit, continue on current path
+                                    usrBoard[x, y] = "H";
+                                    guesses[3] = x;
+                                    guesses[4] = y;
+                                    usrFleet[x, y].hit();
+                                    //check if ship was sunk
+                                    if (usrFleet[x, y].isSunk() == true)
+                                    {
+                                        changeNumShips(user, usrFleet[x, y]);
+                                        guessStatus = 0;
+                                    }
+                                    return true;
+                                }
+                                else
+                                {
+                                    //miss, flip direction and return false
+                                    guesses[2] = flipDirection(guesses[2]);
+                                    usrBoard[x,y] = "O";
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                if (guesses[5] == guesses[2])
+                                {
+                                    //both directions tried, return to random guessing
+                                    guessStatus = 0;
+                                    return newGuess(user);
+                                }
+                                else
+                                {
+                                    //jumps over current coordinate guess and checks again
+                                    newCoords = getCoords(guesses[2], x, y);
+                                    return newGuess(user);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //resets status if both directions are out of bounds
+                            guessStatus = 0;
+                            return newGuess(user);
+                        }
                     }
                     break;
             }
@@ -1070,13 +1237,16 @@ namespace GamesForClass
             }
         }
         //gets 'random' direciton based on x,y and makes sure in bounds and not already used
-        private int[] getDirectionCoords(String[,] usrBoard, int x, int y)
+        private int[] getDirectionCoords(String[,] usrBoard, int initx, int inity)
         {
             int[] directions = { 2, 7, 4, 5, 1, 3, 6, 8 };
             //0: direction number, 1: x coord, 2: y coord
             int[] ret = { 0,0,0 };
+            int x, y;
             for (int i = 0; i < directions.Length; i++)
             {
+                x = initx;
+                y = inity;
                 switch (directions[i])
                 {
                     case 1:
@@ -1125,347 +1295,25 @@ namespace GamesForClass
             ret[0] = -1;
             return ret;
         }
-        //Algorithm to make a guess on the board
-        public bool guess(BattleshipPlayer user)
+        //updates the number of ships that have not been sunk yet for a given user
+        public void changeNumShips(BattleshipPlayer user, Ship ship)
         {
-            String[,] opboard = user.getBoard();
-            Ship[,] opfleet = user.getFleet();
-            int sunkShips = user.getSunkShips();
-            int x, y;
-            bool correct = false;
-            //previous guess was correct
-            if (guesses[0] == 1)
+            int[] usrNumShips = user.getNumShips();
+            String letter = ship.getLetter();
+            switch (letter)
             {
-                //only made one correct guess so far
-                if (guesses[6] == 0)
-                {
-                    Random rnd = new Random();
-                    bool run = true;
-                    x = 0;
-                    y = 0;
-                    while (run)
-                    {
-                        //gets random direction
-                        int dir = rnd.Next(1, 8);
-                        switch (dir)
-                        {
-                            case 1:
-                                x = guesses[1] - 1;
-                                y = guesses[2] - 1;
-                                break;
-                            case 2:
-                                x = guesses[1] - 1;
-                                y = guesses[2];
-                                break;
-                            case 3:
-                                x = guesses[1] - 1;
-                                y = guesses[2] + 1;
-                                break;
-                            case 4:
-                                x = guesses[1];
-                                y = guesses[2] - 1;
-                                break;
-                            case 5:
-                                x = guesses[1];
-                                y = guesses[2] + 1;
-                                break;
-                            case 6:
-                                x = guesses[1] + 1;
-                                y = guesses[2] - 1;
-                                break;
-                            case 7:
-                                x = guesses[1] + 1;
-                                y = guesses[2];
-                                break;
-                            case 8:
-                                x = guesses[1] + 1;
-                                y = guesses[2] + 1;
-                                break;
-                        }
-                        int[] status = checkGuessBounds(dir, x, y, opboard, false);
-                        //within bounds
-                        if (status[0] == 1)
-                        {
-                            if (hitOrMiss(user, status[1], status[2]))
-                            {
-                                guesses[0] = 1;
-                                correct = true;
-                                //sets correct direction
-                                guesses[3] = dir;
-                                //sets og direction
-                                guesses[6] = dir;
-                                //checking if the ship was sunk
-                                if (opfleet[status[1], status[2]].isSunk())
-                                {
-                                    for (int i = 0; i < guesses.Length; i++)
-                                    {
-                                        guesses[i] = -1;
-                                    }
-                                    sunkShips++;
-                                    changeNumShips(opfleet[status[1], status[2]]);
-                                }
-                            }
-                            else
-                            {
-                                guesses[0] = 0;
-                            }
-                            run = false;
-                        }
-                    }
-                }
-                else
-                {
-                    int[] status = checkGuessBounds(guesses[3], guesses[1], guesses[2], opboard, true);
-                    //guess is in bounds
-                    if (status[0] == 1)
-                    {
-                        if (hitOrMiss(user, status[1], status[2]))
-                        {
-                            guesses[0] = 1;
-                            correct = true;
-                            //checking if the ship was sunk
-                            if (opfleet[status[1], status[2]].isSunk())
-                            {
-                                for (int i = 0; i < guesses.Length; i++)
-                                {
-                                    guesses[i] = -1;
-                                }
-                                sunkShips++;
-                                changeNumShips(opfleet[status[1], status[2]]);
-                            }
-                        }
-                        else
-                        {
-                            guesses[0] = 0;
-                        }
-                    }
-                    //guess is not in bounds
-                    else
-                    {
-                        //flips direction and uses og guess
-                        status = checkGuessBounds(flipDirection(guesses[6]), guesses[4], guesses[5], opboard, true);
-                        if (status[0] == 1)
-                        { 
-                            if (hitOrMiss(user, status[1], status[2]))
-                            {
-                                guesses[0] = 1;
-                                correct = true;
-                                //checking if the ship was sunk
-                                if (opfleet[status[1], status[2]].isSunk())
-                                {
-                                    for (int i = 0; i < guesses.Length; i++)
-                                    {
-                                        guesses[i] = -1;
-                                    }
-                                    sunkShips++;
-                                    changeNumShips(opfleet[status[1], status[2]]);
-                                }
-                            }
-                            else
-                            {
-                                guesses[0] = 0;
-                            }
-                        }
-                        //both directions are invalid, find new location
-                        else
-                        {
-                            for (int i = 0; i < guesses.Length; i++)
-                            {
-                                guesses[i] = -1;
-                            }
-                        }
-                    }
-                }
+                case "A":
+                    usrNumShips[0]--; break;
+                case "B":
+                    usrNumShips[1]--; break;
+                case "D":
+                    usrNumShips[2]--; break;
+                case "S":
+                    usrNumShips[3]--; break;
             }
-            //The previous guess was not correct
-            else
-            {
-                //There is no og correct direction, i.e only one guess made so far
-                if (guesses[6] == 0)
-                {
-                    Random rnd = new Random();
-                    bool run = true;
-                    x = 0;
-                    y = 0;
-                    while (run)
-                    {
-                        //gets random direction
-                        int dir = rnd.Next(1, 8);
-                        switch (dir)
-                        {
-                            case 1:
-                                x = guesses[1] - 1;
-                                y = guesses[2] - 1;
-                                break;
-                            case 2:
-                                x = guesses[1] - 1;
-                                y = guesses[2];
-                                break;
-                            case 3:
-                                x = guesses[1] - 1;
-                                y = guesses[2] + 1;
-                                break;
-                            case 4:
-                                x = guesses[1];
-                                y = guesses[2] - 1;
-                                break;
-                            case 5:
-                                x = guesses[1];
-                                y = guesses[2] + 1;
-                                break;
-                            case 6:
-                                x = guesses[1] + 1;
-                                y = guesses[2] - 1;
-                                break;
-                            case 7:
-                                x = guesses[1] + 1;
-                                y = guesses[2];
-                                break;
-                            case 8:
-                                x = guesses[1] + 1;
-                                y = guesses[2] + 1;
-                                break;
-                        }
-                        int[] status = checkGuessBounds(dir, x, y, opboard, false);
-                        //within bounds
-                        if (status[0] == 1)
-                        {
-                            if (hitOrMiss(user, status[1], status[2]))
-                            {
-                                guesses[0] = 1;
-                                correct = true;
-                                //sets correct direction
-                                guesses[3] = dir;
-                                //sets og direction
-                                guesses[6] = dir;
-                                //checking if the ship was sunk
-                                if (opfleet[status[1], status[2]].isSunk())
-                                {
-                                    for (int i = 0; i < guesses.Length; i++)
-                                    {
-                                        guesses[i] = -1;
-                                    }
-                                    sunkShips++;
-                                    changeNumShips(opfleet[status[1], status[2]]);
-                                }
-                            }
-                            else
-                            {
-                                guesses[0] = 0;
-                            }
-                            run = false;
-                        }
-                    }
-                }
-                else
-                {
-                    //not currently working on a ship
-                    if (guesses[6] == -1)
-                    {
-                        Random rnd = new Random();
-                        bool run = true;
-                        while (run)
-                        {
-                            x = rnd.Next(0, 9);
-                            y = rnd.Next(0, 9);
-                            //found a ship to sink
-                            if (opfleet[x, y].getName() != "None")
-                            {
-                                opboard[x, y] = "H";
-                                opfleet[x, y].hit();
-                                guesses[0] = 1;
-                                correct = true;
-                                if (!opfleet[x, y].isSunk())
-                                {
-                                    guesses[1] = x;
-                                    guesses[2] = y;
-                                    guesses[4] = x;
-                                    guesses[5] = y;
-                                    guesses[6] = 0;
-                                    sunkShips++;
-                                }
-                                run = false;
-                            }
-                            //already guessed
-                            else if (opboard[x,y] == "O" || opboard[x,y] == "H")
-                            {
-                                continue;
-                            }
-                            //nothing guessed
-                            else
-                            {
-                                opboard[x, y] = "O";
-                                guesses[0] = 0;
-                                run = false;
-                            }
-                        }
-                        user.setBoard(opboard);
-                        user.setFleet(opfleet);
-                    }
-                    //currently working on a ship
-                    else
-                    {
-
-                        //there is a og correct direction, go in opposite direction.
-                        int newDir = flipDirection(guesses[6]);
-                        int[] status = checkGuessBounds(newDir, guesses[4], guesses[5], opboard, true);
-                        //working status
-                        if (status[0] == 1)
-                        {
-                            if (hitOrMiss(user, status[1], status[2]))
-                            {
-                                guesses[0] = 1;
-                                correct = true;
-                                //sets correct direction
-                                guesses[3] = newDir;
-                                //checking if the ship was sunk
-                                if (opfleet[status[1], status[2]].isSunk())
-                                {
-                                    for (int i = 0; i < guesses.Length; i++)
-                                    {
-                                        guesses[i] = -1;
-                                    }
-                                    sunkShips++;
-                                }
-                            }
-                            else
-                            {
-                                guesses[0] = 0;
-                            }
-
-                        }
-
-                    }
-                }
-            }
-            user.setSunkShips(sunkShips);
-            return correct;
-        } 
-        //returns true if guess was correct, false if not
-        public bool hitOrMiss(BattleshipPlayer user, int cX, int cY)
-        {
-            String[,] usrboard = user.getBoard();
-            Ship[,] usrfleet = user.getFleet();
-            //checks if the spot has a ship on it
-            if (usrfleet[cX, cY].getName() != "None")
-            {
-                usrboard[cX, cY] = "H";
-                usrfleet[cX, cY].hit();
-                guesses[1] = cX;
-                guesses[2] = cY;
-                user.setBoard(usrboard);
-                user.setFleet(usrfleet);
-                return true;
-            }
-            //was a miss
-            else
-            {
-                usrboard[cX,cY] = "O";
-                guesses[0] = 0;
-                user.setBoard(usrboard);
-                return false;
-            }
+            user.setNumShips(usrNumShips);
         }
+        #endregion
         //checks the bounds of coordinates, makes sure spot was not already taken
         //index 0: 0 if used already, 1 if free. 1: x coord, 2: y coord
         /* 1 2 3
@@ -1569,21 +1417,6 @@ namespace GamesForClass
             return 0;
         }
         //changes number of ships that have not been sunk
-        private void changeNumShips(Ship ship)
-        {
-            String letter = ship.getLetter();
-            switch (letter)
-            {
-                case "A":
-                    numShips[0]--; break;
-                case "B":
-                    numShips[1]--; break;
-                case "D":
-                    numShips[2]--; break;
-                case "S":
-                    numShips[3]--; break;
-            }
-        }
     }
     //Class that represents the individual ship
     public class Ship
