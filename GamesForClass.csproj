@@ -81,6 +81,12 @@
     <Compile Include="Battleship.Designer.cs">
       <DependentUpon>Battleship.cs</DependentUpon>
     </Compile>
+    <Compile Include="Checkers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Checkers.Designer.cs">
+      <DependentUpon>Checkers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,6 +121,9 @@
     </Compile>
     <EmbeddedResource Include="Battleship.resx">
       <DependentUpon>Battleship.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Checkers.resx">
+      <DependentUpon>Checkers.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
