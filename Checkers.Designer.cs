@@ -39,7 +39,7 @@
             // 
             this.title.AutoSize = true;
             this.title.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.title.Location = new System.Drawing.Point(430, 9);
+            this.title.Location = new System.Drawing.Point(435, 5);
             this.title.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.title.Name = "title";
             this.title.Size = new System.Drawing.Size(241, 55);
@@ -50,10 +50,10 @@
             // 
             this.boardBackground.AutoSize = true;
             this.boardBackground.BackColor = System.Drawing.Color.SlateGray;
-            this.boardBackground.Location = new System.Drawing.Point(240, 65);
-            this.boardBackground.MinimumSize = new System.Drawing.Size(640, 640);
+            this.boardBackground.Location = new System.Drawing.Point(235, 60);
+            this.boardBackground.MinimumSize = new System.Drawing.Size(650, 650);
             this.boardBackground.Name = "boardBackground";
-            this.boardBackground.Size = new System.Drawing.Size(640, 640);
+            this.boardBackground.Size = new System.Drawing.Size(650, 650);
             this.boardBackground.TabIndex = 51;
             // 
             // startReset
