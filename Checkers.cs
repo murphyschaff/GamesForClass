@@ -33,7 +33,7 @@ namespace GamesForClass
         #region board functions
         //creates board
         public void createBoard()
-        {      
+        {
             int startX = 240;
             int startY = 65;
             int size = 80;
@@ -51,7 +51,7 @@ namespace GamesForClass
                         //label
                         if (j % 2 == 0)
                         {
-                            createLabel(j, i, x, y, size);                           
+                            createLabel(j, i, x, y, size);
                         }
                         //button
                         else
@@ -74,7 +74,7 @@ namespace GamesForClass
                         //label
                         else
                         {
-                            createLabel(j, i, x, y, size);                            
+                            createLabel(j, i, x, y, size);
                         }
                     }
                 }
@@ -109,9 +109,9 @@ namespace GamesForClass
             label.Size = new Size(size, size);
             label.Enabled = false;
             label.BringToFront();
-            this.Controls.Add(label);         
+            this.Controls.Add(label);
         }
-       
+
         #endregion
         //function that runs when the button boards are clicked
         //places initial checkers onto board
@@ -121,14 +121,10 @@ namespace GamesForClass
             Checker[] blackCheckers = new Checker[12];
             int checkerCounter = 0;
             //places white pieces
-            for(int i = 0; i < 12; i++)
+            for (int i = 0; i < 12; i++)
             {
                 Button button = buttons[i];
-                String xVal = "";
-                String yVal = "";
-                xVal += button.Name[0];
-                yVal += button.Name[1];
-                int[] location = { Convert.ToInt32(xVal), Convert.ToInt32(yVal) };
+                int[] location = getCoords(button);
                 Color color = Color.White;
                 Checker checker = new Checker(location, color);
 
@@ -143,11 +139,7 @@ namespace GamesForClass
             for (int i = 31; i > 19; i--)
             {
                 Button button = buttons[i];
-                String xVal = "";
-                String yVal = "";
-                xVal += button.Name[0];
-                yVal += button.Name[1];
-                int[] location = { Convert.ToInt32(xVal), Convert.ToInt32(yVal) };
+                int[] location = getCoords(button);
                 Color color = Color.Black;
                 Checker checker = new Checker(location, color);
 
@@ -162,17 +154,14 @@ namespace GamesForClass
             CPU.setCheckers(whiteCheckers);
         }
         #region player movement functions
-        //
         //Finds all possible moves for given checker
         //references column, row
-        private void findMoves(Button button)
+        private bool findMoves(Button button)
         {
-            String xVal = "";
-            String yVal = "";
-            xVal += button.Name[0];
-            yVal += button.Name[1];
-            int x = Convert.ToInt32(xVal);
-            int y = Convert.ToInt32(yVal);
+            bool option = false;
+            int[] coords = getCoords(button);
+            int x = coords[0];
+            int y = coords[1];
 
             Checker checker = player.findCheckerAtCoordinates(x, y);
             //makes sure checker is not null
@@ -182,13 +171,19 @@ namespace GamesForClass
                 if (checker.getText() == "O")
                 {
                     //check directions 1 & 2
-                    if (checkBounds(x-1,y-1))
+                    if (checkBounds(x - 1, y - 1))
                     {
-                        checkDirection(1, x - 1, y - 1);
+                        if (checkDirection(1, x - 1, y - 1))
+                        {
+                            option = true;
+                        }
                     }
-                    if (checkBounds(x+1, y - 1))
+                    if (checkBounds(x + 1, y - 1))
                     {
-                        checkDirection(2, x + 1, y - 1);
+                        if (checkDirection(2, x + 1, y - 1))
+                        {
+                            option = true;
+                        }
                     }
                 }
                 else
@@ -196,19 +191,31 @@ namespace GamesForClass
                     //check all directions
                     if (checkBounds(x - 1, y - 1))
                     {
-                        checkDirection(1, x - 1, y - 1);
+                        if (checkDirection(1, x - 1, y - 1))
+                        {
+                            option = true;
+                        }
                     }
                     if (checkBounds(x + 1, y - 1))
                     {
-                        checkDirection(2, x + 1, y - 1);
+                        if (checkDirection(2, x + 1, y - 1))
+                        {
+                            option = true;
+                        }
                     }
-                    if (checkBounds(x-1, y + 1))
+                    if (checkBounds(x - 1, y + 1))
                     {
-                        checkDirection(3, x - 1, y + 1);
+                        if (checkDirection(3, x - 1, y + 1))
+                        {
+                            option = true;
+                        }
                     }
-                    if (checkBounds(x+1, y + 1))
+                    if (checkBounds(x + 1, y + 1))
                     {
-                        checkDirection(4, x + 1, y + 1);
+                        if (checkDirection(4, x + 1, y + 1))
+                        {
+                            option = true;
+                        }
                     }
                 }
             }
@@ -216,6 +223,7 @@ namespace GamesForClass
             {
                 test.Text = "No Player checker found at location";
             }
+            return option;
         }
         //checks given coordinates if can jump or not
         /* Directions
@@ -223,12 +231,11 @@ namespace GamesForClass
          *   O
          * 3   4
          */
-        private void checkDirection(int direction, int x, int y)
+        private bool checkDirection(int direction, int x, int y)
         {
             //look to see if take is possible in this direction
             if (findCheckerAtCoordinates(x, y) != null)
             {
-
                 switch (direction)
                 {
                     case 1:
@@ -240,22 +247,23 @@ namespace GamesForClass
                         y--;
                         break;
                     case 3:
-                        y++;
                         x--;
+                        y++;
                         break;
                     case 4:
+                        x++;
                         y++;
-                        x--;
                         break;
                 }
                 //checks to see if the space would be in bounds, and there is no other piece in the space to make jump, and makes sure piece is enemy
                 Checker checker = findCheckerAtCoordinates(x, y);
-                if (checkBounds(x,y) && checker != null)
+                if (checkBounds(x, y) && checker == null)
                 {
                     Button button = findButtonWithCoordinates(x, y);
                     if (button != null && checker.getColor() != Color.Black)
                     {
                         button.BackColor = Color.Yellow;
+                        return true;
                     }
                     else
                     {
@@ -269,11 +277,48 @@ namespace GamesForClass
                 Button button = findButtonWithCoordinates(x, y);
                 if (button != null)
                 {
-                    button.BackColor= Color.Yellow;
+                    button.BackColor = Color.Yellow;
                 }
                 else
                 {
                     test.Text = "Button not found";
+                }
+            }
+            return false;
+        }
+        //Makes move to specified button
+        private void makeMove(Button button)
+        {
+            //finds current and hold button's coordinates
+            int[] currentCoords = getCoords(button);
+            int[] holdCoords = getCoords(holdButton);
+
+            //finds given piece to move
+            Checker checker = findCheckerAtCoordinates(holdCoords[0], holdCoords[1]);
+            //move checker to location and updates board
+            if (checker != null)
+            {
+                holdButton.Text = "";   
+                removeButtonColor(Color.Yellow);
+                checker.setLocation(currentCoords);
+                //makes checker a king if it made to the top
+                if (currentCoords[0] == 0)
+                {
+                    checker.makeKing();
+                }
+                button.Text = checker.getText();
+                button.ForeColor = checker.getColor();
+                //checks to see if a jump was made
+                if (currentCoords[0] > holdCoords[0] + 1 || currentCoords[1] > holdCoords[1] + 1)
+                {
+                    //jump was made, stage to find another option
+                    holdButton = button;
+                    findMoves(button);
+                }
+                else
+                {
+                    //makes CPU move
+                    test.Text = "Make CPU move";
                 }
             }
         }
@@ -325,7 +370,7 @@ namespace GamesForClass
         //removes all checkers from board, resets text
         private void resetButtons()
         {
-            for (int i =0; i < buttons.Length;i++)
+            for (int i = 0; i < buttons.Length; i++)
             {
                 buttons[i].Text = "";
                 buttons[i].BackColor = buttonDefaultColor;
@@ -350,6 +395,18 @@ namespace GamesForClass
                 return true;
             }
             return false;
+        }
+        //returns the coordinates of a given button
+        public int[] getCoords(Button button)
+        {
+            int[] coords = new int[2];
+            String x = "";
+            String y = "";
+            x += button.Name[0];
+            y += button.Name[1];
+            coords[0] = Convert.ToInt32(x);
+            coords[1] = Convert.ToInt32(y);
+            return coords;
         }
         #endregion
         #region button functions
@@ -392,6 +449,11 @@ namespace GamesForClass
                     findMoves(button);
                 }
             }
+            else
+            {
+                //calls make move function
+                makeMove(button);
+            }
         }
         #endregion
     }
@@ -424,6 +486,70 @@ namespace GamesForClass
             }
             return checker;
         }
+        #region automatic movements
+        //makes a movement automatically
+        public void makeMove(Checker[] globalCheckers, Checkers instance)
+        {
+            bool moveMade = false;
+            //checks to see if any checker could be taken in the next move, attempts to stop it
+            for (int i = 0; i < checkers.Length; i++)
+            {
+
+            }
+        }
+        //looks for danger around a given checker
+        /* Locations
+         * 1   2
+         *   O
+         * 3   4
+         */
+        private bool lookForDanger(Checker checker, Checkers instance)
+        {
+            bool danger = false;
+            int[] location = checker.getLocation();
+            int x = 0;
+            int y = 0;
+            //looks in 4 directions, checks to see if there is danger
+            for (int i = 1; i <= 4; i++)
+            {
+                switch (i)
+                {
+                    case 1:
+                        x = location[0] - 1;
+                        y = location[1] - 1;
+                        break;
+                    case 2:
+                        x = location[0] + 1;
+                        y = location[1] - 1;
+                        break;
+                    case 3:
+                        x = location[0] - 1;
+                        y = location[1] + 1;
+                        break;
+                    case 4:
+                        x = location[0] + 1;
+                        y = location[1] + 1;
+                        break;
+                }
+                //checks to see if a given position would be in bounds
+                if (instance.checkBounds(x, y))
+                {
+                    Checker potentialChecker = instance.findCheckerAtCoordinates(x, y);
+                    if (potentialChecker != null)
+                    {
+                        //looks to see if the found checker and the current checker are the same type
+                        if (potentialChecker.getColor() != checker.getColor())
+                        {
+                            //see if there is danger in opposite direction
+
+                            danger = true;
+                        }
+                    }
+                }
+            }
+            return danger;
+        }
+        #endregion
     }
     /*
      * Class that represents an individual checker on the board
