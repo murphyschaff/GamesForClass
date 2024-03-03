@@ -111,7 +111,32 @@ namespace GamesForClass
             label.BringToFront();
             this.Controls.Add(label);
         }
-
+        //updates the board after moves are made
+        public void updateBoard()
+        {
+            removeButtonColor(buttonDefaultColor);
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                int[] coords = getCoords(buttons[i]);
+                Checker checker = findCheckerAtCoordinates(coords[0], coords[1]);
+                if (checker != null)
+                {
+                    if (checker.getHealth() > 0)
+                    {
+                        buttons[i].Text = checker.getText();
+                        buttons[i].ForeColor = checker.getColor();
+                    }
+                    else
+                    {
+                        buttons[i].Text = "";
+                    }
+                }
+                else
+                {
+                    buttons[i].Text = "";
+                }
+            }
+        }
         #endregion
         //function that runs when the button boards are clicked
         //places initial checkers onto board
@@ -257,7 +282,7 @@ namespace GamesForClass
                 }
                 //checks to see if the space would be in bounds, and there is no other piece in the space to make jump, and makes sure piece is enemy
                 Checker checker = findCheckerAtCoordinates(x, y);
-                if (checkBounds(x, y) && checker == null)
+                if (checkBounds(x, y) && checker != null)
                 {
                     Button button = findButtonWithCoordinates(x, y);
                     if (button != null && checker.getColor() != Color.Black)
@@ -302,12 +327,10 @@ namespace GamesForClass
                 removeButtonColor(Color.Yellow);
                 checker.setLocation(currentCoords);
                 //makes checker a king if it made to the top
-                if (currentCoords[0] == 0)
+                if (currentCoords[1] == 0)
                 {
                     checker.makeKing();
                 }
-                button.Text = checker.getText();
-                button.ForeColor = checker.getColor();
                 //checks to see if a jump was made
                 if (currentCoords[0] > holdCoords[0] + 1 || currentCoords[1] > holdCoords[1] + 1)
                 {
@@ -318,14 +341,15 @@ namespace GamesForClass
                 else
                 {
                     //makes CPU move
-                    test.Text = "Make CPU move";
+                    CPU.makeMove(this);
+                    updateBoard();
                 }
             }
         }
         #endregion
         #region find functions
         //finds a specific button at given coordinates, returns null if none found
-        private Button findButtonWithCoordinates(int x, int y)
+        public Button findButtonWithCoordinates(int x, int y)
         {
             Button button = null;
             for (int i = 0; i < buttons.Length; i++)
@@ -463,7 +487,9 @@ namespace GamesForClass
     public class CheckerPlayer
     {
         private Checker[] checkers;
-
+        private const int normalCheckerDirections = 2;
+        private const int kingCheckerDirections = 4;
+        private int dimention = 9;
         public CheckerPlayer()
         {
             checkers = new Checker[12];
@@ -488,13 +514,68 @@ namespace GamesForClass
         }
         #region automatic movements
         //makes a movement automatically
-        public void makeMove(Checker[] globalCheckers, Checkers instance)
+        public void makeMove(Checkers instance)
         {
-            bool moveMade = false;
-            //checks to see if any checker could be taken in the next move, attempts to stop it
+            //checks to see if any checker is in danger, makes move if so
             for (int i = 0; i < checkers.Length; i++)
             {
+                if (lookForDanger(checkers[i], instance))
+                {
+                    //checker found to be in danger, check to see if you can take first
+                    if (attemptTake(checkers[i], instance) == false)
+                    {
+                        //attempt to move piece out of danger
+                        if (attemptMove(checkers[i], instance))
+                        {
+                            //piece was moved
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        //piece was taken
+                        return;
+                    }
+                }
+            }
 
+            //move 'random' piece if one cannot be taken or moved already
+            bool find = true;
+            int loopCounter = 0;
+            int index = 0;
+            while (find)
+            {
+                //looks to see if the player has a king to move
+                if (loopCounter < checkers.Length)
+                {
+                    if (checkers[index].getText() == "K")
+                    {
+                        if (attemptMove(checkers[index], instance))
+                        {
+                            return;
+                        }
+                    }
+                    index++;
+                }
+                else
+                {
+                    if (index >= checkers.Length)
+                    {
+                        index = 0;
+                    }
+                    //move first piece that can move
+                    if (attemptMove(checkers[index], instance))
+                    {
+                        return;
+                    }
+                    index++;
+                }
+                loopCounter++;
+                //stops infinite loop, SHOULD NOT HIT
+                if (loopCounter > 100)
+                {
+                    return;
+                }
             }
         }
         //looks for danger around a given checker
@@ -505,49 +586,332 @@ namespace GamesForClass
          */
         private bool lookForDanger(Checker checker, Checkers instance)
         {
-            bool danger = false;
             int[] location = checker.getLocation();
             int x = 0;
             int y = 0;
+            int x1 = 0;
+            int y1 = 0;
             //looks in 4 directions, checks to see if there is danger
-            for (int i = 1; i <= 4; i++)
+            for (int i = 1; i <= normalCheckerDirections; i++)
             {
                 switch (i)
                 {
                     case 1:
                         x = location[0] - 1;
                         y = location[1] - 1;
+                        x1 = location[0] + 1;
+                        y1 = location[1] + 1;
                         break;
                     case 2:
                         x = location[0] + 1;
                         y = location[1] - 1;
-                        break;
-                    case 3:
-                        x = location[0] - 1;
-                        y = location[1] + 1;
-                        break;
-                    case 4:
-                        x = location[0] + 1;
-                        y = location[1] + 1;
+                        x1 = location[0] - 1;
+                        y1 = location[1] + 1;
                         break;
                 }
+                Checker pc1 = null;
+                Checker pc2 = null;
                 //checks to see if a given position would be in bounds
                 if (instance.checkBounds(x, y))
                 {
-                    Checker potentialChecker = instance.findCheckerAtCoordinates(x, y);
-                    if (potentialChecker != null)
+                    pc1 = instance.findCheckerAtCoordinates(x, y);
+                }
+                if (instance.checkBounds(x1, y1))
+                {
+                    pc2 = instance.findCheckerAtCoordinates(x1, y1);
+                }
+                //checks to see if there are checkers at specified locations
+                if (pc1 != null || pc2 != null)
+                {
+                    //checks if enemy color is in area
+                    if (pc1 != null && pc1.getColor() != checker.getColor())
                     {
-                        //looks to see if the found checker and the current checker are the same type
-                        if (potentialChecker.getColor() != checker.getColor())
+                        //if the other space is open, danger is true
+                        if (pc2 == null)
                         {
-                            //see if there is danger in opposite direction
-
-                            danger = true;
+                            return true;
+                        }
+                    }
+                    if (pc2 != null && pc2.getColor() != checker.getColor())
+                    {
+                        if (pc1 == null)
+                        {
+                            return true;
                         }
                     }
                 }
             }
-            return danger;
+            return false;
+        }
+        //function that attempts to make random move on checker, not for attempting to take a piece
+        //returns true if move made, false if none made
+        private bool attemptMove(Checker checker, Checkers instance)
+        {
+            int[] coords = checker.getLocation();
+            int x, y;
+            //standard peice
+            if (checker.getText() == "O")
+            {
+                for (int i = 1; i <=normalCheckerDirections; i++)
+                {
+                    x = coords[0];
+                    y = coords[1];
+                    switch (i)
+                    {
+                        case 1:
+                            //black pieces move up, white move down
+                            if (checker.getColor() == Color.Black)
+                            {
+                                //direction 1
+                                x--;
+                                y--;
+                            }
+                            else
+                            {
+                                //direction 3
+                                x--;
+                                y++;
+                            }
+                            break;
+                        case 2:
+                            if (checker.getColor() == Color.Black)
+                            {
+                                //direction 2
+                                x++;
+                                y--;
+                            }
+                            else
+                            {
+                                //direction 4
+                                x++;
+                                y++;
+                            }
+                            break;
+                    }
+                    //checks coordinate bounds
+                    if (instance.checkBounds(x, y))
+                    {
+                        //checks to see if there is a checker already at this coordinate, preventing move
+                        if (instance.findCheckerAtCoordinates(x, y) == null)
+                        {
+                            //looks to see if the checker needs to be kinged
+                            if (checker.getColor() == Color.Black && y == 0)
+                            {
+                                checker.makeKing();
+                            }
+                            if (checker.getColor() == Color.White && y == dimention)
+                            {
+                                checker.makeKing();
+                            }
+                            //moves checker to this location
+                            int[] newLocation = {x, y};
+                            checker.setLocation(newLocation);
+                            return true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 1; i <= kingCheckerDirections; i++)
+                {
+                    x = coords[0];
+                    y = coords[1];
+                    switch (i)
+                    {
+                        case 1:
+                            x--;
+                            y--;
+                            break;
+                        case 2:
+                            x++;
+                            y--;
+                            break;
+                        case 3:
+                            x--;
+                            y++;
+                            break;
+                        case 4:
+                            x++;
+                            y++;
+                            break;
+                    }
+                    //checks coordinate bounds
+                    if (instance.checkBounds(x, y))
+                    {
+                        //checks to see if there is a checker already at this coordinate, preventing move
+                        if (instance.findCheckerAtCoordinates(x, y) == null)
+                        {
+                            //looks to see if the checker needs to be kinged
+                            if (checker.getColor() == Color.Black && y == 0)
+                            {
+                                checker.makeKing();
+                            }
+                            if (checker.getColor() == Color.White && y == dimention)
+                            {
+                                checker.makeKing();
+                            }
+                            //moves checker to this location
+                            int[] newLocation = { x, y };
+                            checker.setLocation(newLocation);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        //attempts to take a piece
+        //returns true if piece was taken, false if not
+        private bool attemptTake(Checker checker, Checkers instance)
+        {
+            int[] location = checker.getLocation();
+            int x = 0;
+            int y = 0;
+            int openx = 0;
+            int openy = 0;
+
+            if (checker.getText() == "O")
+            {
+                for (int i = 1; i <= normalCheckerDirections; i++)
+                {
+                    switch (i)
+                    {
+                        case 1:
+                            if (checker.getColor() == Color.Black)
+                            {
+                                //direction 1
+                                x = location[0] - 1;
+                                y = location[1] - 1;
+                                openx = location[0] - 2;
+                                openy = location[1] - 2;
+                            }
+                            else
+                            {
+                                //direction 3
+                                x = location[0] - 1;
+                                y = location[1] + 1;
+                                openx = location[0] - 2;
+                                openy = location[1] + 2;
+                            }
+                            break;
+                        case 2:
+                            if (checker.getColor() == Color.Black)
+                            {
+                                //direction 2
+                                x = location[0] + 1;
+                                y = location[1] - 1;
+                                openx = location[0] + 2;
+                                openy = location[1] - 2;
+                            }
+                            else
+                            {
+                                //direction 4
+                                x = location[0] + 1;
+                                y = location[1] + 1;
+                                openx = location[0] + 2;
+                                openy = location[1] + 2;
+                            }
+                            break;
+                    }
+                    //checks if coordinates are in bounds
+                    if (instance.checkBounds(x, y))
+                    {
+                        Checker checkChecker = instance.findCheckerAtCoordinates(x,y);
+                        //makes sure checker exists, and checks if it is enemy color
+                        if (checkChecker != null && checkChecker.getColor() != checker.getColor())
+                        {
+                            //checks if the space behind said checker is open, and in bounds
+                            if (instance.checkBounds(openx, openy) && instance.findCheckerAtCoordinates(openx, openy) == null)
+                            {
+                                //checks if checker needs to be kinged
+                                if (checker.getColor() == Color.Black && y == 0)
+                                {
+                                    checker.makeKing();
+                                }
+                                if (checker.getColor() == Color.White && y == dimention)
+                                {
+                                    checker.makeKing();
+                                }
+                                //sets new location for button
+                                int[] newcoords = { openx, openy };
+                                checker.setLocation(newcoords);
+
+                                //takes other player's checker
+                                checkChecker.take();
+
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            //king piece
+            else
+            {
+                for (int i =0; i <= kingCheckerDirections; i++)
+                {
+                    //gets directions
+                    switch (i)
+                    {
+                        case 1:
+                            x = location[0] - 1;
+                            y = location[1] - 1;
+                            openx = location[0] - 2;
+                            openy = location[1] - 2;
+                            break;
+                        case 2:
+                            x = location[0] + 1;
+                            y = location[1] - 1;
+                            openx = location[0] + 2;
+                            openy = location[1] - 2;
+                            break;
+                        case 3:
+                            x = location[0] - 1;
+                            y = location[1] + 1;
+                            openx = location[0] - 2;
+                            openy = location[1] + 2;
+                            break;
+                        case 4:
+                            x = location[0] + 1;
+                            y = location[1] + 1;
+                            openx = location[0] + 2;
+                            openy = location[1] + 2;
+                            break;
+                    }
+                    //checks if coordinates are in bounds
+                    if (instance.checkBounds(x, y))
+                    {
+                        Checker checkChecker = instance.findCheckerAtCoordinates(x, y);
+                        //makes sure checker exists, and checks if it is enemy color
+                        if (checkChecker != null && checkChecker.getColor() != checker.getColor())
+                        {
+                            //checks if the space behind said checker is open, and in bounds
+                            if (instance.checkBounds(openx, openy) && instance.findCheckerAtCoordinates(openx, openy) == null)
+                            {
+                                //checks if checker needs to be kinged
+                                if (checker.getColor() == Color.Black && y == 0)
+                                {
+                                    checker.makeKing();
+                                }
+                                if (checker.getColor() == Color.White && y == dimention)
+                                {
+                                    checker.makeKing();
+                                }
+                                //sets new location for button
+                                int[] newcoords = { openx, openy };
+                                checker.setLocation(newcoords);
+
+                                //takes other player's checker
+                                checkChecker.take();
+
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         }
         #endregion
     }
