@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 0.6: Battleship Rework
+## Version 0.7: Checkers Release
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v0_6
+Release Executable is located under Releases, GamesForClass_v0_7
 
 # Game Instructions
 ## Tic Tac Toe
@@ -17,9 +17,18 @@ Upon opening Battleship, you are greeted with two battleship boards. On the left
 ## Yahtzee
 Clicking "Roll" when it is your turn will roll each dice on the board. You can click any individual dice to place it into a "hold" state, where once you roll the dice again it will not be rolled. On the right side are the player's point sections. When you place dice into the hold, each possible combination that you can use will have a check box next to it. To place the dice into that section and get points, click the box and click the "Confirm" button. This will give the turn to the CPU. Click "CPU Turn" and "Next" to have the CPU run through its options. Click "Your Turn" to run your next turn. Once the game is complete, you can click either "Reset" button to reset the game. You can also click the "Reset" button at the bottom at any time to reset the game.
 ## Minesweeper
-To start a game of minesweeper, select your difficulty on the bottom left. Click "Start Game" once you have selected the difficulty you want to play. Easy is a 8x8 board with 10 mines, Medium is a 16x16 board with 40 mines, and Hard is a 30x16 board with 99 mines. Select "Start Game" to spawn the board, and click a individual button to start. Right clicking a button will mark the space as a mine, where left clicking will reveal the value of the space. Left clicking on a bomb tile will cause the mine to explode, ending the game. To reset the game, click the "Reset" button. 
+To start a game of minesweeper, select your difficulty on the bottom left. Click "Start Game" once you have selected the difficulty you want to play. Easy is a 8x8 board with 10 mines, Medium is a 16x16 board with 40 mines, and Hard is a 30x16 board with 99 mines. Select "Start Game" to spawn the board, and click a individual button to start. Right clicking a button will mark the space as a mine, where left clicking will reveal the value of the space. Left clicking on a bomb tile will cause the mine to explode, ending the game. To reset the game, click the "Reset" button.
+## Checkers
+To start a game of checkers, select the start button. You play as the black checkers, and make the first move. Clicking on a checker will highlight all possible moves for that checker. Clicking on a highlighted space will move the checker to that position. If you take a checker, this checker will be removed from the board. If the CPU takes your checker, it will also be removed from the board. Clicking "Make Move for Me" will automatically move one of your pieces for you based on the CPU's algorithm. Clicking "Reset" will reset the game board at any time.
 
 # Release Notes
+## Release v0.7: Checkers Release
++ Features
+    + Checkers
+        + Added game Checkers
+        + Added CPU movement algorithm
+        + Added automatic player movement functions
+
 ## Release v0.6: Battleship Rework
 + Features
     + Battleship

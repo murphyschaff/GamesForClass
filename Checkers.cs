@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
@@ -122,7 +123,7 @@ namespace GamesForClass
                 Checker checker = findCheckerAtCoordinates(coords[0], coords[1]);
                 if (checker != null)
                 {
-                    if (checker.getHealth() > 0)
+                    if (checker.isAlive())
                     {
                         buttons[i].Text = checker.getText();
                         buttons[i].ForeColor = checker.getColor();
@@ -136,6 +137,24 @@ namespace GamesForClass
                 {
                     buttons[i].Text = "";
                 }
+            }
+            //finds number of checkers that are remaining on the board
+            int playerCheckers = player.countAliveCheckers();
+            int CPUCheckers = CPU.countAliveCheckers();
+            feedback.Text = "You: " + playerCheckers.ToString() + "\nCPU: " + CPUCheckers.ToString();
+            if (playerCheckers == 0)
+            {
+                winCondition.Text = "CPU Wins.";
+                //changeButtonEnable(false);
+                autoPlayerMove.Visible = false;
+                simulateButton.Visible = false;
+            }
+            if (CPUCheckers == 0)
+            {
+                winCondition.Text = "You Win!";
+                //changeButtonEnable(false);
+                autoPlayerMove.Visible = false;
+                simulateButton.Visible = false;
             }
         }
         #endregion
@@ -244,13 +263,6 @@ namespace GamesForClass
                         }
                     }
                 }
-            }
-            else
-            {
-                //checking for health
-                Checker testchecker = findCheckerAtCoordinates(x, y);
-
-                if (testchecker != null) { test.Text = testchecker.getHealth().ToString(); } else { test.Text = x.ToString() + y.ToString(); }
             }
             return option;
         }
@@ -410,10 +422,6 @@ namespace GamesForClass
                         button.BackColor = Color.Yellow;
                         return true;
                     }
-                    else
-                    {
-                        test.Text = "jump button not found";
-                    }
                 }
             }
             //normal move
@@ -423,10 +431,6 @@ namespace GamesForClass
                 if (button != null)
                 {
                     button.BackColor = Color.Yellow;
-                }
-                else
-                {
-                    test.Text = "Button not found";
                 }
             }
             return false;
@@ -512,10 +516,6 @@ namespace GamesForClass
             if (removeChecker != null)
             {
                 removeChecker.take();
-            }
-            else
-            {
-                test.Text = "Checker not found, error";
             }
         }
         #endregion
@@ -616,12 +616,18 @@ namespace GamesForClass
                 changeButtonEnable(true);
                 placePieces();
                 startReset.Text = "Reset";
+                autoPlayerMove.Visible = true;
+                feedback.Text = "You: 12\nCPU: 12";
             }
             else
             {
                 resetButtons();
                 changeButtonEnable(false);
                 startReset.Text = "Start";
+                winCondition.Text = "";
+                feedback.Text = "You:\nCPU:";
+                autoPlayerMove.Visible = false;
+                simulateButton.Visible = false;
             }
         }
         //When a button on the board is clicked, this function runs
@@ -651,7 +657,35 @@ namespace GamesForClass
                 makeMove(button);
             }
         }
+        //makes player move for them
+        private void autoPlayerMove_Click(object sender, EventArgs e)
+        {
+            player.makeMove(this);
+            CPU.makeMove(this);
+            updateBoard();
+        }
+        private void simulateButton_Click(object sender, EventArgs e)
+        {
+            int count = 0;
+            int max = 1000;
+            autoPlayerMove.Visible = false;
+            simulateButton.Visible = false;
+            //runs until win condition met, or meets max count
+            while (winCondition.Text == "" && count < max)
+            {
+                player.makeMove(this);
+                CPU.makeMove(this);
+                updateBoard();
+                count++;
+            }
+            if (count == max)
+            {
+                winCondition.Text = "Stalemate.";
+                changeButtonEnable(false);
+            }
+        }
         #endregion
+
     }
     /*
      * Class that represents a checker player
@@ -662,6 +696,7 @@ namespace GamesForClass
         private const int normalCheckerDirections = 2;
         private const int kingCheckerDirections = 4;
         private int dimention = 9;
+
         public CheckerPlayer()
         {
             checkers = new Checker[12];
@@ -684,6 +719,19 @@ namespace GamesForClass
             }
             return checker;
         }
+        //counts the number of checkers this player has left
+        public int countAliveCheckers()
+        {
+            int count = 0;
+            for (int i = 0; i < checkers.Length; i++)
+            {
+                if (checkers[i].isAlive())
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
         #region automatic movements
         //makes a movement automatically
         public void makeMove(Checkers instance)
@@ -692,7 +740,7 @@ namespace GamesForClass
             for (int i = 0; i < checkers.Length; i++)
             {
                 //makes sure the checker is playable
-                if (checkers[i].getHealth() > 0)
+                if (checkers[i].isAlive())
                 {
                     if (lookForDanger(checkers[i], instance))
                     {
@@ -722,7 +770,7 @@ namespace GamesForClass
             while (find)
             {
                 //looks to see if the player has a king to move
-                if (loopCounter < checkers.Length && checkers[index].getHealth() > 0)
+                if (loopCounter < checkers.Length && checkers[index].isAlive())
                 {
                     if (checkers[index].getText() == "K")
                     {
@@ -740,7 +788,7 @@ namespace GamesForClass
                         index = 0;
                     }
                     //move first piece that can move
-                    if (checkers[index].getHealth() > 0 && attemptMove(checkers[index], instance))
+                    if (checkers[index].isAlive() && attemptMove(checkers[index], instance))
                     {
                         return;
                     }
@@ -863,18 +911,18 @@ namespace GamesForClass
                         //checks to see if there is a checker already at this coordinate, preventing move
                         if (instance.findCheckerAtCoordinates(x, y) == null)
                         {
+                            //moves checker to this location
+                            int[] newLocation = {x, y};
+                            checker.setLocation(newLocation);
                             //looks to see if the checker needs to be kinged
                             if (checker.getColor() == Color.Black && y == 0)
                             {
                                 checker.makeKing();
                             }
-                            if (checker.getColor() == Color.White && y == dimention)
+                            if (checker.getColor() == Color.White && y == dimention - 2)
                             {
                                 checker.makeKing();
                             }
-                            //moves checker to this location
-                            int[] newLocation = {x, y};
-                            checker.setLocation(newLocation);
                             return true;
                         }
                     }
@@ -911,15 +959,6 @@ namespace GamesForClass
                         //checks to see if there is a checker already at this coordinate, preventing move
                         if (instance.findCheckerAtCoordinates(x, y) == null)
                         {
-                            //looks to see if the checker needs to be kinged
-                            if (checker.getColor() == Color.Black && y == 0)
-                            {
-                                checker.makeKing();
-                            }
-                            if (checker.getColor() == Color.White && y == dimention)
-                            {
-                                checker.makeKing();
-                            }
                             //moves checker to this location
                             int[] newLocation = { x, y };
                             checker.setLocation(newLocation);
@@ -993,18 +1032,18 @@ namespace GamesForClass
                             //checks if the space behind said checker is open, and in bounds
                             if (instance.checkBounds(openx, openy) && instance.findCheckerAtCoordinates(openx, openy) == null)
                             {
+                                //sets new location for button
+                                int[] newcoords = { openx, openy };
+                                checker.setLocation(newcoords);
                                 //checks if checker needs to be kinged
                                 if (checker.getColor() == Color.Black && y == 0)
                                 {
                                     checker.makeKing();
                                 }
-                                if (checker.getColor() == Color.White && y == dimention)
+                                if (checker.getColor() == Color.White && openy == dimention - 2)
                                 {
                                     checker.makeKing();
                                 }
-                                //sets new location for button
-                                int[] newcoords = { openx, openy };
-                                checker.setLocation(newcoords);
 
                                 //takes other player's checker
                                 checkChecker.take();
@@ -1058,15 +1097,6 @@ namespace GamesForClass
                             //checks if the space behind said checker is open, and in bounds
                             if (instance.checkBounds(openx, openy) && instance.findCheckerAtCoordinates(openx, openy) == null)
                             {
-                                //checks if checker needs to be kinged
-                                if (checker.getColor() == Color.Black && y == 0)
-                                {
-                                    checker.makeKing();
-                                }
-                                if (checker.getColor() == Color.White && y == dimention)
-                                {
-                                    checker.makeKing();
-                                }
                                 //sets new location for button
                                 int[] newcoords = { openx, openy };
                                 checker.setLocation(newcoords);
