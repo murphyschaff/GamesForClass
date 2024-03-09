@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Yahtzee));
             this.dice = new System.Windows.Forms.Label();
             this.dice1 = new System.Windows.Forms.Label();
             this.dice2 = new System.Windows.Forms.Label();
@@ -523,6 +524,7 @@
             this.Controls.Add(this.dice2);
             this.Controls.Add(this.dice1);
             this.Controls.Add(this.dice);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Yahtzee";
             this.Text = "GamesForClass: Yahtzee";

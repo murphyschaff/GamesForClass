@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Checkers));
             this.title = new System.Windows.Forms.Label();
             this.boardBackground = new System.Windows.Forms.Label();
             this.startReset = new System.Windows.Forms.Button();
@@ -146,6 +147,7 @@
             this.Controls.Add(this.startReset);
             this.Controls.Add(this.boardBackground);
             this.Controls.Add(this.title);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Checkers";
             this.Text = "GamesForClass: Checkers";
             this.ResumeLayout(false);

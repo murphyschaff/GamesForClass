@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Minesweeper));
             this.title = new System.Windows.Forms.Label();
             this.test = new System.Windows.Forms.Label();
             this.background = new System.Windows.Forms.Label();
@@ -187,6 +188,7 @@
             this.Controls.Add(this.test);
             this.Controls.Add(this.title);
             this.Controls.Add(this.background);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Minesweeper";
             this.Text = "GamesForClass: Minesweeper";
             this.ResumeLayout(false);

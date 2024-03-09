@@ -23,20 +23,21 @@ namespace GamesForClass
 {
     public partial class Battleship : Form
     {
-        BattleshipPlayer player = new BattleshipPlayer();
-        BattleshipPlayer CPU = new BattleshipPlayer();
+        BattleshipPlayer player;
+        BattleshipPlayer CPU;
         private int dimention = 9;
         private Button[,] cpuButtons;
         private Button[,] plrButtons;
         public Battleship()
         {
             InitializeComponent();
+            initBattleship();
             createButtons();
         }
         public void initBattleship()
         {
-            player = new BattleshipPlayer();
-            CPU = new BattleshipPlayer();
+            player = new BattleshipPlayer(normalRadio.Checked);
+            CPU = new BattleshipPlayer(true);
         }
         //adds buttons to board on initilization
         private void createButtons()
@@ -180,7 +181,14 @@ namespace GamesForClass
             {
                 if (numShips[0] > 0)
                 {
-                    playerFeedback.Text = "You have already placed the maximum number of Aircraft Carriers (1)";
+                    if (normalRadio.Checked)
+                    {
+                        playerFeedback.Text = "You have already placed the maximum number of Aircraft Carriers (1)";
+                    }
+                    else
+                    {
+                        playerFeedback.Text = "You cannot place Aircraft Carriers in this mode";
+                    }
                     return;
                 }
                 size = 4;
@@ -190,7 +198,14 @@ namespace GamesForClass
             {
                 if (numShips[1] > 1)
                 {
-                    playerFeedback.Text = "You have already placed the maximum number of Battleships (2)";
+                    if (normalRadio.Checked)
+                    {
+                        playerFeedback.Text = "You have already placed the maximum number of Battleships (2)";
+                    }
+                    else
+                    {
+                        playerFeedback.Text = "You cannot place Battleships in this mode";
+                    }
                     return;
                 }
                 size = 3;
@@ -200,7 +215,14 @@ namespace GamesForClass
             {
                 if (numShips[2] > 1)
                 {
-                    playerFeedback.Text = "You have already placed the maximum number of Destroyers (2)";
+                    if (normalRadio.Checked)
+                    {
+                        playerFeedback.Text = "You have already placed the maximum number of Destroyers (2)";
+                    }
+                    else
+                    {
+                        playerFeedback.Text = "You cannot place Destroyers in this mode";
+                    }
                     return;
                 }
                 size = 2;
@@ -540,7 +562,15 @@ namespace GamesForClass
             }
             int[] plrShips = player.getNumShips();
             int[] cpuShips = CPU.getNumShips();
-            userShipInfo.Text = "Aircraft Carriers: " + plrShips[0].ToString() + " Battleships: " + plrShips[1].ToString() + "\nDestroyers: " + plrShips[2].ToString() + " Submarines: " + plrShips[3].ToString();
+            //checks which mode this is
+            if (normalRadio.Checked == true)
+            {
+                userShipInfo.Text = "Aircraft Carriers: " + plrShips[0].ToString() + " Battleships: " + plrShips[1].ToString() + "\nDestroyers: " + plrShips[2].ToString() + " Submarines: " + plrShips[3].ToString();
+            }
+            else
+            {
+                userShipInfo.Text = "Aircraft Carriers: 0 Battleships: 0\nDestroyers: 0 Submarines: " + plrShips[3].ToString();
+            }
             cpuShipInfo.Text = "Aircraft Carriers: " + cpuShips[0].ToString() + " Battleships: " + cpuShips[1].ToString() + "\nDestroyers: " + cpuShips[2].ToString() + " Submarines: " + cpuShips[3].ToString();
         }
         //Places guess on board, tells player if it was a hit or not (Assumes valid coordinates)
@@ -606,9 +636,8 @@ namespace GamesForClass
             }
 
         }
-        /* BUTTON FUNCTIONS */
-        #region button functions
-        private void button4_Click(object sender, EventArgs e)
+        //resets game board
+        private void resetGame()
         {
             initBattleship();
             guessFeedback.Text = "";
@@ -616,13 +645,22 @@ namespace GamesForClass
             changeButtonEnable(plrButtons, true);
             changeButtonBackColor(plrButtons, Color.DeepSkyBlue);
             changeButtonBackColor(cpuButtons, Color.DeepSkyBlue);
+            startButton.Visible = false;
             autoPlaceShips.Visible = true;
             shipSelection.Visible = true;
+            userShipInfo.Text = "Aircraft Carriers: 0 Battleships: 0\nDestroyers: 0 Submarines: 0";
+            cpuShipInfo.Text = "Aircraft Carriers: 0 Battleships: 0\nDestroyers: 0 Submarines: 0";
+        }
+        /* BUTTON FUNCTIONS */
+        #region button functions
+        private void button4_Click(object sender, EventArgs e)
+        {
+            resetGame();
         }
         //automatically places player ships
         private void autoPlaceShips_Click(object sender, EventArgs e)
         {
-            player.placeShips();
+            player.placeShips(normalRadio.Checked);
             //clears all text on screen
             removeButtonText(plrButtons, cpuButtons);
             startButton.Visible = true;
@@ -637,9 +675,18 @@ namespace GamesForClass
             autoPlaceShips.Visible = false;
             startButton.Visible = false;
             playerFeedback.Text = "";
-            CPU.placeShips();
+            CPU.placeShips(true);
             changeButtonEnable(cpuButtons, true);
             changeButtonEnable(plrButtons, false);
+            //if the mode is submarine mode, set all other ships to 'sunk'
+            if (normalRadio.Checked == false)
+            {
+                int[] numShips = player.getNumShips();
+                numShips[0] = 0;
+                numShips[1] = 0;
+                numShips[2] = 0;
+                player.setNumShips(numShips);
+            }
             updateBoard(false);
         }
         #endregion
@@ -659,6 +706,10 @@ namespace GamesForClass
                 }
             }
         }
+        /* Mode Radio button changes */
+        private void normalRadio_CheckedChanged(object sender, EventArgs e) { if (normalRadio.Checked == true) { submarineRadio.Checked = false; } else { submarineRadio.Checked = true; } resetGame(); }
+
+        private void submarineRadio_CheckedChanged(object sender, EventArgs e) { if (submarineRadio.Checked == true) { normalRadio.Checked = false; } else {  normalRadio.Checked = true; } resetGame(); }
     }
     /* BattleshipPlayer class. Represents the players, holds board data */
     public class BattleshipPlayer
@@ -671,7 +722,7 @@ namespace GamesForClass
         private int[] numShips = { 0, 0, 0, 0 };
         private int sunkShips = 0;
         private int guessStatus = 0;
-        public BattleshipPlayer()
+        public BattleshipPlayer(bool normalMode)
         {
             Ship blankShip = new Ship(0, "None", "N");
             for (int i = 0; i < 9; i++)
@@ -681,6 +732,13 @@ namespace GamesForClass
                     board[i,j] = "";
                     fleet[i, j] = blankShip;
                 }
+            }
+            //if it is submarine mode, acts like all other ships are on board
+            if (!normalMode)
+            {
+                numShips[0] = 1;
+                numShips[1] = 2;
+                numShips[2] = 2;
             }
         }
         //Getters and setters
@@ -694,13 +752,25 @@ namespace GamesForClass
         public void setSunkShips(int sunkShips) { this.sunkShips = sunkShips; }
         /* AI places ships onto board */
         #region ship placement
-        public void placeShips()
+        //Mode: true, normal mode; false, single submarine mode
+        public void placeShips(bool mode)
         {
             int x = 0;
             int y = 0;
             int type;
             int count = 0;
             Random rnd = new Random();
+            //places single submarine for submarine only mode (player only)
+            if (!mode)
+            {
+                x = rnd.Next(0, 8);
+                y = rnd.Next(0, 8);
+                if (checkForShip(x, y, 1, 1))
+                {
+                    addShipNew(x, y, 1, 1);
+                }
+                return;
+            }
             //places ships onto board
             while (count < 6)
             {
@@ -1336,7 +1406,7 @@ namespace GamesForClass
                     break;
             }
             int[] ret = { 0, 0 };
-            if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+            if (x >= 0 && x < 9 && y >= 0 && y < 9)
             {
                 ret[0] = x;
                 ret[1] = y;
