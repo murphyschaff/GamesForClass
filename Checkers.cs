@@ -767,6 +767,7 @@ namespace GamesForClass
             bool find = true;
             int loopCounter = 0;
             int index = 0;
+            Random rnd = new Random();
             while (find)
             {
                 //looks to see if the player has a king to move
@@ -783,16 +784,12 @@ namespace GamesForClass
                 }
                 else
                 {
-                    if (index >= checkers.Length)
-                    {
-                        index = 0;
-                    }
-                    //move first piece that can move
+                    //randomizes which piece is moved
+                    index = rnd.Next(0, 12);
                     if (checkers[index].isAlive() && attemptMove(checkers[index], instance))
                     {
                         return;
                     }
-                    index++;
                 }
                 loopCounter++;
                 //stops infinite loop, SHOULD NOT HIT

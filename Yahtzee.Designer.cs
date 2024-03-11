@@ -72,7 +72,7 @@
             this.dice.BackColor = System.Drawing.Color.DarkGray;
             this.dice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice.Location = new System.Drawing.Point(352, 144);
+            this.dice.Location = new System.Drawing.Point(360, 137);
             this.dice.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.dice.MinimumSize = new System.Drawing.Size(76, 82);
             this.dice.Name = "dice";
@@ -89,7 +89,7 @@
             this.dice1.BackColor = System.Drawing.Color.DarkGray;
             this.dice1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice1.Location = new System.Drawing.Point(440, 144);
+            this.dice1.Location = new System.Drawing.Point(448, 137);
             this.dice1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.dice1.MinimumSize = new System.Drawing.Size(76, 82);
             this.dice1.Name = "dice1";
@@ -106,7 +106,7 @@
             this.dice2.BackColor = System.Drawing.Color.DarkGray;
             this.dice2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice2.Location = new System.Drawing.Point(527, 144);
+            this.dice2.Location = new System.Drawing.Point(535, 137);
             this.dice2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.dice2.MinimumSize = new System.Drawing.Size(76, 82);
             this.dice2.Name = "dice2";
@@ -123,7 +123,7 @@
             this.dice3.BackColor = System.Drawing.Color.DarkGray;
             this.dice3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice3.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice3.Location = new System.Drawing.Point(397, 243);
+            this.dice3.Location = new System.Drawing.Point(405, 236);
             this.dice3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.dice3.MinimumSize = new System.Drawing.Size(76, 82);
             this.dice3.Name = "dice3";
@@ -140,7 +140,7 @@
             this.dice4.BackColor = System.Drawing.Color.DarkGray;
             this.dice4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dice4.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dice4.Location = new System.Drawing.Point(487, 243);
+            this.dice4.Location = new System.Drawing.Point(495, 236);
             this.dice4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.dice4.MinimumSize = new System.Drawing.Size(76, 82);
             this.dice4.Name = "dice4";
@@ -152,7 +152,7 @@
             // 
             // rollButton
             // 
-            this.rollButton.Location = new System.Drawing.Point(412, 359);
+            this.rollButton.Location = new System.Drawing.Point(420, 352);
             this.rollButton.Margin = new System.Windows.Forms.Padding(2);
             this.rollButton.Name = "rollButton";
             this.rollButton.Size = new System.Drawing.Size(137, 51);
@@ -399,7 +399,7 @@
             // 
             this.winLabel.AutoSize = true;
             this.winLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.winLabel.Location = new System.Drawing.Point(428, 429);
+            this.winLabel.Location = new System.Drawing.Point(436, 422);
             this.winLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.winLabel.Name = "winLabel";
             this.winLabel.Size = new System.Drawing.Size(0, 29);

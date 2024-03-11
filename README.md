@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 0.7: Checkers Release
+## Version 1.0
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v0_7
+Release Executable is located under Releases, GamesForClass_v1_0
 
 # Game Instructions
 ## Tic Tac Toe
@@ -34,7 +34,25 @@ To start a game of minesweeper, select your difficulty on the bottom left. Click
 
 To start a game of checkers, select the start button. You play as the black checkers, and make the first move. Clicking on a checker will highlight all possible moves for that checker. Clicking on a highlighted space will move the checker to that position. If you take a checker, this checker will be removed from the board. If the CPU takes your checker, it will also be removed from the board. The number of checkers remaining on the board for each player is shown on the right side of the checker board. Clicking "Make Move for Me" will automatically move one of your pieces for you based on the CPU's algorithm. Clicking "Reset" will reset the game board at any time.
 
+# Disclosure
+I do not claim to own the IP to any of the games represented in this program. The MIT License only applies to the code implementation, not the IP of any game. Please check out original IP holders for sanctioned versions of each game.
+
+Executable icon from Icons8: https://icons8.com/icon/59791/game-controller
+
 # Release Notes
+## Release v1.0
++ Features/Updates
+    + General
+        + Added icon to each window
+        + Minor visual updates to each game
+    + Checkers
+        + Added more ranomization to CPU movement algorithm
+    + Battleship
+        + Added 'Single Submarine' mode
++ Bug Fixes
+    + Battleship
+        + Fixed 'out-of-bounds' error when CPU guessing ship on edge of board
+
 ## Release v0.7: Checkers Release
 + Features
     + Checkers

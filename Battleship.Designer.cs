@@ -96,7 +96,7 @@
             // 
             this.playerFeedback.AutoSize = true;
             this.playerFeedback.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playerFeedback.Location = new System.Drawing.Point(634, 581);
+            this.playerFeedback.Location = new System.Drawing.Point(598, 581);
             this.playerFeedback.Name = "playerFeedback";
             this.playerFeedback.Size = new System.Drawing.Size(0, 16);
             this.playerFeedback.TabIndex = 10;

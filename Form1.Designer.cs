@@ -37,6 +37,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.minesweeper = new System.Windows.Forms.Button();
             this.checkersButton = new System.Windows.Forms.Button();
+            this.loadingLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -125,11 +126,21 @@
             this.checkersButton.UseVisualStyleBackColor = true;
             this.checkersButton.Click += new System.EventHandler(this.checkersButton_Click);
             // 
+            // loadingLabel
+            // 
+            this.loadingLabel.AutoSize = true;
+            this.loadingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loadingLabel.Location = new System.Drawing.Point(332, 249);
+            this.loadingLabel.Name = "loadingLabel";
+            this.loadingLabel.Size = new System.Drawing.Size(0, 25);
+            this.loadingLabel.TabIndex = 8;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.loadingLabel);
             this.Controls.Add(this.checkersButton);
             this.Controls.Add(this.minesweeper);
             this.Controls.Add(this.button4);
@@ -156,6 +167,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button minesweeper;
         private System.Windows.Forms.Button checkersButton;
+        private System.Windows.Forms.Label loadingLabel;
     }
 }
 
