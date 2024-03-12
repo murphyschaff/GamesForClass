@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 1.0
+## Version 1.0.1
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v1_0
+Release Executable is located under Releases, GamesForClass_v1_0_1
 
 # Game Instructions
 ## Tic Tac Toe
@@ -40,6 +40,12 @@ I do not claim to own the IP to any of the games represented in this program. Th
 Executable icon from Icons8: https://icons8.com/icon/59791/game-controller
 
 # Release Notes
+## Release v1.0.1
++ Bug Fixes
+    + Battleship
+        + Fixed out of bounds error (again)
+        + Fixed "Auto Place Ships" placing too many ships if user placed a ship themselves.
+
 ## Release v1.0
 + Features/Updates
     + General
