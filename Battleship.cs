@@ -279,6 +279,7 @@ namespace GamesForClass
                         changeButtonSurround(button, xVal, yVal, size, true);
                     }
                     //ship is to be placed
+                    autoPlaceShips.Visible = false;
                     player.addShipNew(xVal, yVal, size, direction);
                     updateBoard(true);
                 }
@@ -660,14 +661,23 @@ namespace GamesForClass
         //automatically places player ships
         private void autoPlaceShips_Click(object sender, EventArgs e)
         {
-            player.placeShips(normalRadio.Checked);
-            //clears all text on screen
-            removeButtonText(plrButtons, cpuButtons);
-            startButton.Visible = true;
-            autoPlaceShips.Visible = false;
-            shipSelection.Visible = false;
-            updateBoard(true);
-            changeButtonEnable(plrButtons, false);
+            int[] numShips = player.getNumShips();
+            if (numShips[0] >0 || numShips[1] > 0 || numShips[2] > 0 || numShips[3] > 0)
+            {
+                playerFeedback.Text = "You have already placed some ships. Please place rest or reset";
+                autoPlaceShips.Visible = false;
+            }
+            else
+            {
+                player.placeShips(normalRadio.Checked);
+                //clears all text on screen
+                removeButtonText(plrButtons, cpuButtons);
+                startButton.Visible = true;
+                autoPlaceShips.Visible = false;
+                shipSelection.Visible = false;
+                updateBoard(true);
+                changeButtonEnable(plrButtons, false);
+            }
         }
         //places CPU ships, starts game
         private void startButton_Click(object sender, EventArgs e)
@@ -1461,7 +1471,7 @@ namespace GamesForClass
                         break;
                 }
                 //makes sure the guess is in bounds
-                if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+                if (x >= 0 && x < 9 && y >= 0 && y < 9)
                 {
                     //means that the spot was not already used
                     if (usrBoard[x, y] != "H" && usrBoard[x,y] != "O")
