@@ -71,5 +71,40 @@ namespace GamesForClass
             checkers.Show();
             loadingLabel.Text = "";
         }
+        /* Super Tic-Tac-Toe */
+        private void STTTbutton_Click(object sender, EventArgs e)
+        {
+
+        }
+        /* Random button */
+        private void supriseButton_Click(object sender, EventArgs e)
+        {
+            Random rnd = new Random();
+            int val = rnd.Next(0,6);
+            switch(val)
+            {
+                case 0:
+                    button1_Click(sender, e);
+                    break;
+                case 1:
+                    button2_Click(sender, e);
+                    break;
+                case 2:
+                    button3_Click(sender, e);
+                    break;
+                case 3:
+                    button4_Click(sender, e);
+                    break;
+                case 4:
+                    minesweeper_Click(sender, e);
+                    break;
+                case 5:
+                    checkersButton_Click(sender, e);
+                    break;
+                case 6:
+                    STTTbutton_Click(sender, e);
+                    break;
+            }
+        }
     }
 }
