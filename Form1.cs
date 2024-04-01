@@ -19,6 +19,7 @@ namespace GamesForClass
         private Yahtzee yahtzee;
         private Minesweeper masweeper;
         private Checkers checkers;
+        private STTT sttt;
         public Form1()
         {
             InitializeComponent();
@@ -74,7 +75,10 @@ namespace GamesForClass
         /* Super Tic-Tac-Toe */
         private void STTTbutton_Click(object sender, EventArgs e)
         {
-
+            loadingLabel.Text = "Loading...";
+            sttt = new STTT();
+            sttt.Show();
+            loadingLabel.Text = "";
         }
         /* Random button */
         private void supriseButton_Click(object sender, EventArgs e)

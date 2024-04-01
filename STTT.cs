@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,15 +13,61 @@ namespace GamesForClass
 {
     public partial class STTT : Form
     {
-        TTTGame[] smallGames;
-        String[] mainGame;
+        TTTGame[] smallGames = new TTTGame[9];
+        String[] mainGame = new string[9];
+        private int buttonSize = 50;
+        private int buffer = 5;
         public STTT()
         {
             InitializeComponent();
+            generate();
         }
         //generates STTT board on form
         #region generate functions
         public void generate()
+        {
+            int startX = 190;
+            int startY = 90;
+            int counter = 0;
+            int arraySize = (buttonSize * 3) + (buffer * 2);
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    TTTGame newGame = new TTTGame(generateSmallBoard(startX + (i * arraySize), startY + (j * arraySize)));
+                    smallGames[counter] = newGame;
+                    counter++;
+                }
+            }
+
+        }
+        private Button[] generateSmallBoard(int startX, int startY)
+        {
+            int counter = 0;
+            Button[] buttons = new Button[9];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    Button button = new Button();
+                    button.Name = i.ToString() + "-" + j.ToString();
+                    button.Size = new Size(buttonSize, buttonSize);
+                    button.Location = new Point(startX + buffer + (buttonSize * i), startY + buffer + (buttonSize * j));
+                    button.Font = new Font("Microsoft Sans Sarif", 20);
+                    buttons[counter] = button;
+                    this.Controls.Add(button);
+                    counter++;
+                }
+            }
+
+            return buttons;
+        }
+        #endregion
+
+        #region buttons
+        /* Button Clicks */
+        private void resetButton_Click(object sender, EventArgs e)
         {
 
         }
@@ -32,47 +79,47 @@ namespace GamesForClass
     public class TTTGame
     {
         private String winner = "";
-        private String[] board;
+        private Button[] board;
 
-        public TTTGame()
+        public TTTGame(Button[] board)
         {
-            board = new String[6];
+            this.board = board;
         }
         //getters
         public String getWinner() { return winner; }
-        public String[] getBoard() { return board;}
+        public Button[] getBoard() { return board;}
 
         //Changes board, only if winner is not yet decided
         public void changeBoard(int index, String usr)
         {
             if (winner == "")
             {
-                board[index] = usr;
+                board[index].Text = usr;
                 checkWinner();
             }
         }
         //checks for small board winner, changes winner variable if a player has won the game
         private void checkWinner()
         {
-            if (board[0] == board[1] && board[1] == board[2] && board[2] != null)
+            if (board[0].Text == board[1].Text && board[1].Text == board[2].Text && board[2].Text != "")
             {
-                winner = board[0];
+                winner = board[0].Text;
             }
-            else if (board[3] == board[4] && board[4] == board[5] && board[5] != null)
+            else if (board[3].Text == board[4].Text && board[4].Text == board[5].Text && board[5].Text != "")
             {
-                winner = board[3];
+                winner = board[3].Text;
             }
-            else if (board[6] == board[7] && board[7] == board[8] && board[8] != null)
+            else if (board[6].Text == board[7].Text && board[7].Text == board[8].Text && board[8].Text != "")
             {
-                winner = board[5];
+                winner = board[5].Text;
             }
-            else if (board[0] == board[4] && board[4] == board[8] && board[8] != null)
+            else if (board[0].Text == board[4].Text && board[4].Text == board[8].Text && board[8].Text != "")
             {
-                winner = board[7];
+                winner = board[7].Text;
             }
-            else if (board[2] == board[4] && board[4] == board[6] && board[6] != null)
+            else if (board[2].Text == board[4].Text && board[4].Text == board[6].Text && board[6].Text != "")
             {
-                winner = board[5];
+                winner = board[5].Text;
             } 
         }
     }
