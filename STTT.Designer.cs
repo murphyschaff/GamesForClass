@@ -32,6 +32,7 @@
             this.title = new System.Windows.Forms.Label();
             this.testButton = new System.Windows.Forms.Button();
             this.resetButton = new System.Windows.Forms.Button();
+            this.feedback = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // title
@@ -66,11 +67,21 @@
             this.resetButton.UseVisualStyleBackColor = true;
             this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
+            // feedback
+            // 
+            this.feedback.AutoSize = true;
+            this.feedback.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.feedback.Location = new System.Drawing.Point(274, 576);
+            this.feedback.Name = "feedback";
+            this.feedback.Size = new System.Drawing.Size(0, 25);
+            this.feedback.TabIndex = 55;
+            // 
             // STTT
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(881, 621);
+            this.Controls.Add(this.feedback);
             this.Controls.Add(this.resetButton);
             this.Controls.Add(this.testButton);
             this.Controls.Add(this.title);
@@ -88,5 +99,6 @@
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.Button testButton;
         private System.Windows.Forms.Button resetButton;
+        private System.Windows.Forms.Label feedback;
     }
 }
