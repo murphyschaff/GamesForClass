@@ -55,6 +55,7 @@
             this.testButton.TabIndex = 52;
             this.testButton.Text = "T";
             this.testButton.UseVisualStyleBackColor = true;
+            this.testButton.Visible = false;
             // 
             // resetButton
             // 
@@ -71,7 +72,7 @@
             // 
             this.feedback.AutoSize = true;
             this.feedback.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.feedback.Location = new System.Drawing.Point(274, 576);
+            this.feedback.Location = new System.Drawing.Point(328, 575);
             this.feedback.Name = "feedback";
             this.feedback.Size = new System.Drawing.Size(0, 25);
             this.feedback.TabIndex = 55;

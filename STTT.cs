@@ -238,7 +238,9 @@ namespace GamesForClass
                 else
                 {
                     //makes move on any board if they are all open
-                    retIndex = CPU.makeOpenMove(smallGames);
+                    int[] ret = CPU.makeOpenMove(smallGames);
+                    newIndex = ret[0];
+                    retIndex = ret[1];
                     changeAllButtonEnables(false, retIndex);
                     openMove = 1;
                 }
@@ -292,7 +294,15 @@ namespace GamesForClass
         /* Button Clicks */
         private void resetButton_Click(object sender, EventArgs e)
         {
-
+            openMove = 0;
+            feedback.Text = "";
+            changeAllButtonEnables(true, -1);
+            for (int i = 0; i < smallGames.Length; i++)
+            {
+                mainGame[i].Text = "";
+                mainGame[i].SendToBack();
+                smallGames[i].reset();
+            }
         }
         #endregion
     }
@@ -352,11 +362,11 @@ namespace GamesForClass
             }
             else if (board[8].Text != "" && board[0].Text == board[4].Text && board[4].Text == board[8].Text)
             {
-                winner = board[7].Text;
+                winner = board[0].Text;
             }
             else if (board[6].Text != "" && board[2].Text == board[4].Text && board[4].Text == board[6].Text)
             {
-                winner = board[5].Text;
+                winner = board[2].Text;
             }
             else
             {
@@ -470,16 +480,35 @@ namespace GamesForClass
                 board[i].Enabled = enable;
             }
         }
+        //resets all button text, and winner value
+        public void reset()
+        {
+            winner = "";
+            for (int i = 0; i < board.Length; i++)
+            {
+                board[i].Text = "";
+                
+            }
+        }
     }
     /*
      * Represents the AI playing against player
      */
     public class STTTAI
     {
-        String letter = "O";
+        String letter;
+        String otherLetter;
         public STTTAI(string letter)
         {
             this.letter = letter;
+            if (letter == "O")
+            {
+                otherLetter = "X";
+            } 
+            else
+            {
+                otherLetter = "O";
+            }
         }
 
         //makes move for AI
@@ -499,22 +528,10 @@ namespace GamesForClass
                 if (ret == -1)
                 {
                     //try to make move that does not allow player to make easy win in their next move
-                    ret = intelligentMove(largeBoard, currentGame, "X");
+                    ret = intelligentMove(largeBoard, currentGame, otherLetter);
                     if (ret == -1)
                     {
-                        //move must then be 'random'
-                        int[] attemptIndex = { 8, 6, 0, 2, 4, 1, 3, 5, 7 };
-                        attemptIndex = shuffle(attemptIndex);
-                        for (int i = 0; i < attemptIndex.Length; i++)
-                        {
-                            //makes move at index if it is available, and it would not give other player easy move
-                            if (currentGame.getText(attemptIndex[i]) == "")
-                            {
-                                currentGame.changeBoard(attemptIndex[i], letter);
-                                ret = attemptIndex[i];
-                                break;
-                            }
-                        }
+                        ret = randomMove(currentGame);
                     }
                 }
             }
@@ -553,6 +570,23 @@ namespace GamesForClass
             //no easy, intelligent move found
             return -1;
         }
+        //makes a 'random' move
+        private int randomMove(TTTGame currentGame)
+        {
+            //move must then be 'random'
+            int ret = 0;
+            int[] attemptIndex = { 8, 6, 0, 2, 4, 1, 3, 5, 7 };
+            attemptIndex = shuffle(attemptIndex);
+            for (int i = 0; i < attemptIndex.Length; i++)
+            {
+                if (currentGame.getText(attemptIndex[i]) == "")
+                {
+                    currentGame.changeBoard(attemptIndex[i], letter);
+                    ret = attemptIndex[i];
+                }
+            }
+            return ret;
+        }
         //randomly shuffles array contents
         private int[] shuffle(int[] arr)
         {
@@ -575,11 +609,67 @@ namespace GamesForClass
             return arr;
         }
         //makes a move, if the movement is open to all not finished boards
-        public int makeOpenMove(TTTGame[] games)
+        //returns: 0: index of game played in, 1: index of next game
+        public int[] makeOpenMove(TTTGame[] games)
         {
+            int closeWin = -1;
+            int[] ret = { -1, -1 };
+            int[] attemptIndex = { 8, 6, 0, 2, 4, 1, 3, 5, 7 };
             //look to win for a given game
+            for (int i = 0; i < games.Length; i++)
+            {
+                //only looks at games that were won
+                if (games[i].getWinner() == "")
+                {
+                    closeWin = games[i].checkCloseWin(letter);
+                    if (closeWin != -1)
+                    {
+                        games[i].changeBoard(closeWin, letter);
+                        ret[0] = i;
+                        ret[1] = closeWin;
+                        return ret;
+                    }
+                }
+            }
             //look to block for a given game
+            for (int i = 0; i < games.Length; i++)
+            {
+                if (games[i].getWinner() == "")
+                {
+                    closeWin = games[i].checkCloseWin(otherLetter);
+                    if (closeWin != -1)
+                    {
+                        games[i].changeBoard(closeWin, letter);
+                        ret[0] = i;
+                        ret[1] = closeWin;
+                        return ret;
+                    }
+                }
+            }
             //make random move otherwise
+            //intelligent choice made first, if fails makes random move
+            for (int i = 0; i < attemptIndex.Length; i++)
+            {
+                if (games[attemptIndex[i]].getWinner() == "")
+                {
+                    closeWin = intelligentMove(games, games[attemptIndex[i]], otherLetter);
+                    if (closeWin == -1)
+                    {
+                        closeWin = randomMove(games[attemptIndex[i]]);
+                        ret[0] = i;
+                        ret[1] = closeWin;
+                        return ret;
+                    }
+                    else
+                    {
+                        ret[0] = i;
+                        ret[1] = closeWin;
+                        return ret;
+                    }
+                }
+            }
+            //should not reach here
+            return ret;
         }
         #endregion
     }
