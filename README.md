@@ -33,6 +33,8 @@ To start a game of minesweeper, select your difficulty on the bottom left. Click
 ![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/b5e82724-f512-40e4-8a90-05543804fd9a)
 
 To start a game of checkers, select the start button. You play as the black checkers, and make the first move. Clicking on a checker will highlight all possible moves for that checker. Clicking on a highlighted space will move the checker to that position. If you take a checker, this checker will be removed from the board. If the CPU takes your checker, it will also be removed from the board. The number of checkers remaining on the board for each player is shown on the right side of the checker board. Clicking "Make Move for Me" will automatically move one of your pieces for you based on the CPU's algorithm. Clicking "Reset" will reset the game board at any time.
+## Super Tic-Tac-Toe
+![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/df32dfc8-2f35-43cc-998c-b7d0a30272df)
 
 # Disclosure
 I do not claim to own the IP to any of the games represented in this program. The MIT License only applies to the code implementation, not the IP of any game. Please check out original IP holders for sanctioned versions of each game.
