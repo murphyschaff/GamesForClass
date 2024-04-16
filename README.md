@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 1.0.1
+## Version 1.1: Super Tic-Tac-Toe Release
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v1_0_1
+Release Executable is located under Releases, GamesForClass_v1_1
 
 # Game Instructions
 ## Tic Tac Toe
@@ -36,12 +36,22 @@ To start a game of checkers, select the start button. You play as the black chec
 ## Super Tic-Tac-Toe
 ![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/df32dfc8-2f35-43cc-998c-b7d0a30272df)
 
+Super Tic-Tac-Toe (also known as Ultimate Tic-Tac-Toe) consists of one large Tic-Tac-Toe game, however in each square of the large game exists one smaller game of Tic-Tac-Toe. To claim a square in the large game, you must win the small game in that square. Selecting a space in a small game dictates which game the next player must play in (ex. choosing the top right square forces the next player to play in the top right game). If a square is chosen in which the game in that section is complete, the next player can choose any small game to play in. To reset the game at any time, click the 'Reset' button.
+
 # Disclosure
 I do not claim to own the IP to any of the games represented in this program. The MIT License only applies to the code implementation, not the IP of any game. Please check out original IP holders for sanctioned versions of each game.
 
 Executable icon from Icons8: https://icons8.com/icon/59791/game-controller
 
 # Release Notes
+## Release v1.1: Super Tic-Tac-Toe Release
++ Features
+    + Super-Tic-Tac-Toe
+        + Added game functionality
+        + Added opponent logic functions
+    + Added 'Suprise Me!' button
+        + Clicking this button opens a random game
+
 ## Release v1.0.1
 + Bug Fixes
     + Battleship

@@ -60,7 +60,7 @@ namespace GamesForClass
             {
                 mainGame[i].SendToBack();
             }
-
+            background.SendToBack();
         }
         private Button[] generateSmallBoard(int startX, int startY, int name)
         {
@@ -140,6 +140,7 @@ namespace GamesForClass
                 if (!open)
                 {
                     winner = "T";
+                    feedback.Text = "Tie!";
                 }
             }
 
@@ -259,13 +260,27 @@ namespace GamesForClass
                 else
                 {
                     //game is over
-                    endGame("CPU is");
+                    if (feedback.Text != "Tie!")
+                    {
+                        endGame("CPU is");
+                    }
+                    else
+                    {
+                        changeAllButtonEnables(false, -1);
+                    }
                 }
             }
             else
             {
                 //game is over
-                endGame("You are");
+                if (feedback.Text != "Tie!")
+                {
+                    endGame("You are");
+                } 
+                else
+                {
+                    changeAllButtonEnables(false, -1);
+                }
             }
         }
         //changes the enablement of all buttons on board. ignores index passed
