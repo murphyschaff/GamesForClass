@@ -27,14 +27,19 @@ namespace GamesForClass
         /* creates the initial decks for the game */
         public void initWar()
         {
-            int[] initDeck = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-            bool run = true;
+            List<int> initDeck = new List<int>();
             int count = 0;
-            //runs untill the cards are given out
-            while (run)
+            Random choice = new Random();
+            //creates the initial list
+            for (int i = 0; i < 52;  i++)
             {
-                Random choice = new Random();
-                int val = choice.Next(0,52);
+                initDeck.Add((i % 13) + 1);
+            }
+
+            //runs untill the cards are given out
+            while (initDeck.Count > 0)
+            {
+                int val = choice.Next(0, initDeck.Count);
                 //if the random value chose one that has not been chosen yet
                 if (initDeck[val] != 0)
                 {
@@ -51,10 +56,7 @@ namespace GamesForClass
                         initDeck[val] = 0;
                         count++;
                     }
-                }
-                if (count >= initDeck.Length)
-                {
-                    run = false;
+                    initDeck.RemoveAt(val);
                 }
             }
             label3.Text = "";
