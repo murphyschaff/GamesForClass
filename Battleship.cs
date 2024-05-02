@@ -1298,8 +1298,8 @@ namespace GamesForClass
                                 newCoords = getCoords(guesses[2], x, y);
                                 if (newCoords[0] != -1)
                                 {
-                                    guesses[3] = newCoords[1];
-                                    guesses[4] += newCoords[2];                                     
+                                    guesses[3] = newCoords[0];
+                                    guesses[4] += newCoords[1];                                     
                                 }
                                 else
                                 {
@@ -1358,8 +1358,8 @@ namespace GamesForClass
                                     newCoords = getCoords(guesses[2], x, y);
                                     if (newCoords[0] != -1)
                                     {
-                                        guesses[3] = newCoords[1];
-                                        guesses[4] += newCoords[2];
+                                        guesses[3] = newCoords[0];
+                                        guesses[4] += newCoords[1];
                                     }
                                     else
                                     {
