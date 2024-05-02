@@ -19,6 +19,8 @@ namespace GamesForClass
         Queue<int> CPUDownCards = new Queue<int>();
         bool complete = false;
         bool tie = false;
+        bool plrallIn = false;
+        bool cpuallin = false;
         public War()
         {
             InitializeComponent();
@@ -138,21 +140,21 @@ namespace GamesForClass
                 {
                     tie = true;
                     //places down 3 cards on top of the other card, draws again
-                    playerDownCards.Enqueue(playerCard);
                     int i = 0;
                     while (playerDeck.Count > 1 && i < 3)
                     {
                         playerDownCards.Enqueue(playerDeck.Dequeue());
                         i++;
                     }
+                    playerDownCards.Enqueue(playerCard);
 
-                    CPUDownCards.Enqueue(CPUCard);
                     i = 0;
                     while (CPUDeck.Count > 1 && i < 3)
                     {
                         CPUDownCards.Enqueue(CPUDeck.Dequeue());
                         i++;
                     }
+                    CPUDownCards.Enqueue(CPUCard);
                     //adds the graphics for the tie
                     label3.Text = "Round Tie!";
                     label10.Visible = true;
@@ -175,14 +177,161 @@ namespace GamesForClass
         {
             if (playerDeck.Count == 0)
             {
-                label3.Text = "CPU is the winner.";
-                complete = true;
+                if (tie)
+                {
+                    plrallIn = true;
+                }
+                else
+                {
+                    label3.Text = "CPU is the winner.";
+                    button1.Enabled = false;
+                    complete = true;
+                }
             }
             else if (CPUDeck.Count == 0)
             {
-                label3.Text = "You are the winner!!!!";
-                complete = true;
+                if (tie)
+                {
+                    cpuallin = true;
+                }
+                else
+                {
+                    label3.Text = "You are the winner!!!!";
+                    button1.Enabled = false;
+                    complete = true;
+                }
             }
+        }
+        /* simulates when a player is 'all in' */
+        private void allIn()
+        {
+            int playerCard, CPUcard;
+            //when the player is all in
+            if (plrallIn)
+            {
+                playerCard = playerDownCards.Dequeue();
+                CPUcard = CPUDeck.Dequeue();
+                label1.Text = Convert.ToString(CPUcard);
+                label2.Text = Convert.ToString(playerCard);
+                //player wins
+                if (playerCard > CPUcard)
+                {
+                    tie = false;
+                    //adds all cards on the table to the players deck
+                    while (playerDownCards.Count > 0)
+                    {
+                        playerDeck.Enqueue(playerDownCards.Dequeue());
+                    }
+                    while (CPUDownCards.Count > 0)
+                    {
+                        playerDeck.Enqueue(CPUDownCards.Dequeue());
+                    }
+                    //removes tie labels
+                    label17.Visible = false;
+                    label16.Visible = false;
+                    label15.Visible = false;
+                    label14.Visible = false;
+                    label13.Visible = false;
+                    label12.Visible = false;
+                    label11.Visible = false;
+                    label10.Visible = false;
+                    playerDeck.Enqueue(playerCard);
+                    playerDeck.Enqueue(CPUcard);
+                    label3.Text = "You Win the round!";
+                    plrallIn = false;
+                }
+                //CPU wins, and thus wins the whole match
+                else if (playerCard < CPUcard)
+                {
+                    tie = false;
+                    //adds all cards on the ground to CPU deck
+                    while (CPUDownCards.Count > 0)
+                    {
+                        CPUDeck.Enqueue(CPUDownCards.Dequeue());
+                    }
+                    while (playerDownCards.Count > 0)
+                    {
+                        CPUDeck.Enqueue(playerDownCards.Dequeue());
+                    }
+                    //removes tie lables
+                    label17.Visible = false;
+                    label16.Visible = false;
+                    label15.Visible = false;
+                    label14.Visible = false;
+                    label13.Visible = false;
+                    label12.Visible = false;
+                    label11.Visible = false;
+                    label10.Visible = false; 
+                    CPUDeck.Enqueue(CPUcard);
+                    CPUDeck.Enqueue(playerCard);
+                    label3.Text = "CPU Wins the Round";
+                    plrallIn = false;
+                }
+            }
+            //CPU is all in
+            else
+            {
+                playerCard = playerDeck.Dequeue();
+                CPUcard = CPUDownCards.Dequeue();
+                label1.Text = Convert.ToString(CPUcard);
+                label2.Text = Convert.ToString(playerCard);
+                //player wins, and thus wins whole game
+                if (playerCard > CPUcard)
+                {
+                    tie = false;
+                    //adds all cards on the table to the players deck
+                    while (playerDownCards.Count > 0)
+                    {
+                        playerDeck.Enqueue(playerDownCards.Dequeue());
+                    }
+                    while (CPUDownCards.Count > 0)
+                    {
+                        playerDeck.Enqueue(CPUDownCards.Dequeue());
+                    }
+                    //removes tie labels
+                    label17.Visible = false;
+                    label16.Visible = false;
+                    label15.Visible = false;
+                    label14.Visible = false;
+                    label13.Visible = false;
+                    label12.Visible = false;
+                    label11.Visible = false;
+                    label10.Visible = false;
+                    playerDeck.Enqueue(playerCard);
+                    playerDeck.Enqueue(CPUcard);
+                    label3.Text = "You Win the round!";
+                    cpuallin = false;
+                }
+                //CPU wins
+                else if (playerCard < CPUcard)
+                {
+                    tie = false;
+                    //adds all cards on the ground to CPU deck
+                    while (CPUDownCards.Count > 0)
+                    {
+                        CPUDeck.Enqueue(CPUDownCards.Dequeue());
+                    }
+                    while (playerDownCards.Count > 0)
+                    {
+                        CPUDeck.Enqueue(playerDownCards.Dequeue());
+                    }
+                    //removes tie lables
+                    label17.Visible = false;
+                    label16.Visible = false;
+                    label15.Visible = false;
+                    label14.Visible = false;
+                    label13.Visible = false;
+                    label12.Visible = false;
+                    label11.Visible = false;
+                    label10.Visible = false;
+                    CPUDeck.Enqueue(CPUcard);
+                    CPUDeck.Enqueue(playerCard);
+                    label3.Text = "CPU Wins the Round";
+                    cpuallin = false;
+                }
+            }
+            label4.Text = Convert.ToString(CPUDeck.Count);
+            label5.Text = Convert.ToString(playerDeck.Count);
         }
         /* Simulates the game of war until there is a winner */
         private void simulate()
@@ -193,7 +342,14 @@ namespace GamesForClass
             label25.Visible = true;
             while (!complete)
             {
-                play();
+                if (cpuallin || plrallIn)
+                {
+                    allIn();
+                }
+                else
+                {
+                    play();
+                }
                 checkWinner();
                 label25.Text = Convert.ToString(counter);
                 counter++;
@@ -202,7 +358,14 @@ namespace GamesForClass
         /* Play button */
         private void button1_Click(object sender, EventArgs e)
         {
-            play();
+            if (cpuallin || plrallIn)
+            {
+                allIn();
+            }
+            else
+            {
+                play();
+            }
             checkWinner();
         }
         /* New Game button */
@@ -228,12 +391,15 @@ namespace GamesForClass
             label11.Visible = false;
             label10.Visible = false;
             complete = false;
+            button1.Enabled = true;
+            button3.Enabled = true;
             initWar();
         }
         /* Simulate button */
         private void button3_Click(object sender, EventArgs e)
         {
             simulate();
+            button3.Enabled = false;
         }
     }
 }

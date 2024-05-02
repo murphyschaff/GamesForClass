@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 1.1: Super Tic-Tac-Toe Release
+## Version 1.2
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v1_1
+Release Executable is located under Releases, GamesForClass_v1_2
 
 # Game Instructions
 ## Tic Tac Toe
@@ -16,7 +16,6 @@ Once the game is complete, the score will be tallied on the right side. Select "
 
 On the left side of the screen are the player's and computer's decks of cards. The number represents how many cards are currently in each deck. To play a round, click "Play!". The player with the higher card wins the round, along with both of the cards. If there is a tie, on the right side of the window each player will place down 4 cards and a 5th card will be drawn to break the tie. The winner of that round gets all the cards on the table. Once the game is complete, you can select "New Game" to play again. You can also select "Simulate", to simulate a full game.
 
-NOTE: Upon opening War and selecting "New Game", the program is randomly dealing out all cards. This takes a few seconds.
 ## Battleship
 ![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/00ef7744-20bd-4a8e-8ae3-04d0c3ab3e33)
 
@@ -44,6 +43,15 @@ I do not claim to own the IP to any of the games represented in this program. Th
 Executable icon from Icons8: https://icons8.com/icon/59791/game-controller
 
 # Release Notes
+## Release v1.2
++ Updates
+    + War
+        + Increased speed of card shuffling algorithm, now runs in linear time
+        + Changed button enablement to better show what the player can do at a given time
++ Bug Fixes
+    + War
+        + Fixed issue where a player could tie a round with no remaining cards in deck and loose the game.
+
 ## Release v1.1: Super Tic-Tac-Toe Release
 + Features
     + Super-Tic-Tac-Toe
