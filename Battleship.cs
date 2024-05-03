@@ -631,7 +631,7 @@ namespace GamesForClass
             }
             else if (plrShips[0] == 0 && plrShips[1] == 0 && plrShips[2] == 0 && plrShips[3] == 0)
             {
-                guessFeedback.Text = "You Loose.";
+                guessFeedback.Text = "You Lose.";
                 changeButtonEnable(plrButtons, false);
                 changeButtonEnable(cpuButtons, false);
             }

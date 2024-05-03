@@ -378,7 +378,7 @@ namespace GamesForClass
                 {
                     //explode
                     explode();
-                    resultsLabel.Text = "You Loose!";
+                    resultsLabel.Text = "You Lose!";
                     return;
                 }
                 else if (val == 0)

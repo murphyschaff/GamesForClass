@@ -505,7 +505,7 @@ namespace GamesForClass
                 rollButton.Text = "Reset";
                 if (cpuPts > plrPts)
                 {
-                    winLabel.Text = "You loose!";
+                    winLabel.Text = "You Lose!";
                 }
                 else if (cpuPts < plrPts)
                 {
