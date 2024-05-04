@@ -641,7 +641,7 @@ namespace GamesForClass
         private void resetGame()
         {
             initBattleship();
-            guessFeedback.Text = "";
+            guessFeedback.Text = ""; 
             removeButtonText(plrButtons, cpuButtons);
             changeButtonEnable(plrButtons, true);
             changeButtonBackColor(plrButtons, Color.DeepSkyBlue);
@@ -662,7 +662,18 @@ namespace GamesForClass
         private void autoPlaceShips_Click(object sender, EventArgs e)
         {
             int[] numShips = player.getNumShips();
-            if (numShips[0] >0 || numShips[1] > 0 || numShips[2] > 0 || numShips[3] > 0)
+            if (submarineRadio.Checked)
+            {
+                player.placeShips(normalRadio.Checked);
+                //clears all text on screen
+                removeButtonText(plrButtons, cpuButtons);
+                startButton.Visible = true;
+                autoPlaceShips.Visible = false;
+                shipSelection.Visible = false;
+                updateBoard(true);
+                changeButtonEnable(plrButtons, false);
+            }
+            else if (numShips[0] >0 || numShips[1] > 0 || numShips[2] > 0 || numShips[3] > 0)
             {
                 playerFeedback.Text = "You have already placed some ships. Please place rest or reset";
                 autoPlaceShips.Visible = false;
