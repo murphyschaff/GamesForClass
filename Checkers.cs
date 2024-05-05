@@ -517,6 +517,10 @@ namespace GamesForClass
             {
                 removeChecker.take();
             }
+            else
+            {
+                test.Text = "Unable to find checker";
+            }
         }
         #endregion
         #region find functions
