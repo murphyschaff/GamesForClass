@@ -128,6 +128,12 @@
     <Compile Include="War.Designer.cs">
       <DependentUpon>War.cs</DependentUpon>
     </Compile>
+    <Compile Include="WordGuess.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WordGuess.Designer.cs">
+      <DependentUpon>WordGuess.cs</DependentUpon>
+    </Compile>
     <Compile Include="Yahtzee.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -154,6 +160,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="STTT.resx">
       <DependentUpon>STTT.cs</DependentUpon>
@@ -163,6 +170,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="War.resx">
       <DependentUpon>War.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WordGuess.resx">
+      <DependentUpon>WordGuess.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Yahtzee.resx">
       <DependentUpon>Yahtzee.cs</DependentUpon>
@@ -195,6 +205,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icons8-game-controller-30.ico" />
+    <None Include="Properties\wordle-answers-alphabetical.txt" />
+    <None Include="Properties\valid-wordle-words.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

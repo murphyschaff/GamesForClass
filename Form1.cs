@@ -20,6 +20,7 @@ namespace GamesForClass
         private Minesweeper masweeper;
         private Checkers checkers;
         private STTT sttt;
+        private WordGuess wordGuess;
         public Form1()
         {
             InitializeComponent();
@@ -80,11 +81,19 @@ namespace GamesForClass
             sttt.Show();
             loadingLabel.Text = "";
         }
+        /* WordGuess */
+        private void wordGuessButton_Click(object sender, EventArgs e)
+        {
+            loadingLabel.Text = "Loading...";
+            wordGuess = new WordGuess();
+            wordGuess.Show();
+            loadingLabel.Text = "";
+        }
         /* Random button */
         private void supriseButton_Click(object sender, EventArgs e)
         {
             Random rnd = new Random();
-            int val = rnd.Next(0,6);
+            int val = rnd.Next(0,7);
             switch(val)
             {
                 case 0:
@@ -108,7 +117,11 @@ namespace GamesForClass
                 case 6:
                     STTTbutton_Click(sender, e);
                     break;
+                case 7:
+                    wordGuessButton_Click(sender, e);
+                    break;
             }
         }
+
     }
 }
