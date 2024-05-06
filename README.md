@@ -38,6 +38,7 @@ To start a game of checkers, select the start button. You play as the black chec
 Super Tic-Tac-Toe (also known as Ultimate Tic-Tac-Toe) consists of one large Tic-Tac-Toe game, however in each square of the large game exists one smaller game of Tic-Tac-Toe. To claim a square in the large game, you must win the small game in that square. Selecting a space in a small game dictates which game the next player must play in (ex. choosing the top right square forces the next player to play in the top right game). If a square is chosen in which the game in that section is complete, the next player can choose any small game to play in. To reset the game at any time, click the 'Reset' button.
 ## Word Guess
 ![Screenshot 2024-05-05 193345](https://github.com/murphyschaff/GamesForClass/assets/97986240/1d3f798e-fff6-4238-9075-29d6e29c3368)
+
 Word Guess (which is definitely NOT Wordle) is a word guessing game, where you have 5 changes to guess a 5 letter word. Upon starting Word Guess, you can start typing a guess. Once you have entered your 5 letter guess, press the enter key to submit your guess. If a letter you typed in turns green, it is in the correct spot. If it turns yellow, then this letter exists in the word but is not in the correct spot. If the square does not change color, then the letter does not appear in the word. Clicking "Reset" at any time will choose another word and reset the game.
 
 # Disclosure
