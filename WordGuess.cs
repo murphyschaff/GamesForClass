@@ -64,6 +64,7 @@ namespace GamesForClass
         {
             Random rnd = new Random();
             word = words[rnd.Next(words.Length)].ToUpper();
+            word = word.Substring(0, word.Length - 1);
         }
         //keeps track of user input
         private void WordGuess_KeyUp(object sender, KeyEventArgs e)
