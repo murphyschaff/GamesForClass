@@ -36,6 +36,8 @@ To start a game of checkers, select the start button. You play as the black chec
 ![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/df32dfc8-2f35-43cc-998c-b7d0a30272df)
 
 Super Tic-Tac-Toe (also known as Ultimate Tic-Tac-Toe) consists of one large Tic-Tac-Toe game, however in each square of the large game exists one smaller game of Tic-Tac-Toe. To claim a square in the large game, you must win the small game in that square. Selecting a space in a small game dictates which game the next player must play in (ex. choosing the top right square forces the next player to play in the top right game). If a square is chosen in which the game in that section is complete, the next player can choose any small game to play in. To reset the game at any time, click the 'Reset' button.
+## Word Guess
+![Screenshot 2024-05-05 193345](https://github.com/murphyschaff/GamesForClass/assets/97986240/1d3f798e-fff6-4238-9075-29d6e29c3368)
 
 # Disclosure
 I do not claim to own the IP to any of the games represented in this program. The MIT License only applies to the code implementation, not the IP of any game. Please check out original IP holders for sanctioned versions of each game.
