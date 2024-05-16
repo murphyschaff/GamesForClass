@@ -38,6 +38,7 @@
             this.fiveLetter = new System.Windows.Forms.RadioButton();
             this.sixLetter = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.randomLetter = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // title
@@ -103,7 +104,7 @@
             this.fourLetter.AutoSize = true;
             this.fourLetter.Checked = true;
             this.fourLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fourLetter.Location = new System.Drawing.Point(212, 617);
+            this.fourLetter.Location = new System.Drawing.Point(136, 618);
             this.fourLetter.Name = "fourLetter";
             this.fourLetter.Size = new System.Drawing.Size(126, 33);
             this.fourLetter.TabIndex = 61;
@@ -116,7 +117,7 @@
             // 
             this.fiveLetter.AutoSize = true;
             this.fiveLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fiveLetter.Location = new System.Drawing.Point(344, 618);
+            this.fiveLetter.Location = new System.Drawing.Point(268, 619);
             this.fiveLetter.Name = "fiveLetter";
             this.fiveLetter.Size = new System.Drawing.Size(126, 33);
             this.fiveLetter.TabIndex = 62;
@@ -128,7 +129,7 @@
             // 
             this.sixLetter.AutoSize = true;
             this.sixLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sixLetter.Location = new System.Drawing.Point(476, 618);
+            this.sixLetter.Location = new System.Drawing.Point(400, 619);
             this.sixLetter.Name = "sixLetter";
             this.sixLetter.Size = new System.Drawing.Size(126, 33);
             this.sixLetter.TabIndex = 63;
@@ -140,17 +141,30 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(76, 618);
+            this.label1.Location = new System.Drawing.Point(0, 619);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(130, 29);
             this.label1.TabIndex = 64;
             this.label1.Text = "Word Size:";
+            // 
+            // randomLetter
+            // 
+            this.randomLetter.AutoSize = true;
+            this.randomLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.randomLetter.Location = new System.Drawing.Point(531, 619);
+            this.randomLetter.Name = "randomLetter";
+            this.randomLetter.Size = new System.Drawing.Size(125, 33);
+            this.randomLetter.TabIndex = 65;
+            this.randomLetter.Text = "Random";
+            this.randomLetter.UseVisualStyleBackColor = true;
+            this.randomLetter.CheckedChanged += new System.EventHandler(this.randomLetter_CheckedChanged);
             // 
             // WordGuess
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(867, 657);
+            this.Controls.Add(this.randomLetter);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.sixLetter);
             this.Controls.Add(this.fiveLetter);
@@ -161,7 +175,7 @@
             this.Controls.Add(this.test);
             this.Controls.Add(this.title);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "WordGuess";
             this.Text = "GamesForClass: Word Guess";
             this.ResumeLayout(false);
@@ -180,5 +194,6 @@
         private System.Windows.Forms.RadioButton fiveLetter;
         private System.Windows.Forms.RadioButton sixLetter;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.RadioButton randomLetter;
     }
 }

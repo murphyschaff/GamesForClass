@@ -122,6 +122,29 @@ namespace GamesForClass
                 words = file.Split('\n');
                 currentLoadedWords = 6;
             }
+            //chooses a random size word (between 4 and 6) to give to player
+            else if (randomLetter.Checked)
+            {
+                int size = rnd.Next(4, 7);
+                if (size == 4 && currentLoadedWords != 4)
+                {
+                    file = Resources._4words;
+                    words = file.Split('\n');
+                    currentLoadedWords = 4;
+                }
+                else if (size == 5 && currentLoadedWords != 5)
+                {
+                    file = Resources._5words;
+                    words = file.Split('\n');
+                    currentLoadedWords = 5;
+                }
+                else if (size == 6 && currentLoadedWords != 6)
+                {
+                    file = Resources._6words;
+                    words = file.Split('\n');
+                    currentLoadedWords = 6;
+                }
+            }
             //selects word
             word = words[rnd.Next(words.Length)].ToUpper();
             if (word.Length > currentLoadedWords)
@@ -284,9 +307,10 @@ namespace GamesForClass
             test.Text = word;
         }
         //radio button changes
-        private void fourLetter_CheckedChanged(object sender, EventArgs e){ if (fourLetter.Checked == true) { fiveLetter.Checked = false; sixLetter.Checked = false; } }
-        private void fiveLetter_CheckedChanged(object sender, EventArgs e){ if (fiveLetter.Checked == true) { fourLetter.Checked = false; sixLetter.Checked = false; } }
-        private void sixLetter_CheckedChanged(object sender, EventArgs e){ if (sixLetter.Checked == true) { fourLetter.Checked = false; fiveLetter.Checked = false; } }
+        private void fourLetter_CheckedChanged(object sender, EventArgs e){ if (fourLetter.Checked == true) { fiveLetter.Checked = false; sixLetter.Checked = false; randomLetter.Checked = false; } }
+        private void fiveLetter_CheckedChanged(object sender, EventArgs e){ if (fiveLetter.Checked == true) { fourLetter.Checked = false; sixLetter.Checked = false; randomLetter.Checked = false; } }
+        private void sixLetter_CheckedChanged(object sender, EventArgs e){ if (sixLetter.Checked == true) { fourLetter.Checked = false; fiveLetter.Checked = false; randomLetter.Checked = false; } }
+        private void randomLetter_CheckedChanged(object sender, EventArgs e){ if (randomLetter.Checked == true) { fourLetter.Checked = false; fiveLetter.Checked = false; sixLetter.Checked = false; } }
         #endregion
     }
 }
