@@ -205,6 +205,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icons8-game-controller-30.ico" />
+    <None Include="Properties\6words.txt" />
+    <None Include="Properties\5words.txt" />
+    <None Include="Properties\4words.txt" />
     <None Include="Properties\wordle-answers-alphabetical.txt" />
     <None Include="Properties\valid-wordle-words.txt" />
   </ItemGroup>

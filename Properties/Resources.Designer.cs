@@ -61,6 +61,117 @@ namespace GamesForClass.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AANI
+        ///AARU
+        ///ABAC
+        ///ABAS
+        ///ABBA
+        ///ABBY
+        ///ABED
+        ///ABEL
+        ///ABET
+        ///ABEY
+        ///ABIE
+        ///ABIR
+        ///ABLE
+        ///ABLY
+        ///ABOX
+        ///ABSI
+        ///ABUT
+        ///ACCA
+        ///ACER
+        ///ACHE
+        ///ACHY
+        ///ACID
+        ///ACIS
+        ///ACLE
+        ///ACME
+        ///ACNE
+        ///ACOR
+        ///ACRE
+        ///ACTA
+        ///ACTS
+        ///ACTU
+        ///ACYL
+        ///ADAD
+        ///ADAD
+        ///ADAI
+        ///ADAM
+        ///ADAR
+        ///ADAT
+        ///ADAW
+        ///ADAY
+        ///ADDA
+        ///ADDA
+        ///ADDU
+        ///ADDY
+        ///ADET
+        ///ADIB
+        ///ADIN
+        ///ADIT
+        ///ADMI
+        ///ADRY
+        ///ADZE
+        ///AEON
+        ///AERO
+        ///AERY
+        ///AFAR
+        ///AFAR
+        ///AFFA
+        ///AFFY
+        ///AGAG
+        ///AGAL
+        ///AGAO
+        ///AGAR
+        ///AGAU
+        ///AGAZ
+        ///AGED
+        ///AGEE
+        ///AGEN
+        ///AGER
+        ///AGHA
+        ///AGIB
+        ///AGIO
+        ///AGLA
+        ///AGOG
+        ///AGON
+        ///AGRA
+        ///AGRE
+        ///AGUA
+        ///AGUE
+        ///AHEM
+        ///AHET
+        ///AHEY
+        ///AHIR
+        ///AHOM
+        ///AHOY
+        ///AHUM
+        ///AIAS
+        ///AIDE
+        ///AIEL
+        ///AILE
+        ///AINT
+        ///AINU
+        ///AION
+        ///AIRA
+        ///AIRE
+        ///AIRT
+        ///AIRY
+        ///AJAR
+        ///AJOG
+        ///AKAL
+        ///AKAN
+        ///AKEE
+        ///AKEY
+        ///AK [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _4words {
+            get {
+                return ResourceManager.GetString("_4words", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to aback
         ///abase
         ///abate
@@ -134,23 +245,84 @@ namespace GamesForClass.Properties {
         ///amber
         ///amble
         ///amend
-        ///amiss
-        ///amity
-        ///among
-        ///ample
-        ///amply
-        ///amuse
-        ///angel
-        ///anger
-        ///angle
-        ///angry
-        ///angst
-        ///anime
-        ///an [rest of string was truncated]&quot;;.
+        ///a [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string wordle_answers_alphabetical {
+        internal static string _5words {
             get {
-                return ResourceManager.GetString("wordle_answers_alphabetical", resourceCulture);
+                return ResourceManager.GetString("_5words", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to aahing
+        ///aaliis
+        ///aarrgh
+        ///abacas
+        ///abacus
+        ///abakas
+        ///abamps
+        ///abased
+        ///abaser
+        ///abases
+        ///abasia
+        ///abated
+        ///abater
+        ///abates
+        ///abatis
+        ///abator
+        ///abayas
+        ///abbacy
+        ///abbess
+        ///abbeys
+        ///abbots
+        ///abduce
+        ///abduct
+        ///abeles
+        ///abelia
+        ///abhors
+        ///abided
+        ///abider
+        ///abides
+        ///abject
+        ///abjure
+        ///ablate
+        ///ablaut
+        ///ablaze
+        ///ablest
+        ///ablins
+        ///abloom
+        ///ablush
+        ///abmhos
+        ///aboard
+        ///aboded
+        ///abodes
+        ///abohms
+        ///abolla
+        ///abomas
+        ///aboral
+        ///aborts
+        ///abound
+        ///aboves
+        ///abrade
+        ///abroad
+        ///abrupt
+        ///abseil
+        ///absent
+        ///absorb
+        ///absurd
+        ///abulia
+        ///abulic
+        ///abused
+        ///abuser
+        ///abuses
+        ///abvolt
+        ///abwatt
+        ///abying
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _6words {
+            get {
+                return ResourceManager.GetString("_6words", resourceCulture);
             }
         }
     }
