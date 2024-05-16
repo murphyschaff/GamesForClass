@@ -34,13 +34,17 @@
             this.feedback = new System.Windows.Forms.Label();
             this.buttonBackground = new System.Windows.Forms.Label();
             this.resetButton = new System.Windows.Forms.Label();
+            this.fourLetter = new System.Windows.Forms.RadioButton();
+            this.fiveLetter = new System.Windows.Forms.RadioButton();
+            this.sixLetter = new System.Windows.Forms.RadioButton();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // title
             // 
             this.title.AutoSize = true;
             this.title.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.title.Location = new System.Drawing.Point(228, 11);
+            this.title.Location = new System.Drawing.Point(242, 9);
             this.title.Name = "title";
             this.title.Size = new System.Drawing.Size(379, 69);
             this.title.TabIndex = 51;
@@ -71,7 +75,7 @@
             // 
             this.buttonBackground.AutoSize = true;
             this.buttonBackground.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.buttonBackground.Location = new System.Drawing.Point(669, 657);
+            this.buttonBackground.Location = new System.Drawing.Point(664, 565);
             this.buttonBackground.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.buttonBackground.MinimumSize = new System.Drawing.Size(200, 86);
             this.buttonBackground.Name = "buttonBackground";
@@ -83,21 +87,74 @@
             this.resetButton.AutoSize = true;
             this.resetButton.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.resetButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.resetButton.Location = new System.Drawing.Point(685, 669);
+            this.resetButton.Location = new System.Drawing.Point(680, 577);
             this.resetButton.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.resetButton.MinimumSize = new System.Drawing.Size(165, 60);
             this.resetButton.Name = "resetButton";
             this.resetButton.Padding = new System.Windows.Forms.Padding(27, 12, 27, 12);
-            this.resetButton.Size = new System.Drawing.Size(160, 63);
+            this.resetButton.Size = new System.Drawing.Size(165, 63);
             this.resetButton.TabIndex = 60;
-            this.resetButton.Text = "Reset";
+            this.resetButton.Text = "Start";
             this.resetButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
+            // 
+            // fourLetter
+            // 
+            this.fourLetter.AutoSize = true;
+            this.fourLetter.Checked = true;
+            this.fourLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fourLetter.Location = new System.Drawing.Point(212, 617);
+            this.fourLetter.Name = "fourLetter";
+            this.fourLetter.Size = new System.Drawing.Size(126, 33);
+            this.fourLetter.TabIndex = 61;
+            this.fourLetter.TabStop = true;
+            this.fourLetter.Text = "4 Letters";
+            this.fourLetter.UseVisualStyleBackColor = true;
+            this.fourLetter.CheckedChanged += new System.EventHandler(this.fourLetter_CheckedChanged);
+            // 
+            // fiveLetter
+            // 
+            this.fiveLetter.AutoSize = true;
+            this.fiveLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fiveLetter.Location = new System.Drawing.Point(344, 618);
+            this.fiveLetter.Name = "fiveLetter";
+            this.fiveLetter.Size = new System.Drawing.Size(126, 33);
+            this.fiveLetter.TabIndex = 62;
+            this.fiveLetter.Text = "5 Letters";
+            this.fiveLetter.UseVisualStyleBackColor = true;
+            this.fiveLetter.CheckedChanged += new System.EventHandler(this.fiveLetter_CheckedChanged);
+            // 
+            // sixLetter
+            // 
+            this.sixLetter.AutoSize = true;
+            this.sixLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sixLetter.Location = new System.Drawing.Point(476, 618);
+            this.sixLetter.Name = "sixLetter";
+            this.sixLetter.Size = new System.Drawing.Size(126, 33);
+            this.sixLetter.TabIndex = 63;
+            this.sixLetter.Text = "6 Letters";
+            this.sixLetter.UseVisualStyleBackColor = true;
+            this.sixLetter.CheckedChanged += new System.EventHandler(this.sixLetter_CheckedChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(76, 618);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(130, 29);
+            this.label1.TabIndex = 64;
+            this.label1.Text = "Word Size:";
             // 
             // WordGuess
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(867, 741);
+            this.ClientSize = new System.Drawing.Size(867, 657);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.sixLetter);
+            this.Controls.Add(this.fiveLetter);
+            this.Controls.Add(this.fourLetter);
             this.Controls.Add(this.resetButton);
             this.Controls.Add(this.buttonBackground);
             this.Controls.Add(this.feedback);
@@ -119,5 +176,9 @@
         private System.Windows.Forms.Label feedback;
         private System.Windows.Forms.Label buttonBackground;
         private System.Windows.Forms.Label resetButton;
+        private System.Windows.Forms.RadioButton fourLetter;
+        private System.Windows.Forms.RadioButton fiveLetter;
+        private System.Windows.Forms.RadioButton sixLetter;
+        private System.Windows.Forms.Label label1;
     }
 }
