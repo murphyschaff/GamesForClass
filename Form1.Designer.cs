@@ -41,6 +41,7 @@
             this.STTTbutton = new System.Windows.Forms.Button();
             this.supriseButton = new System.Windows.Forms.Button();
             this.wordGuessButton = new System.Windows.Forms.Button();
+            this.sudokuButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -163,7 +164,7 @@
             // wordGuessButton
             // 
             this.wordGuessButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.wordGuessButton.Location = new System.Drawing.Point(311, 300);
+            this.wordGuessButton.Location = new System.Drawing.Point(311, 301);
             this.wordGuessButton.Name = "wordGuessButton";
             this.wordGuessButton.Size = new System.Drawing.Size(151, 49);
             this.wordGuessButton.TabIndex = 11;
@@ -171,11 +172,23 @@
             this.wordGuessButton.UseVisualStyleBackColor = true;
             this.wordGuessButton.Click += new System.EventHandler(this.wordGuessButton_Click);
             // 
+            // sudokuButton
+            // 
+            this.sudokuButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sudokuButton.Location = new System.Drawing.Point(311, 173);
+            this.sudokuButton.Name = "sudokuButton";
+            this.sudokuButton.Size = new System.Drawing.Size(151, 49);
+            this.sudokuButton.TabIndex = 12;
+            this.sudokuButton.Text = "Sudoku";
+            this.sudokuButton.UseVisualStyleBackColor = true;
+            this.sudokuButton.Click += new System.EventHandler(this.sudokuButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.sudokuButton);
             this.Controls.Add(this.wordGuessButton);
             this.Controls.Add(this.supriseButton);
             this.Controls.Add(this.STTTbutton);
@@ -210,6 +223,7 @@
         private System.Windows.Forms.Button STTTbutton;
         private System.Windows.Forms.Button supriseButton;
         private System.Windows.Forms.Button wordGuessButton;
+        private System.Windows.Forms.Button sudokuButton;
     }
 }
 

@@ -21,6 +21,7 @@ namespace GamesForClass
         private Checkers checkers;
         private STTT sttt;
         private WordGuess wordGuess;
+        private sudoku sudoku;
         public Form1()
         {
             InitializeComponent();
@@ -89,11 +90,19 @@ namespace GamesForClass
             wordGuess.Show();
             loadingLabel.Text = "";
         }
+        /* Sudoku */
+        private void sudokuButton_Click(object sender, EventArgs e)
+        {
+            loadingLabel.Text = "Loading...";
+            sudoku = new sudoku();
+            sudoku.Show();
+            loadingLabel.Text = "";
+        }
         /* Random button */
         private void supriseButton_Click(object sender, EventArgs e)
         {
             Random rnd = new Random();
-            int val = rnd.Next(0,7);
+            int val = rnd.Next(0,8);
             switch(val)
             {
                 case 0:
@@ -119,6 +128,9 @@ namespace GamesForClass
                     break;
                 case 7:
                     wordGuessButton_Click(sender, e);
+                    break;
+                case 8:
+                    sudokuButton_Click(sender, e);
                     break;
             }
         }
