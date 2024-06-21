@@ -14,25 +14,164 @@ namespace GamesForClass
 {
     public partial class sudoku : Form
     {
+        private int size = 9;
+        private int sqrtSize = 3;
         private int[,] puzzle;
         private int[,] userPuzzle;
         private String[,] userNotes;
-        private int size = 9;
-        private int sqrtSize = 3;
+        private Button[,] buttons;
+        private Label[,] labels;
+        private Button[] numberButtons;
         private int difficulty = 0;
         public sudoku()
         {
             InitializeComponent();
         }
+        #region board
+        //creates board buttons and lables
+        //287
+        private void genBoard()
+        {
+            int buttonSize = 50;
+            int offset = 2;
+            int startx = 75;
+            int starty = 75;
+            int x = startx;
+            int y = starty;
+            buttons = new Button[size, size];
+            labels = new Label[size, size];
+
+            for (int i = 0; i < size; i++)
+            {
+                if (i % 3 == 0 && i != 0) y += 4;
+                for (int j = 0; j < size; j++)
+                {
+                    if (j == 0) x = startx; else x += buttonSize + offset;
+                    if (j % 3 == 0 && j != 0) x += 4;
+                    
+                    Button button = new Button();
+                    button.Size = new Size(buttonSize, buttonSize);
+                    button.Location = new Point(x, y);
+                    button.Font = new Font("Microsoft Sans Sarif", 30);
+                    button.TextAlign = ContentAlignment.MiddleCenter;
+                    button.MouseDown += boardButtonClick;
+                    this.Controls.Add(button);
+                    button.BringToFront();
+                    buttons[j, i] = button;
+
+                    //lables for notes
+                    Label label = new Label();
+                    label.Size = new Size(buttonSize, 24);
+                    label.Location = new Point(x, y);
+                    label.Font = new Font("Microsoft Sans Sarif", 30);
+                    label.TextAlign = ContentAlignment.MiddleRight;
+                    //this.Controls.Add(label);
+                    label.BringToFront();
+                    labels[j,i] = label;
+                    
+                }
+                y += buttonSize + offset;
+            }
+        }
+        //creates the value buttons to place a value into the board
+        private void genValueButtons()
+        {
+            int buttonSize = 50;
+            int offset = 2;
+            int startx = 580;
+            int starty = 183;
+            int x = startx;
+            int y = starty;
+            numberButtons = new Button[9];
+
+            //fill button
+            Button fill = new Button();
+            fill.Location = new Point(startx, starty);
+            fill.Size = new Size(buttonSize + offset + (buttonSize / 2), buttonSize);
+            fill.Text = "Fill";
+            fill.Font = new Font("Microsoft Sans Sarif", 15);
+            fill.TextAlign = ContentAlignment.MiddleCenter;
+            fill.MouseDown += setFillNumber;
+            this.Controls.Add(fill);
+            fill.BringToFront();
+
+            //note button
+            Button note = new Button();
+            note.Location = new Point(startx + buttonSize + offset + (buttonSize / 2), starty);
+            note.Size = new Size(buttonSize + offset + (buttonSize / 2), buttonSize);
+            note.Text = "Note";
+            note.Font = new Font("Microsoft Sans Sarif", 15);
+            note.TextAlign = ContentAlignment.MiddleCenter;
+            note.MouseDown += setNoteNumber;
+            this.Controls.Add(note);
+            note.BringToFront();
+
+            //Places number buttons
+            for (int i = 0; i < size; i++)
+            {
+                if (i % 3 == 0) { x = startx; y += buttonSize + offset; } else x += buttonSize + offset;
+
+                Button button = new Button();
+                button.Location = new Point(x, y);
+                button.Size = new Size(buttonSize, buttonSize);
+                button.Font = new Font("Microsoft Sans Sarif", 30);
+                button.TextAlign = ContentAlignment.MiddleCenter;
+                button.Text = (i + 1).ToString();
+                button.MouseDown += numberButtonClick;
+                this.Controls.Add(button);
+                button.BringToFront();
+                numberButtons[i] = button;
+
+            }
+
+            //remove button
+            x = startx;
+            y += buttonSize + offset;
+            Button remove = new Button();
+            remove.Location = new Point(x, y);
+            remove.Size = new Size((buttonSize + offset) * 3, buttonSize);
+            remove.Text = "Remove";
+            remove.Font = new Font("Microsoft Sans Sarif", 15);
+            remove.TextAlign = ContentAlignment.MiddleCenter;
+            remove.MouseDown += setRemoveNumber;
+            this.Controls.Add(remove);
+            remove.BringToFront();
+        }
+        //function for when the board button is clicked
+        private void boardButtonClick(object sender, MouseEventArgs e)
+        {
+
+        }
+        //function for when a number button is clicked
+        private void numberButtonClick(object sender, MouseEventArgs e)
+        {
+
+        }
+        //sets number to be placed as a final value
+        private void setFillNumber(object sender, MouseEventArgs e)
+        {
+
+        }
+        //sets number to be placed as note
+        private void setNoteNumber(object sender, MouseEventArgs e)
+        {
+
+        }
+        //sets to remove a number from the board
+        private void setRemoveNumber(object sender, MouseEventArgs e)
+        {
+
+        }
+        #endregion
+        #region puzzle generation
         /*
          * Puzzle setup functions
          */
-        #region setup
         private void initSudoku()
         {
-            puzzle = new int[9, 9];
-            userPuzzle = new int[9, 9];
-            userNotes = new string[9, 9];
+            puzzle = new int[size, size];
+            userPuzzle = new int[size, size];
+            userNotes = new string[size, size];
             for (int i = 0; i < puzzle.GetLength(0); i++)
             {
                 for (int j = 0; j < puzzle.GetLength(1); j++)
@@ -196,6 +335,8 @@ namespace GamesForClass
             if (startReset.Text == "Start")
             {
                 startReset.Text = "Reset";
+                genBoard();
+                genValueButtons();
             }
             initSudoku();
         }

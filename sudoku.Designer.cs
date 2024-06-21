@@ -72,6 +72,7 @@
             // easyRadio
             // 
             this.easyRadio.AutoSize = true;
+            this.easyRadio.Checked = true;
             this.easyRadio.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.easyRadio.Location = new System.Drawing.Point(12, 586);
             this.easyRadio.Name = "easyRadio";
@@ -90,7 +91,6 @@
             this.mediumRadio.Name = "mediumRadio";
             this.mediumRadio.Size = new System.Drawing.Size(79, 22);
             this.mediumRadio.TabIndex = 56;
-            this.mediumRadio.TabStop = true;
             this.mediumRadio.Text = "Medium";
             this.mediumRadio.UseVisualStyleBackColor = true;
             this.mediumRadio.CheckedChanged += new System.EventHandler(this.mediumRadio_CheckedChanged);
@@ -103,7 +103,6 @@
             this.hardRadio.Name = "hardRadio";
             this.hardRadio.Size = new System.Drawing.Size(58, 22);
             this.hardRadio.TabIndex = 57;
-            this.hardRadio.TabStop = true;
             this.hardRadio.Text = "Hard";
             this.hardRadio.UseVisualStyleBackColor = true;
             this.hardRadio.CheckedChanged += new System.EventHandler(this.hardRadio_CheckedChanged);
