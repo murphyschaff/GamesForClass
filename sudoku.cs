@@ -17,10 +17,12 @@ namespace GamesForClass
         private int[,] puzzle;
         private int[,] userPuzzle;
         private String[,] userNotes;
+        private int size = 9;
+        private int sqrtSize = 3;
+        private int difficulty = 0;
         public sudoku()
         {
             InitializeComponent();
-            initSudoku();
         }
         /*
          * Puzzle setup functions
@@ -41,6 +43,7 @@ namespace GamesForClass
                 }
             }
             genPuzzle();
+            showValues();
         }
         //creates a new puzzle
         private void genPuzzle()
@@ -73,90 +76,56 @@ namespace GamesForClass
                 }
             }
 
-            //fills in remaining spaces, checks for correctness
-            for (int i = 0; i < 6; i++)
-            {
-                //gets square starting locations
-                List<int> squareValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-                int startx = 0;
-                int starty = 0;
-                int count = 0;
-                int row = 0;
-                switch(i)
-                {
-                    case 0:
-                        startx = 0;
-                        starty = 3;
-                        break;
-                    case 1:
-                        startx = 0;
-                        starty = 6;
-                        break;
-                    case 2:
-                        startx = 3;
-                        starty = 0;
-                        break;
-                    case 3:
-                        startx = 3;
-                        starty = 6;
-                        break;
-                    case 4:
-                        startx = 6;
-                        starty = 0;
-                        break;
-                    case 5:
-                        startx = 6;
-                        starty = 3;
-                        break;
-                }
-
-                //runs until entire square filled
-                while (squareValues.Count > 0)
-                {
-                    //gets value from list, calculates coordinates
-                    val = rand.Next(0, squareValues.Count);
-                    int x = startx + row;
-                    int y = starty + (count % 3);
-
-                    int checkVal = squareValues[val];
-                    if (checkRules(checkVal, x, y))
-                    {
-                        puzzle[x, y] = checkVal;
-                        squareValues.RemoveAt(val);
-
-                        count++;
-                        if (count %3 == 0)
-                        {
-                            row++;
-                        }
-                    }
-                }
-                int hold = 0;
-            }
-
+            int startx = 0;
+            int starty = 3;
+            //starts recursion for the remaining resources
+            fillRemaining(startx, starty);
         }
-        //recursive function to make sure a square can be filled in
-        private bool fillSquare(List<int> remainingValues, int x, int y)
+        //fills the reminaing spaces in the puzzle
+        private bool fillRemaining(int i, int j)
         {
-            Random rnd = new Random();
-            int val = rnd.Next(0, remainingValues.Count);
-            int number = remainingValues[val];
-            if (checkRules(number, x, y))
+            //Adapted from https://www.geeksforgeeks.org/program-sudoku-generator/
+            if (j >= size && i < size - 1)
             {
-                remainingValues.RemoveAt(val);
-                if (remainingValues.Count == 0)
-                {
-                    return true;
-                } 
-                else
-                {
-                    return fillSquare(remainingValues, x, y);
-                }
+                i = i + 1;
+                j = 0;
+            }
+            if (i >= size && j >= size)
+                return true;
+
+            if (i < sqrtSize)
+            {
+                if (j < sqrtSize)
+                    j = sqrtSize;
+            }
+            else if (i < size - sqrtSize)
+            {
+                if (j == (int)(i / sqrtSize) * sqrtSize)
+                    j = j + sqrtSize;
             }
             else
             {
-                return false;
+                if (j == size - sqrtSize)
+                {
+                    i = i + 1;
+                    j = 0;
+                    if (i >= size)
+                        return true;
+                }
             }
+
+            for (int num = 1; num <= size; num++)
+            {
+                if (checkRules(num, i, j))
+                {
+                    puzzle[i, j] = num;
+                    if (fillRemaining(i, j + 1))
+                        return true;
+
+                    puzzle[i, j] = 0;
+                }
+            }
+            return false;
         }
         //checks if a current value can go in a place based on sudoku rules
         private bool checkRules(int value, int x, int y)
@@ -170,8 +139,69 @@ namespace GamesForClass
                 }
             }
             //none hit check, returns true
+            return checkSquare(value, x - x % sqrtSize, y - y % sqrtSize);
+        }
+        //checks the current box to see if the number already exits
+        private bool checkSquare(int num, int rowStart, int colStart)
+        {
+            for (int i = 0; i < sqrtSize; i++)
+            {
+                for (int j = 0; j < sqrtSize; j++)
+                {
+                    if (puzzle[rowStart + i, colStart + j] == num)
+                    {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
+        //hides values based on the difficulty level selected
+        //0:Easy, 1: Medium, 2: Hard
+        public void showValues()
+        {
+            int hide = 0;
+            Random rnd = new Random();
+            int x, y;
+            //selects the number of values to be shown to the user
+            switch (difficulty)
+            {
+                case 0:
+                    hide = 20;
+                    break;
+                case 1:
+                    hide = 15;
+                    break;
+                case 2:
+                    hide = 12;
+                    break;
+            }
+            int index = 0;
+            while (index < hide)
+            {
+                x = rnd.Next(0, size);
+                y = rnd.Next(0, size);
+
+                if (userPuzzle[x,y] == 0)
+                {
+                    userPuzzle[x, y] = puzzle[x, y];
+                    index++;
+                }
+            }
+        }
+        #endregion
+        #region button functions
+        private void startReset_Click(object sender, EventArgs e)
+        {
+            if (startReset.Text == "Start")
+            {
+                startReset.Text = "Reset";
+            }
+            initSudoku();
+        }
+        private void easyRadio_CheckedChanged(object sender, EventArgs e) { if (easyRadio.Checked) { hardRadio.Checked = false; mediumRadio.Checked = false; difficulty = 0; } }
+        private void mediumRadio_CheckedChanged(object sender, EventArgs e) { if (mediumRadio.Checked) { easyRadio.Checked = false; hardRadio.Checked = false; difficulty = 1; } }
+        private void hardRadio_CheckedChanged(object sender, EventArgs e) { if (hardRadio.Checked) { easyRadio.Checked = false; mediumRadio.Checked = false; difficulty = 2; } }
 
         #endregion
     }
