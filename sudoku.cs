@@ -19,10 +19,18 @@ namespace GamesForClass
         private int[,] puzzle;
         private int[,] userPuzzle;
         private String[,] userNotes;
-        private Button[,] buttons;
+        private CheckBox[,] buttons;
         private Label[,] labels;
-        private Button[] numberButtons;
+        private CheckBox[] numberButtons;
         private int difficulty = 0;
+        private bool hintActive = false;
+
+        private CheckBox fill;
+        private CheckBox note;
+        private CheckBox remove;
+
+        private CheckBox boardHold = null;
+        private CheckBox valueHold = null;
         public sudoku()
         {
             InitializeComponent();
@@ -38,7 +46,7 @@ namespace GamesForClass
             int starty = 75;
             int x = startx;
             int y = starty;
-            buttons = new Button[size, size];
+            buttons = new CheckBox[size, size];
             labels = new Label[size, size];
 
             for (int i = 0; i < size; i++)
@@ -49,12 +57,13 @@ namespace GamesForClass
                     if (j == 0) x = startx; else x += buttonSize + offset;
                     if (j % 3 == 0 && j != 0) x += 4;
                     
-                    Button button = new Button();
+                    CheckBox button = new CheckBox();
+                    button.Appearance = Appearance.Button;
                     button.Size = new Size(buttonSize, buttonSize);
                     button.Location = new Point(x, y);
                     button.Font = new Font("Microsoft Sans Sarif", 30);
                     button.TextAlign = ContentAlignment.MiddleCenter;
-                    button.MouseDown += boardButtonClick;
+                    button.CheckedChanged += boardButtonClick;
                     this.Controls.Add(button);
                     button.BringToFront();
                     buttons[j, i] = button;
@@ -82,27 +91,30 @@ namespace GamesForClass
             int starty = 183;
             int x = startx;
             int y = starty;
-            numberButtons = new Button[9];
+            numberButtons = new CheckBox[9];
 
             //fill button
-            Button fill = new Button();
+            fill = new CheckBox();
+            fill.Appearance = Appearance.Button;
             fill.Location = new Point(startx, starty);
             fill.Size = new Size(buttonSize + offset + (buttonSize / 2), buttonSize);
             fill.Text = "Fill";
             fill.Font = new Font("Microsoft Sans Sarif", 15);
             fill.TextAlign = ContentAlignment.MiddleCenter;
-            fill.MouseDown += setFillNumber;
+            fill.CheckedChanged += setFillNumber;
+            fill.Checked = true;
             this.Controls.Add(fill);
             fill.BringToFront();
 
             //note button
-            Button note = new Button();
+            note = new CheckBox();
+            note.Appearance = Appearance.Button;
             note.Location = new Point(startx + buttonSize + offset + (buttonSize / 2), starty);
             note.Size = new Size(buttonSize + offset + (buttonSize / 2), buttonSize);
             note.Text = "Note";
             note.Font = new Font("Microsoft Sans Sarif", 15);
             note.TextAlign = ContentAlignment.MiddleCenter;
-            note.MouseDown += setNoteNumber;
+            note.CheckedChanged += setNoteNumber;
             this.Controls.Add(note);
             note.BringToFront();
 
@@ -111,13 +123,14 @@ namespace GamesForClass
             {
                 if (i % 3 == 0) { x = startx; y += buttonSize + offset; } else x += buttonSize + offset;
 
-                Button button = new Button();
+                CheckBox button = new CheckBox();
+                button.Appearance = Appearance.Button;
                 button.Location = new Point(x, y);
                 button.Size = new Size(buttonSize, buttonSize);
                 button.Font = new Font("Microsoft Sans Sarif", 30);
                 button.TextAlign = ContentAlignment.MiddleCenter;
                 button.Text = (i + 1).ToString();
-                button.MouseDown += numberButtonClick;
+                button.CheckedChanged += numberButtonClick;
                 this.Controls.Add(button);
                 button.BringToFront();
                 numberButtons[i] = button;
@@ -127,41 +140,136 @@ namespace GamesForClass
             //remove button
             x = startx;
             y += buttonSize + offset;
-            Button remove = new Button();
+            remove = new CheckBox();
+            remove.Appearance = Appearance.Button;
             remove.Location = new Point(x, y);
             remove.Size = new Size((buttonSize + offset) * 3, buttonSize);
             remove.Text = "Remove";
             remove.Font = new Font("Microsoft Sans Sarif", 15);
             remove.TextAlign = ContentAlignment.MiddleCenter;
-            remove.MouseDown += setRemoveNumber;
+            remove.CheckedChanged += setRemoveNumber;
             this.Controls.Add(remove);
             remove.BringToFront();
         }
         //function for when the board button is clicked
-        private void boardButtonClick(object sender, MouseEventArgs e)
+        private void boardButtonClick(object sender, EventArgs e)
         {
-
+            CheckBox button = (CheckBox)sender;
+            //checks to see if there is a board button in hold already, switches if so
+            if (boardHold != null)
+            {
+                boardHold.Checked = false;
+                boardHold = button;
+            }
+            
+            if (valueHold != null)
+            {
+                //places value onto board
+                placeValue(Convert.ToInt32(valueHold.Text), button);
+                valueHold = null;
+            }
+            else
+            {
+                boardHold = button;
+            }
         }
         //function for when a number button is clicked
-        private void numberButtonClick(object sender, MouseEventArgs e)
+        private void numberButtonClick(object sender, EventArgs e)
         {
+            CheckBox button = (CheckBox)sender;
+            int value = Convert.ToInt32(button.Text);
+            //removes other checks from the other numbers
+            removeNumberChecks(value - 1);
 
+            if (boardHold != null)
+            {
+                //places value onto board
+                placeValue(value, boardHold);
+                boardHold = null;
+            }
+            else
+            {
+                //places number into hold
+                valueHold = button;
+            }
         }
         //sets number to be placed as a final value
-        private void setFillNumber(object sender, MouseEventArgs e)
+        private void setFillNumber(object sender, EventArgs e)
         {
-
+            if (!fill.Checked) { note.Checked = false; remove.Checked = false; }
         }
         //sets number to be placed as note
-        private void setNoteNumber(object sender, MouseEventArgs e)
+        private void setNoteNumber(object sender, EventArgs e)
         {
-
+            if (!note.Checked) { fill.Checked = false; remove.Checked = false; }
         }
         //sets to remove a number from the board
-        private void setRemoveNumber(object sender, MouseEventArgs e)
+        private void setRemoveNumber(object sender, EventArgs e)
+        {
+            if (!remove.Checked) { fill.Checked = false; note.Checked = false; }
+        }
+
+        #region board update functions
+        //updates the board to the current user board, resets all coloring if needed
+        private void updateBoard()
+        {
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    if (userPuzzle[i, j] != 0)
+                    {
+                        buttons[i, j].Text = userPuzzle[i, j].ToString();
+                    }
+                }
+            }
+            if (hintActive) { clearColor(); hintActive = false; }
+        }
+        //changes any incorrect value placed on board to red
+        private void checkCorrectness()
         {
 
         }
+        //clears all colors from the board, resets to default
+        private void clearColor()
+        {
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    buttons[i, j].BackColor = SystemColors.Control;
+                    buttons[i, j].ForeColor = SystemColors.ControlText;
+                }
+            }
+        }
+
+        //unchecks number buttons except for ignoe
+        private void removeNumberChecks(int ignore)
+        {
+            for (int i = 0; i < numberButtons.Length; i++)
+            {
+                if (i != ignore)
+                {
+                    numberButtons[i].Checked = false;
+                }
+            }
+        }
+        #endregion
+        //places a value either into the notes section, or onto the board
+        private void placeValue(int value, CheckBox button)
+        {
+            if (fill.Checked)
+            {
+                //fill number into main board
+                test.Text = "Fill";
+            }
+            else
+            {
+                //fill number into notes
+                test.Text = "Note";
+            }
+        }
+
         #endregion
         #region puzzle generation
         /*
@@ -339,11 +447,13 @@ namespace GamesForClass
                 genValueButtons();
             }
             initSudoku();
+            updateBoard();
         }
         private void easyRadio_CheckedChanged(object sender, EventArgs e) { if (easyRadio.Checked) { hardRadio.Checked = false; mediumRadio.Checked = false; difficulty = 0; } }
         private void mediumRadio_CheckedChanged(object sender, EventArgs e) { if (mediumRadio.Checked) { easyRadio.Checked = false; hardRadio.Checked = false; difficulty = 1; } }
         private void hardRadio_CheckedChanged(object sender, EventArgs e) { if (hardRadio.Checked) { easyRadio.Checked = false; mediumRadio.Checked = false; difficulty = 2; } }
 
         #endregion
+        
     }
 }
