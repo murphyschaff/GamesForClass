@@ -175,7 +175,7 @@
             // sudokuButton
             // 
             this.sudokuButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sudokuButton.Location = new System.Drawing.Point(311, 173);
+            this.sudokuButton.Location = new System.Drawing.Point(311, 171);
             this.sudokuButton.Name = "sudokuButton";
             this.sudokuButton.Size = new System.Drawing.Size(151, 49);
             this.sudokuButton.TabIndex = 12;
