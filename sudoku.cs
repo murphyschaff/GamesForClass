@@ -367,7 +367,7 @@ namespace GamesForClass
                 labels[x, y].Text = "";
                 labels[x, y].SendToBack();
             }
-
+            boardHold = null;
         }
 
         //checks if the user has won

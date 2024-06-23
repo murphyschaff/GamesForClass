@@ -1,9 +1,9 @@
 # GamesForClass
 ## By Murphy Schaff
-## Version 1.3.1
+## Version 1.4: Sudoku Release
 
 # Use Instructions
-Release Executable is located under Releases, GamesForClass_v1_3_1
+Release Executable is located under Releases, GamesForClass_v1_4
 
 # Game Instructions
 ## Tic Tac Toe
@@ -42,6 +42,7 @@ Super Tic-Tac-Toe (also known as Ultimate Tic-Tac-Toe) consists of one large Tic
 Word Guess (which is definitely NOT Wordle) is a word guessing game, where you have 5 changes to guess a 4, 5, or 6 letter word. To Start, select the word size you would like to guess (or random to choose for you). Then, click 'Start'. Upon starting Word Guess, you can start typing a guess. Once you have entered your guess, press the enter key to submit your guess. If a letter you typed in turns green, it is in the correct spot. If it turns yellow, then this letter exists in the word but is not in the correct spot. If the square changes to a different gray, then the letter does not appear in the word. Clicking "Reset" at any time will choose another word and reset the game. To change word size, select the word size you would like to guess next at the bottom and click 'Reset'.
 ## Sudoku
 ![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/8994b5f3-1d44-477f-ae27-97a9620563cd)
+To play Sudoku, first select your difficulty from the list on the bottom left of the screen. Easy gives 25 starting values, Medium gives 20, and hard gives 16. Upon selecting start, the Sudoku board appears in the center left, with a keypad and other buttons on the right. To place a final value onto the board, click the 'Fill' button, the place on the board, and either hit one of the numbers or type in the number on the keyboard. To place a note on the screen, select the 'Note' button, the place on the board, and either type the number or select the number button. To remove a number or notes from the board, select the 'Remove' button and the button of the place you would like to remove either the notes or the number. Choosing the 'Check' button will check all your values for correctness, where incorrect values will turn red. Selecting 'Reset' at any time will give you a new puzzle to solve, based on the current selected difficulty option, or if none are selected, the previous one chosen.
 
 # Disclosure
 I do not claim to own the IP to any of the games represented in this program. The MIT License only applies to the code implementation, not the IP of any game. Please check out original IP holders for sanctioned versions of each game.
@@ -49,6 +50,15 @@ I do not claim to own the IP to any of the games represented in this program. Th
 Executable icon from Icons8: https://icons8.com/icon/59791/game-controller
 
 # Release Notes
+## Release v1.4: Sudoku Release
++ Features
+    + Sudoku
+        + Added game Sudoku
+        + 3 difficulty options that give different number of values
+        + Ability to enter values either through the keyboard, or on screen keypad
+        + Ability to check entered values for correctness
+        + Added Secret Addition
+
 ## Release v1.3.1
 + Features
     + Word Guess
