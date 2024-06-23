@@ -85,6 +85,7 @@ namespace GamesForClass
                 y += buttonSize + offset;
             }
         }
+     
         //creates the value buttons to place a value into the board
         private void genValueButtons()
         {
@@ -160,7 +161,7 @@ namespace GamesForClass
         {
             CheckBox button = (CheckBox)sender;
             //checks if the value needs to be removed first
-            if (remove.Checked && button.Text != "")
+            if (remove.Checked)
             {
                 removeValue(button);
                 clearColor();
@@ -191,24 +192,27 @@ namespace GamesForClass
         private void numberButtonClick(object sender, EventArgs e)
         {
             CheckBox button = (CheckBox)sender;
-            int value = Convert.ToInt32(button.Text);
-            //removes other checks from the other numbers
-            removeNumberChecks(value - 1);
+            if (button.Checked)
+            {
+                int value = Convert.ToInt32(button.Text);
+                //removes other checks from the other numbers
+                removeNumberChecks(value - 1);
 
-            if (boardHold != null)
-            {
-                //places value onto board
-                placeValue(value, boardHold);
-                boardHold = null;
-                if (emptyValues == 0)
+                if (boardHold != null)
                 {
-                    win();
+                    //places value onto board
+                    placeValue(value, boardHold);
+                    boardHold = null;
+                    if (emptyValues == 0)
+                    {
+                        win();
+                    }
                 }
-            }
-            else
-            {
-                //places number into hold, or removes from hold
-                if (button.Checked) valueHold = button; else valueHold = null;
+                else
+                {
+                    //places number into hold, or removes from hold
+                    if (button.Checked) valueHold = button; else valueHold = null;
+                }
             }
         }
         //sets number to be placed as a final value
@@ -269,6 +273,23 @@ namespace GamesForClass
             }
         }
 
+        //clears all the notes when resetting
+        private void clearNotes()
+        {
+            for (int i =0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    if (userNotes[i,j] != "")
+                    {
+                        labels[i, j].Text = "";
+                        labels[i,j].SendToBack();
+                        userNotes[i, j] = "";
+                    }
+                }
+            }
+        }
+
         //unchecks number buttons except for ignoe
         private void removeNumberChecks(int ignore)
         {
@@ -291,7 +312,7 @@ namespace GamesForClass
 
             if (hintActive) { clearColor(); hintActive = false; }
 
-            if (fill.Checked)
+            if (!note.Checked)
             {
                 //fill number into main board
                 if (userPuzzle[x,y] == 0) emptyValues--;
@@ -546,20 +567,34 @@ namespace GamesForClass
             switch (difficulty)
             {
                 case 0:
-                    hide = 20;
+                    hide = 25;
                     break;
                 case 1:
-                    hide = 15;
+                    hide = 20;
                     break;
                 case 2:
-                    hide = 12;
+                    hide = 16;
                     break;
             }
             int index = 0;
             while (index < hide)
             {
-                x = rnd.Next(0, size);
-                y = rnd.Next(0, size);
+                //splits puzzle into thirds, to (hopefully) give numbers in each box
+                if (index < Convert.ToInt32(hide * .333))
+                {
+                    x = rnd.Next(0, size);
+                    y = rnd.Next(0, 3);
+                }
+                else if (index < Convert.ToInt32(hide * .666))
+                {
+                    x = rnd.Next(0, size);
+                    y = rnd.Next(3, 6);
+                }
+                else
+                {
+                    x = rnd.Next(0, size);
+                    y = rnd.Next(7, size);
+                }
 
                 if (userPuzzle[x,y] == 0)
                 {
@@ -583,11 +618,16 @@ namespace GamesForClass
                 this.KeyUp += new KeyEventHandler(keyboardInput);
                 genBoard();
                 genValueButtons();
+                line1.Visible = true;
+                line2.Visible = true;
+                line3.Visible = true;
+                line4.Visible = true;
             }
             else
             {
                 changeButtonEnable(true, buttons);
                 changeButtonColor(Color.LightGray, buttons);
+                clearNotes();
             }
             initSudoku();
             startupBoard();

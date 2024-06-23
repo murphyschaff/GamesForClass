@@ -38,6 +38,10 @@
             this.test = new System.Windows.Forms.Label();
             this.checkButton = new System.Windows.Forms.Button();
             this.feedback = new System.Windows.Forms.Label();
+            this.line1 = new System.Windows.Forms.Label();
+            this.line2 = new System.Windows.Forms.Label();
+            this.line3 = new System.Windows.Forms.Label();
+            this.line4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // title
@@ -141,11 +145,61 @@
             this.feedback.Size = new System.Drawing.Size(0, 24);
             this.feedback.TabIndex = 60;
             // 
+            // line1
+            // 
+            this.line1.AutoSize = true;
+            this.line1.BackColor = System.Drawing.Color.Black;
+            this.line1.Location = new System.Drawing.Point(231, 75);
+            this.line1.MinimumSize = new System.Drawing.Size(4, 475);
+            this.line1.Name = "line1";
+            this.line1.Size = new System.Drawing.Size(4, 475);
+            this.line1.TabIndex = 61;
+            this.line1.Visible = false;
+            // 
+            // line2
+            // 
+            this.line2.AutoSize = true;
+            this.line2.BackColor = System.Drawing.Color.Black;
+            this.line2.Location = new System.Drawing.Point(391, 75);
+            this.line2.MinimumSize = new System.Drawing.Size(4, 475);
+            this.line2.Name = "line2";
+            this.line2.Size = new System.Drawing.Size(4, 475);
+            this.line2.TabIndex = 62;
+            this.line2.Visible = false;
+            // 
+            // line3
+            // 
+            this.line3.AutoSize = true;
+            this.line3.BackColor = System.Drawing.Color.Black;
+            this.line3.Font = new System.Drawing.Font("Microsoft Sans Serif", 2.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.line3.Location = new System.Drawing.Point(75, 231);
+            this.line3.MinimumSize = new System.Drawing.Size(475, 1);
+            this.line3.Name = "line3";
+            this.line3.Size = new System.Drawing.Size(475, 4);
+            this.line3.TabIndex = 63;
+            this.line3.Visible = false;
+            // 
+            // line4
+            // 
+            this.line4.AutoSize = true;
+            this.line4.BackColor = System.Drawing.Color.Black;
+            this.line4.Font = new System.Drawing.Font("Microsoft Sans Serif", 2.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.line4.Location = new System.Drawing.Point(75, 391);
+            this.line4.MinimumSize = new System.Drawing.Size(475, 1);
+            this.line4.Name = "line4";
+            this.line4.Size = new System.Drawing.Size(475, 4);
+            this.line4.TabIndex = 64;
+            this.line4.Visible = false;
+            // 
             // sudoku
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(802, 675);
+            this.Controls.Add(this.line4);
+            this.Controls.Add(this.line3);
+            this.Controls.Add(this.line2);
+            this.Controls.Add(this.line1);
             this.Controls.Add(this.feedback);
             this.Controls.Add(this.checkButton);
             this.Controls.Add(this.test);
@@ -174,5 +228,9 @@
         private System.Windows.Forms.Label test;
         private System.Windows.Forms.Button checkButton;
         private System.Windows.Forms.Label feedback;
+        private System.Windows.Forms.Label line1;
+        private System.Windows.Forms.Label line2;
+        private System.Windows.Forms.Label line3;
+        private System.Windows.Forms.Label line4;
     }
 }
