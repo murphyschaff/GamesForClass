@@ -116,6 +116,12 @@
     <Compile Include="STTT.Designer.cs">
       <DependentUpon>STTT.cs</DependentUpon>
     </Compile>
+    <Compile Include="sudoku.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="sudoku.Designer.cs">
+      <DependentUpon>sudoku.cs</DependentUpon>
+    </Compile>
     <Compile Include="TicTacToe.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,6 +170,9 @@
     </Compile>
     <EmbeddedResource Include="STTT.resx">
       <DependentUpon>STTT.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sudoku.resx">
+      <DependentUpon>sudoku.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TicTacToe.resx">
       <DependentUpon>TicTacToe.cs</DependentUpon>
