@@ -40,6 +40,8 @@ Super Tic-Tac-Toe (also known as Ultimate Tic-Tac-Toe) consists of one large Tic
 ![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/2ed72447-8de1-4744-8d85-10d052b182f2)
 
 Word Guess (which is definitely NOT Wordle) is a word guessing game, where you have 5 changes to guess a 4, 5, or 6 letter word. To Start, select the word size you would like to guess (or random to choose for you). Then, click 'Start'. Upon starting Word Guess, you can start typing a guess. Once you have entered your guess, press the enter key to submit your guess. If a letter you typed in turns green, it is in the correct spot. If it turns yellow, then this letter exists in the word but is not in the correct spot. If the square changes to a different gray, then the letter does not appear in the word. Clicking "Reset" at any time will choose another word and reset the game. To change word size, select the word size you would like to guess next at the bottom and click 'Reset'.
+## Sudoku
+![image](https://github.com/murphyschaff/GamesForClass/assets/97986240/8994b5f3-1d44-477f-ae27-97a9620563cd)
 
 # Disclosure
 I do not claim to own the IP to any of the games represented in this program. The MIT License only applies to the code implementation, not the IP of any game. Please check out original IP holders for sanctioned versions of each game.
